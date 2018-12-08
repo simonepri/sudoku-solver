@@ -1,9 +1,15 @@
 plugins {
-  // Apply the java plugin to add support for Java
+  // Apply the java plugin to add support for Java.
   id 'java'
 
-  // Apply the application plugin to add support for building an application
+  // Apply the application plugin to add support for building an application.
   id 'application'
+
+  // Apply the jacoco plugin to enable coverage generation for tests.
+  id 'jacoco'
+
+  // Apply the checkstyle plugin.
+  id 'checkstyle'
 }
 
 repositories {
@@ -16,9 +22,39 @@ dependencies {
   // This dependency is found on compile classpath of this component and consumers.
   implementation 'com.google.guava:guava:26.0-jre'
 
-  // Use JUnit test framework
+  // Use JUnit test framework.
   testImplementation 'junit:junit:4.12'
 }
 
-// Define the main class for the application
+test {
+  // Log detailed errors.
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
+
+jacoco {}
+jacocoTestReport {
+  // Configure reports for jacoco plugin.
+  reports {
+    xml.enabled true
+    html.enabled true
+  }
+}
+
+checkstyle {
+  showViolations = true
+}
+tasks.withType(Checkstyle) {
+  // Configure reports for checkstyle plugin.
+  reports {
+    xml.enabled true
+    html.enabled true
+  }
+}
+
+// Execute jacocoTestReport on check
+check.dependsOn jacocoTestReport
+
+// Define the main class for the application.
 mainClassName = 'psu.App'

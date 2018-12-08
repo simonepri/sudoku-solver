@@ -1,7 +1,9 @@
 package psu;
 
-import org.junit.Test;
+// checkstyle-disable-next-line AvoidStarImport
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 public class AppTest {
   @Test public void testAppHasAGreeting() {
