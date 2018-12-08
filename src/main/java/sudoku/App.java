@@ -1,4 +1,4 @@
-package psu;
+package sudoku;
 
 public class App {
   public String getGreeting() {

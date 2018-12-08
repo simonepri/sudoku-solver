@@ -57,4 +57,4 @@ tasks.withType(Checkstyle) {
 check.dependsOn jacocoTestReport
 
 // Define the main class for the application.
-mainClassName = 'psu.App'
+mainClassName = 'sudoku.App'

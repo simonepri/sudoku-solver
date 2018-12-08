@@ -1,4 +1,4 @@
-package psu;
+package sudoku;
 
 // checkstyle-disable-next-line AvoidStarImport
 import static org.junit.Assert.*;
