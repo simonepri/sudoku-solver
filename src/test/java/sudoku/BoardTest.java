@@ -211,6 +211,7 @@ public class BoardTest {
 
     assertThat(sudoku.isCandidate(0, 0, 1)).isFalse();
     assertThat(sudoku.isCandidate(0, 0, 3)).isFalse();
+    assertThat(sudoku.isCandidate(0, 0, 4)).isFalse();
     assertThat(sudoku.isCandidate(0, 2, 1)).isFalse();
 
     assertThat(sudoku.isCandidate(0, 2, 4)).isTrue();

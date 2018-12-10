@@ -115,7 +115,7 @@ final class Board {
     if (!isValidCell(row, col)) {
       throw new IllegalArgumentException("The cell specified is out of the board");
     }
-    if (!isValidValue(val)) {
+    if (!isValidValue(val) || board[row][col] != EMPTY_CELL) {
       return false;
     }
     int box = getBoxIndex(row, col);
