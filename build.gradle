@@ -10,6 +10,9 @@ plugins {
 
   // Apply the checkstyle plugin.
   id 'checkstyle'
+
+  // Apply test logger plugin.
+  id 'com.adarshr.test-logger' version '1.6.0'
 }
 
 repositories {
@@ -58,6 +61,10 @@ tasks.withType(Checkstyle) {
     xml.enabled true
     html.enabled true
   }
+}
+
+testlogger {
+  slowThreshold 0
 }
 
 // Execute jacocoTestReport on check
