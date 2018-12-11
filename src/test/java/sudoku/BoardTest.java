@@ -335,4 +335,99 @@ public class BoardTest {
       }
     }).doesNotThrowAnyException();
   }
+
+  @Test
+  public void testBoardSize() {
+    Board sudoku = new Board(new int[][]{
+      {3, 1, 0, 0},
+      {0, 2, 0, 0},
+      {0, 0, 2, 0},
+      {0, 0, 1, 3}
+    });
+    assertThat(sudoku.getSize()).isEqualTo(16);
+    assertThat(sudoku.getBorderLength()).isEqualTo(4);
+    assertThat(sudoku.getBoxLength()).isEqualTo(2);
+    assertThat(sudoku.isFull()).isFalse();
+
+    sudoku = new Board(new int[][]{
+      {1}
+    });
+    assertThat(sudoku.getSize()).isEqualTo(1);
+    assertThat(sudoku.getBorderLength()).isEqualTo(1);
+    assertThat(sudoku.getBoxLength()).isEqualTo(1);
+    assertThat(sudoku.isFull()).isTrue();
+
+    sudoku = new Board(new int[][]{
+      {1, 2, 3, 4, 5, 6, 7, 8, 9},
+      {4, 5, 6, 7, 8, 9, 1, 2, 3},
+      {7, 8, 9, 1, 2, 3, 4, 5, 6},
+      {2, 3, 1, 5, 6, 4, 8, 9, 7},
+      {5, 6, 4, 8, 9, 7, 2, 3, 1},
+      {8, 9, 7, 2, 3, 1, 5, 6, 4},
+      {3, 1, 2, 6, 4, 5, 9, 7, 8},
+      {6, 4, 5, 9, 7, 8, 3, 1, 2},
+      {9, 7, 8, 3, 1, 2, 6, 4, 5}
+    });
+    assertThat(sudoku.getSize()).isEqualTo(81);
+    assertThat(sudoku.getBorderLength()).isEqualTo(9);
+    assertThat(sudoku.getBoxLength()).isEqualTo(3);
+    assertThat(sudoku.isFull()).isTrue();
+  }
+
+  @Test
+  public void testBoardFillables() {
+    Board sudoku = new Board(new int[][]{
+      {3, 1, 0, 0},
+      {0, 2, 0, 0},
+      {0, 0, 2, 0},
+      {0, 0, 1, 3}
+    });
+    assertThat(
+        sudoku.getFillables().map(cell -> cell.toString())
+    ).containsOnly(
+        "(0,2)", "(0,3)",
+        "(1,0)", "(1,2)", "(1,3)",
+        "(2,0)", "(2,1)", "(2,3)",
+        "(3,0)", "(3,1)"
+    );
+  }
+
+  @Test
+  public void testBoardNextToFill() {
+    int[][] board = new int[][]{
+      {3, 1, 0, 0},
+      {0, 2, 0, 0},
+      {0, 0, 2, 0},
+      {0, 0, 1, 3}
+    };
+    int[][] solution = new int[][]{
+      {3, 1, 4, 2},
+      {4, 2, 3, 1},
+      {1, 3, 2, 4},
+      {2, 4, 1, 3}
+    };
+    Board sudoku = new Board(board);
+
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(0,2)");
+    sudoku.setCell(0, 3, solution[0][3]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(0,2)");
+    sudoku.setCell(0, 2, solution[0][2]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,0)");
+    sudoku.setCell(1, 0, solution[1][0]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,2)");
+    sudoku.setCell(1, 2, solution[1][2]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,3)");
+    sudoku.setCell(2, 3, solution[2][3]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,3)");
+    sudoku.setCell(1, 3, solution[1][3]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    sudoku.setCell(2, 1, solution[2][1]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    sudoku.setCell(3, 0, solution[3][0]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    sudoku.setCell(2, 0, solution[2][0]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(3,1)");
+    sudoku.setCell(3, 1, solution[3][1]);
+    assertThat(sudoku.getNextToFill()).isEqualTo(null);
+  }
 }
