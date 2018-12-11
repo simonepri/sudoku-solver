@@ -115,7 +115,7 @@ final class Board {
     if (!isValidCell(row, col)) {
       throw new IllegalArgumentException("The cell specified is out of the board");
     }
-    if (!isValidValue(val) || board[row][col] != EMPTY_CELL) {
+    if (!isValidValue(val)) {
       return false;
     }
     int box = getBoxIndex(row, col);
@@ -130,9 +130,6 @@ final class Board {
   public IntStream getCandidates(int row, int col) {
     if (!isValidCell(row, col)) {
       throw new IllegalArgumentException("The cell specified is out of the board");
-    }
-    if (board[row][col] != EMPTY_CELL) {
-      return IntStream.empty();
     }
     int box = getBoxIndex(row, col);
     return IntStream.rangeClosed(1, gridSize).filter(val -> isCandidateRaw(row, col, box, val));

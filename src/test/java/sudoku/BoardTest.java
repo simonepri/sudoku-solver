@@ -172,30 +172,30 @@ public class BoardTest {
   public void testBoardCandidatesStream() {
     int[][] board = new int[][]{
       {3, 1, 0, 0},
-      {0, 2, 0, 0},
+      {4, 2, 0, 0},
       {0, 0, 2, 0},
       {0, 0, 1, 3}
     };
     Board sudoku = new Board(board);
     assertThat(sudoku.getCandidates(0, 0)).isEmpty();
     assertThat(sudoku.getCandidates(0, 1)).isEmpty();
+    assertThat(sudoku.getCandidates(1, 0)).isEmpty();
     assertThat(sudoku.getCandidates(1, 1)).isEmpty();
-    assertThat(sudoku.getCandidates(2, 2)).isEmpty();
-    assertThat(sudoku.getCandidates(3, 2)).isEmpty();
-    assertThat(sudoku.getCandidates(3, 3)).isEmpty();
+    assertThat(sudoku.getCandidates(2, 2)).containsOnly(4);
+    assertThat(sudoku.getCandidates(3, 2)).containsOnly(4);
+    assertThat(sudoku.getCandidates(3, 3)).containsOnly(4);
 
     assertThat(sudoku.getCandidates(0, 2)).containsOnly(4);
     assertThat(sudoku.getCandidates(0, 3)).containsOnly(2, 4);
 
-    assertThat(sudoku.getCandidates(1, 0)).containsOnly(4);
-    assertThat(sudoku.getCandidates(1, 2)).containsOnly(3, 4);
-    assertThat(sudoku.getCandidates(1, 3)).containsOnly(1, 4);
+    assertThat(sudoku.getCandidates(1, 2)).containsOnly(3);
+    assertThat(sudoku.getCandidates(1, 3)).containsOnly(1);
 
-    assertThat(sudoku.getCandidates(2, 0)).containsOnly(1, 4);
+    assertThat(sudoku.getCandidates(2, 0)).containsOnly(1);
     assertThat(sudoku.getCandidates(2, 1)).containsOnly(3, 4);
     assertThat(sudoku.getCandidates(2, 3)).containsOnly(4);
 
-    assertThat(sudoku.getCandidates(3, 0)).containsOnly(2, 4);
+    assertThat(sudoku.getCandidates(3, 0)).containsOnly(2);
     assertThat(sudoku.getCandidates(3, 1)).containsOnly(4);
   }
 
@@ -211,7 +211,7 @@ public class BoardTest {
 
     assertThat(sudoku.isCandidate(0, 0, 1)).isFalse();
     assertThat(sudoku.isCandidate(0, 0, 3)).isFalse();
-    assertThat(sudoku.isCandidate(0, 0, 4)).isFalse();
+    assertThat(sudoku.isCandidate(0, 0, 4)).isTrue();
     assertThat(sudoku.isCandidate(0, 2, 1)).isFalse();
 
     assertThat(sudoku.isCandidate(0, 2, 4)).isTrue();
