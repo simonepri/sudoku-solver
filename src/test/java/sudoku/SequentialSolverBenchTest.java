@@ -168,6 +168,6 @@ public class SequentialSolverBenchTest {
       {0, 0, 0, 0, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 0, 4, 0, 0}
     });
-    assertThat(SequentialSolver.enumerate(sudoku).toString()).isEqualTo("TBD");
+    assertThat(SequentialSolver.enumerate(sudoku).toString()).isEqualTo("7388360");
   }
 }
