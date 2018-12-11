@@ -244,7 +244,12 @@ public class BoardTest {
       {0, 0, 1, 3}
     };
     Board sudoku = new Board(board);
-    assertThat(sudoku.toString()).isEqualTo("31__\n_2__\n__2_\n__13\n");
+    assertThat(sudoku.toString()).isEqualTo(
+        "31__\n"
+        + "_2__\n"
+        + "__2_\n"
+        + "__13\n"
+    );
   }
 
   @Test

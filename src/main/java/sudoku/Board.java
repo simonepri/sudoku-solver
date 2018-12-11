@@ -4,11 +4,13 @@ import java.util.BitSet;
 import java.util.stream.IntStream;
 
 final class Board {
-  static final int EMPTY_CELL = 0;
+  private static final int MAX_BOARD_LENGTH = 9; // Math.floor(Math.sqrt(Byte.MAX_VALUE))
+  public static final int EMPTY_CELL = 0;
 
   private final int[][] board;
-  private final int regionSize;
-  private final int gridSize;
+  private final int boxLength;
+  private final int boardLength;
+
   private BitSet[] rowUsed;
   private BitSet[] colUsed;
   private BitSet[] boxUsed;
@@ -21,37 +23,34 @@ final class Board {
     if (board == null) {
       throw new IllegalArgumentException("The board size is too small");
     }
-    if (board.length > 128) {
+    if (board.length > MAX_BOARD_LENGTH) {
       throw new IllegalArgumentException("The board size is too large");
     }
-    regionSize = (int)(Math.sqrt(board.length));
-    gridSize = (regionSize * regionSize);
-    if (board.length != gridSize) {
+
+    boxLength = (int) (Math.sqrt(board.length));
+    boardLength = (boxLength * boxLength);
+
+    if (board.length != boardLength) {
       throw new IllegalArgumentException("The board size must be a perfect square");
     }
 
-    this.board = new int[gridSize][gridSize];
-    rowUsed = new BitSet[gridSize];
-    colUsed = new BitSet[gridSize];
-    boxUsed = new BitSet[gridSize];
-    for (int i = 0; i < gridSize; i++) {
-      rowUsed[i] = new BitSet(gridSize + 1);
-      colUsed[i] = new BitSet(gridSize + 1);
-      boxUsed[i] = new BitSet(gridSize + 1);
+    this.board = new int[boardLength][boardLength];
+    rowUsed = new BitSet[boardLength];
+    colUsed = new BitSet[boardLength];
+    boxUsed = new BitSet[boardLength];
+    for (int i = 0; i < boardLength; i++) {
+      rowUsed[i] = new BitSet(boardLength + 1);
+      colUsed[i] = new BitSet(boardLength + 1);
+      boxUsed[i] = new BitSet(boardLength + 1);
     }
 
-    for (int row = 0; row < gridSize; row++) {
-      if (board[row].length != gridSize) {
+    for (int row = 0; row < boardLength; row++) {
+      if (board[row].length != boardLength) {
         throw new IllegalArgumentException("The board must be a square");
       }
 
-      for (int col = 0; col < gridSize; col++) {
-        int val = board[row][col];
-        if (val == EMPTY_CELL) {
-          this.board[row][col] = val;
-        } else {
-          setCell(row, col, board[row][col]);
-        }
+      for (int col = 0; col < boardLength; col++) {
+        setCell(row, col, board[row][col]);
       }
     }
   }
@@ -98,10 +97,13 @@ final class Board {
       colUsed[col].clear(oldval);
       boxUsed[box].clear(oldval);
     }
+    if (val != EMPTY_CELL) {
+      rowUsed[row].set(val);
+      colUsed[col].set(val);
+      boxUsed[box].set(val);
+    }
+
     board[row][col] = val;
-    rowUsed[row].set(val);
-    colUsed[col].set(val);
-    boxUsed[box].set(val);
   }
 
   /**
@@ -132,7 +134,7 @@ final class Board {
       throw new IllegalArgumentException("The cell specified is out of the board");
     }
     int box = getBoxIndex(row, col);
-    return IntStream.rangeClosed(1, gridSize).filter(val -> isCandidateRaw(row, col, box, val));
+    return IntStream.rangeClosed(1, boardLength).filter(val -> isCandidateRaw(row, col, box, val));
   }
 
   /**
@@ -141,7 +143,7 @@ final class Board {
    * @param col a column of the board.
    */
   protected boolean isValidCell(int row, int col) {
-    return row >= 0 && row < gridSize && col >= 0 && col < gridSize;
+    return row >= 0 && row < boardLength && col >= 0 && col < boardLength;
   }
 
   /**
@@ -150,7 +152,7 @@ final class Board {
    * @param col a column of the board.
    */
   protected boolean isValidValue(int val) {
-    return val >= 1 && val <= gridSize;
+    return val >= 0 && val <= boardLength;
   }
 
   /**
@@ -159,7 +161,7 @@ final class Board {
    * @param col a column of the board.
    */
   protected int getBoxIndex(int row, int col) {
-    return (((row / regionSize) * regionSize) + (col / regionSize));
+    return (((row / boxLength) * boxLength) + (col / boxLength));
   }
 
   /**
@@ -179,12 +181,12 @@ final class Board {
    */
   @Override
   public String toString() {
-    final int bufSize = ((gridSize + 1) * gridSize);
+    final int bufSize = ((boardLength + 1) * boardLength);
     final StringBuilder buffer = new StringBuilder(bufSize);
-    for (int row = 0; row < gridSize; row++) {
-      for (int col = 0; col < gridSize; col++) {
+    for (int row = 0; row < boardLength; row++) {
+      for (int col = 0; col < boardLength; col++) {
         int val = board[row][col];
-        buffer.append(val == EMPTY_CELL ? '_' : (char)(val + '0'));
+        buffer.append(val == EMPTY_CELL ? '_' : (char) (val + '0'));
       }
       buffer.append('\n');
     }
