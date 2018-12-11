@@ -246,4 +246,88 @@ public class BoardTest {
     Board sudoku = new Board(board);
     assertThat(sudoku.toString()).isEqualTo("31__\n_2__\n__2_\n__13\n");
   }
+
+  @Test
+  public void testBoardGetSet() {
+    int[][] board = new int[][]{
+      {3, 1, 0, 0},
+      {0, 2, 0, 0},
+      {0, 0, 2, 0},
+      {0, 0, 1, 3}
+    };
+    Board sudoku = new Board(board);
+
+    for (int r = 0; r < 4; r++) {
+      for (int c = 0; c < 4; c++) {
+        assertThat(sudoku.getCell(r, c)).isEqualTo(board[r][c]);
+      }
+    }
+
+    assertThatCode(() -> {
+      int[][] solution = new int[][]{
+        {3, 1, 4, 2},
+        {4, 2, 3, 1},
+        {1, 3, 2, 4},
+        {2, 4, 1, 3}
+      };
+      for (int r = 0; r < 4; r++) {
+        for (int c = 0; c < 4; c++) {
+          sudoku.setCell(r, c, solution[r][c]);
+        }
+      }
+    }).doesNotThrowAnyException();
+
+    for (int r = 0; r < 4; r++) {
+      for (int c = 0; c < 4; c++) {
+        assertThat(sudoku.getCandidates(r, c)).isEmpty();
+      }
+    }
+  }
+
+
+  @Test
+  public void testBoardUpdate() {
+    int[][] board = new int[][]{
+      {3, 1, 0, 0},
+      {0, 2, 0, 0},
+      {0, 0, 2, 0},
+      {0, 0, 1, 3}
+    };
+    Board sudoku = new Board(board);
+
+    assertThatCode(() -> {
+      int[][] update = new int[][]{
+        {4, 2, 0, 0},
+        {0, 3, 0, 0},
+        {0, 0, 3, 0},
+        {0, 0, 2, 4}
+      };
+      sudoku.setCell(0, 0, update[0][0]);
+      sudoku.setCell(1, 1, update[1][1]);
+      sudoku.setCell(0, 1, update[0][1]);
+      sudoku.setCell(3, 3, update[3][3]);
+      sudoku.setCell(2, 2, update[2][2]);
+      sudoku.setCell(3, 2, update[3][2]);
+
+      for (int r = 0; r < 4; r++) {
+        for (int c = 0; c < 4; c++) {
+          assertThat(sudoku.getCell(r, c)).isEqualTo(update[r][c]);
+        }
+      }
+    }).doesNotThrowAnyException();
+
+    assertThatCode(() -> {
+      int[][] solution = new int[][]{
+        {4, 2, 1, 3},
+        {1, 3, 4, 2},
+        {2, 4, 3, 1},
+        {3, 1, 2, 4}
+      };
+      for (int r = 0; r < 4; r++) {
+        for (int c = 0; c < 4; c++) {
+          sudoku.setCell(r, c, solution[r][c]);
+        }
+      }
+    }).doesNotThrowAnyException();
+  }
 }
