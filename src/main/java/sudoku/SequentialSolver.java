@@ -32,6 +32,7 @@ public class SequentialSolver {
       return BigInteger.ONE;
     }
 
+    Long modcount = 0L;
     BigInteger count = BigInteger.ZERO;
     Stack<Pair<Board.Cell, Integer>> stack = new Stack<>();
 
@@ -50,7 +51,11 @@ public class SequentialSolver {
         continue;
       }
       if (board.isFull()) {
-        count = count.add(BigInteger.ONE);
+        modcount++;
+        if (modcount == Long.MAX_VALUE) {
+          count = count.add(BigInteger.valueOf(modcount));
+          modcount = 0L;
+        }
         onSolution.accept(board);
         continue;
       }
@@ -62,6 +67,6 @@ public class SequentialSolver {
           .forEach(nval -> stack.push(new Pair<>(ncell, nval)));
     }
 
-    return count;
+    return count.add(BigInteger.valueOf(modcount));
   }
 }
