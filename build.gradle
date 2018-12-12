@@ -41,6 +41,10 @@ test {
   testLogging {
     exceptionFormat = 'full'
   }
+  filter {
+    // Exclude benchmark test.
+    excludeTestsMatching '*.*BenchTest'
+  }
 }
 
 jacoco {}
@@ -67,8 +71,17 @@ testlogger {
   slowThreshold 0
 }
 
+task bench(type: Test) {
+  group 'Verification'
+  description 'Runs the benchmark tests'
+
+  filter {
+    includeTestsMatching '*.*BenchTest'
+  }
+}
+
 // Execute jacocoTestReport on check
-check.dependsOn jacocoTestReport
+check.dependsOn 'jacocoTestReport'
 
 // Define the main class for the application.
 mainClassName = 'sudoku.App'
