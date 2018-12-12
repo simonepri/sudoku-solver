@@ -42,7 +42,7 @@ test {
     exceptionFormat = 'full'
   }
   filter {
-    // Exclude benchmark test.
+    // Exclude benchmark tests.
     excludeTestsMatching '*.*BenchTest'
   }
 }
@@ -80,7 +80,7 @@ task bench(type: Test) {
   }
 }
 
-// Execute jacocoTestReport on check
+// Execute jacocoTestReport on check.
 check.dependsOn 'jacocoTestReport'
 
 // Define the main class for the application.
