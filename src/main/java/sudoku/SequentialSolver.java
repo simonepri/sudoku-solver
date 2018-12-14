@@ -5,6 +5,8 @@ import java.util.Stack;
 import java.util.function.Consumer;
 import org.apache.commons.math3.util.Pair;
 
+import sudoku.utils.BigCounter;
+
 public class SequentialSolver {
   /**
    * Default Constructor.
@@ -17,7 +19,7 @@ public class SequentialSolver {
    * @param board the board for which to enumerate all the solutions.
    */
   public static BigInteger enumerate(Board board) {
-    return enumerate(board, b -> { });
+    return enumerate(board, null);
   }
 
   /**
@@ -27,13 +29,18 @@ public class SequentialSolver {
    * @param onSolution callback called each time a solution is found.
    */
   public static BigInteger enumerate(Board board, Consumer<Board> onSolution) {
+    if (board == null) {
+      return BigInteger.ZERO;
+    }
+
     if (board.isFull()) {
-      onSolution.accept(board);
+      if (onSolution != null) {
+        onSolution.accept(board);
+      }
       return BigInteger.ONE;
     }
 
-    Long modcount = 0L;
-    BigInteger count = BigInteger.ZERO;
+    BigCounter count = new BigCounter();
     Stack<Pair<Board.Cell, Integer>> stack = new Stack<>();
 
     Board.Cell start = board.getNextToFill();
@@ -50,23 +57,20 @@ public class SequentialSolver {
       if (val == Board.EMPTY_CELL) {
         continue;
       }
+
       if (board.isFull()) {
-        modcount++;
-        if (modcount == Long.MAX_VALUE) {
-          count = count.add(BigInteger.valueOf(modcount));
-          modcount = 0L;
+        if (onSolution != null) {
+          onSolution.accept(board);
         }
-        onSolution.accept(board);
+        count.inc();
         continue;
       }
 
       Board.Cell ncell = board.getNextToFill();
       stack.push(new Pair<>(ncell, Board.EMPTY_CELL));
-      board
-          .getCandidates(ncell.row, ncell.col)
-          .forEach(nval -> stack.push(new Pair<>(ncell, nval)));
+      board.getCandidates(ncell.row, ncell.col).forEach(nval -> stack.push(new Pair<>(ncell, nval)));
     }
 
-    return count.add(BigInteger.valueOf(modcount));
+    return count.get();
   }
 }
