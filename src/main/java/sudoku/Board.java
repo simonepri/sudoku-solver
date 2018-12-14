@@ -104,6 +104,7 @@ final class Board {
     if (!isValidValue(val)) {
       throw new IllegalArgumentException("The value specified is invalid");
     }
+
     int oldval = board[row][col];
     if (oldval == val) {
       return;
@@ -136,6 +137,7 @@ final class Board {
         }
       }
     }
+
     if (val != EMPTY_CELL) {
       int setbit = (1 << val);
       rowUsed[row] |= setbit;
@@ -168,6 +170,7 @@ final class Board {
     if (!isValidValue(val)) {
       return false;
     }
+
     int box = getBoxIndex(row, col);
     return isCandidateRaw(row, col, box, val);
   }
@@ -176,11 +179,13 @@ final class Board {
    * Get a stream of possible legal values for a particular empty cell.
    * @param row a row of the board.
    * @param col a column of the board.
+   * @throws IllegalArgumentException if the action cannot be taken.
    */
   public IntStream getCandidates(int row, int col) {
     if (!isValidCell(row, col)) {
       throw new IllegalArgumentException("The cell specified is out of the board");
     }
+
     int box = getBoxIndex(row, col);
     return IntStream.rangeClosed(1, boardLength).filter(val -> isCandidateRaw(row, col, box, val));
   }
@@ -205,22 +210,30 @@ final class Board {
     return new Cell(nextFreeRow, nextFreeOnRow[nextFreeRow]);
   }
 
-  /** Get the width and height of the table. */
+  /**
+   * Get the width and height of the table.
+   */
   public int getBorderLength() {
     return boardLength;
   }
 
-  /** Get the width and height of a table's box. */
+  /**
+   * Get the width and height of a table's box.
+   */
   public int getBoxLength() {
     return boxLength;
   }
 
-  /** Get the number of cells of the boards. */
+  /**
+   * Get the number of cells of the boards.
+   */
   public int getSize() {
     return cellCount;
   }
 
-  /** Check wether the board is complete. */
+  /**
+   * Check wether the board is complete.
+   */
   public boolean isFull() {
     return clueCount == cellCount;
   }
@@ -230,7 +243,7 @@ final class Board {
    * @param row a row of the board.
    * @param col a column of the board.
    */
-  protected boolean isValidCell(int row, int col) {
+  public boolean isValidCell(int row, int col) {
     return row >= 0 && row < boardLength && col >= 0 && col < boardLength;
   }
 
@@ -239,7 +252,7 @@ final class Board {
    * @param row a row of the board.
    * @param col a column of the board.
    */
-  protected boolean isValidValue(int val) {
+  public boolean isValidValue(int val) {
     return val >= 0 && val <= boardLength;
   }
 
@@ -248,23 +261,22 @@ final class Board {
    * @param row a row of the board.
    * @param col a column of the board.
    */
-  protected int getBoxIndex(int row, int col) {
+  public int getBoxIndex(int row, int col) {
     return (((row / boxLength) * boxLength) + (col / boxLength));
   }
 
   /**
-   * Raw version of Board#isCandidate that does not compute the box value.
+   * Check whether a certain value can be legally placed in a cell.
    * @param row a row of the board.
    * @param col a column of the board.
    * @param box the box of the cell provided.
    * @param val the value to place at the position.
-   * @throws IllegalArgumentException if the action cannot be taken.
    */
   private boolean isCandidateRaw(int row, int col, int box, int val) {
     int nthbit = 1 << val;
-    return ((rowUsed[row] & nthbit) == 0) &&
-           ((colUsed[col] & nthbit) == 0) &&
-           ((boxUsed[box] & nthbit) == 0);
+    return ((rowUsed[row] & nthbit) == 0)
+        && ((colUsed[col] & nthbit) == 0)
+        && ((boxUsed[box] & nthbit) == 0);
   }
 
   /**
