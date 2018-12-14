@@ -15,7 +15,6 @@ public class SequentialSolver {
 
   /**
    * Enumerate all the legal solutions of the given board.
-   *
    * @param board the board for which to enumerate all the solutions.
    */
   public static BigInteger enumerate(Board board) {
@@ -24,7 +23,6 @@ public class SequentialSolver {
 
   /**
    * Enumerate all the legal solutions of the given board.
-   *
    * @param board the board for which to enumerate all the solutions.
    * @param onSolution callback called each time a solution is found.
    */
