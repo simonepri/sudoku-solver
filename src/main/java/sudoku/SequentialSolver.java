@@ -3,7 +3,6 @@ package sudoku;
 import java.math.BigInteger;
 import java.util.Stack;
 import java.util.function.Consumer;
-import org.apache.commons.math3.util.Pair;
 
 import sudoku.utils.BigCounter;
 
@@ -27,6 +26,11 @@ public class SequentialSolver {
    * @param onSolution callback called each time a solution is found.
    */
   public static BigInteger enumerate(Board board, Consumer<Board> onSolution) {
+    class StackElement {
+      private final int row, col, val;
+      public StackElement(int r, int c, int v) { row = r; col = c; val = v; }
+    }
+
     if (board == null) {
       return BigInteger.ZERO;
     }
@@ -39,20 +43,19 @@ public class SequentialSolver {
     }
 
     BigCounter count = new BigCounter();
-    Stack<Pair<Board.Cell, Integer>> stack = new Stack<>();
+    Stack<StackElement> stack = new Stack<>();
 
     Board.Cell start = board.getNextToFill();
-    stack.push(new Pair<>(start, Board.EMPTY_CELL));
-    board.getCandidates(start.row, start.col).forEach(nval -> stack.push(new Pair<>(start, nval)));
+    stack.push(new StackElement(start.row, start.col, Board.EMPTY_CELL));
+    board.getCandidates(start.row, start.col)
+         .forEach(nval -> stack.push(new StackElement(start.row, start.col, nval)));
 
     while (!stack.isEmpty()) {
-      Pair<Board.Cell, Integer> curr = stack.pop();
-      Board.Cell cell = curr.getFirst();
-      int val = curr.getSecond();
+      StackElement curr = stack.pop();
 
-      board.setCell(cell.row, cell.col, val);
+      board.setCell(curr.row, curr.col, curr.val);
 
-      if (val == Board.EMPTY_CELL) {
+      if (curr.val == Board.EMPTY_CELL) {
         continue;
       }
 
@@ -65,8 +68,9 @@ public class SequentialSolver {
       }
 
       Board.Cell ncell = board.getNextToFill();
-      stack.push(new Pair<>(ncell, Board.EMPTY_CELL));
-      board.getCandidates(ncell.row, ncell.col).forEach(nval -> stack.push(new Pair<>(ncell, nval)));
+      stack.push(new StackElement(ncell.row, ncell.col, Board.EMPTY_CELL));
+      board.getCandidates(ncell.row, ncell.col)
+           .forEach(nval -> stack.push(new StackElement(ncell.row, ncell.col, nval)));
     }
 
     return count.get();
