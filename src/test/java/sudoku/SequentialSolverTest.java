@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 // checkstyle-disable-next-line AvoidStarImport
 import static org.junit.Assert.*;
 
-import org.apache.commons.math3.util.Pair;
-
 import org.junit.Test;
 
 public class SequentialSolverTest {

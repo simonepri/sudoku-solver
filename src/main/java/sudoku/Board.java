@@ -24,6 +24,9 @@ final class Board {
   private static final int MAX_BOARD_LENGTH = 9; // Math.floor(Math.sqrt(Byte.MAX_VALUE))
   public static final int EMPTY_CELL = 0;
 
+  private static int[] BITSET_COUNT = null;
+  private static int BITSET_SIZE = 0;
+
   private final int[][] board;
   private final int boxLength;
   private final int boardLength;
@@ -58,14 +61,15 @@ final class Board {
       throw new IllegalArgumentException("The board size must be a perfect square");
     }
 
-    this.board = new int[boardLength][boardLength];
     rowUsed = new int[boardLength];
     colUsed = new int[boardLength];
     boxUsed = new int[boardLength];
+    buildCountBitSetLookupTable(boardLength + 1);
 
     nextFreeRow = 0;
     nextFreeOnRow = new int[boardLength];
 
+    this.board = new int[boardLength][boardLength];
     for (int row = 0; row < boardLength; row++) {
       if (board[row].length != boardLength) {
         throw new IllegalArgumentException("The board must be a square");
@@ -176,7 +180,7 @@ final class Board {
   }
 
   /**
-   * Get a stream of possible legal values for a particular empty cell.
+   * Get a stream of possible legal values to set for a particular cell.
    * @param row a row of the board.
    * @param col a column of the board.
    * @throws IllegalArgumentException if the action cannot be taken.
@@ -188,6 +192,21 @@ final class Board {
 
     int box = getBoxIndex(row, col);
     return IntStream.rangeClosed(1, boardLength).filter(val -> isCandidateRaw(row, col, box, val));
+  }
+
+  /**
+   * Get the number of possible legal values to set for a particular cell.
+   * @param row a row of the board.
+   * @param col a column of the board.
+   * @throws IllegalArgumentException if the action cannot be taken.
+   */
+  public int getCandidatesCount(int row, int col) {
+    if (!isValidCell(row, col)) {
+      throw new IllegalArgumentException("The cell specified is out of the board");
+    }
+
+    int box = getBoxIndex(row, col);
+    return boardLength - getUsedCountRaw(row, col, box);
   }
 
   /**
@@ -208,6 +227,31 @@ final class Board {
       return null;
     }
     return new Cell(nextFreeRow, nextFreeOnRow[nextFreeRow]);
+  }
+
+  /**
+   * Get the next cell that is empty and has the least number of candidates.
+   * (left to right, top to bottom)
+   */
+  public Cell getBestNextToFill() {
+    if (nextFreeRow >= boardLength) {
+      return null;
+    }
+
+    int max = 0;
+    int maxr = 0, maxc = 0;
+    for (int r = nextFreeRow; r < boardLength; r++) {
+      for (int c = nextFreeOnRow[r]; c < boardLength; c++) {
+        if (board[r][c] != EMPTY_CELL) continue;
+        int pmax = getUsedCountRaw(r, c, getBoxIndex(r, c));
+        if (max < pmax) {
+          maxr = r;
+          maxc = c;
+          max = pmax;
+        }
+      }
+    }
+    return new Cell(maxr, maxc);
   }
 
   /**
@@ -277,6 +321,31 @@ final class Board {
     return ((rowUsed[row] & nthbit) == 0)
         && ((colUsed[col] & nthbit) == 0)
         && ((boxUsed[box] & nthbit) == 0);
+  }
+
+  /**
+   * Get the number of possible legal values to set for a particular cell.
+   * @param row a row of the board.
+   * @param col a column of the board.
+   * @param box the box of the cell provided.
+   */
+  private int getUsedCountRaw(int row, int col, int box) {
+    return BITSET_COUNT[rowUsed[row] | colUsed[col] | boxUsed[box]];
+  }
+
+  /**
+   * Build a lookup table to be able to count set bits of a bitset faster.
+   * @param size the number of bits of the bitset.
+   */
+  private static void buildCountBitSetLookupTable(int size) {
+    if (BITSET_COUNT == null || BITSET_SIZE < size) {
+      BITSET_SIZE = size;
+      int space = 1 << BITSET_SIZE;
+      BITSET_COUNT = new int[space];
+      for (int i = 1; i < space; i++) {
+        BITSET_COUNT[i] = (i & 1) + BITSET_COUNT[i >> 1];
+      }
+    }
   }
 
   /**

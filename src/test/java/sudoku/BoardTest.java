@@ -178,25 +178,41 @@ public class BoardTest {
     };
     Board sudoku = new Board(board);
     assertThat(sudoku.getCandidates(0, 0)).isEmpty();
+    assertThat(sudoku.getCandidatesCount(0, 0)).isEqualTo(0);
     assertThat(sudoku.getCandidates(0, 1)).isEmpty();
+    assertThat(sudoku.getCandidatesCount(0, 1)).isEqualTo(0);
     assertThat(sudoku.getCandidates(1, 0)).isEmpty();
+    assertThat(sudoku.getCandidatesCount(1, 0)).isEqualTo(0);
     assertThat(sudoku.getCandidates(1, 1)).isEmpty();
+    assertThat(sudoku.getCandidatesCount(1, 1)).isEqualTo(0);
     assertThat(sudoku.getCandidates(2, 2)).containsOnly(4);
+    assertThat(sudoku.getCandidatesCount(2, 2)).isEqualTo(1);
     assertThat(sudoku.getCandidates(3, 2)).containsOnly(4);
+    assertThat(sudoku.getCandidatesCount(3, 2)).isEqualTo(1);
     assertThat(sudoku.getCandidates(3, 3)).containsOnly(4);
+    assertThat(sudoku.getCandidatesCount(3, 3)).isEqualTo(1);
 
     assertThat(sudoku.getCandidates(0, 2)).containsOnly(4);
+    assertThat(sudoku.getCandidatesCount(0, 2)).isEqualTo(1);
     assertThat(sudoku.getCandidates(0, 3)).containsOnly(2, 4);
+    assertThat(sudoku.getCandidatesCount(0, 3)).isEqualTo(2);
 
     assertThat(sudoku.getCandidates(1, 2)).containsOnly(3);
+    assertThat(sudoku.getCandidatesCount(1, 2)).isEqualTo(1);
     assertThat(sudoku.getCandidates(1, 3)).containsOnly(1);
+    assertThat(sudoku.getCandidatesCount(1, 3)).isEqualTo(1);
 
     assertThat(sudoku.getCandidates(2, 0)).containsOnly(1);
+    assertThat(sudoku.getCandidatesCount(2, 0)).isEqualTo(1);
     assertThat(sudoku.getCandidates(2, 1)).containsOnly(3, 4);
+    assertThat(sudoku.getCandidatesCount(2, 1)).isEqualTo(2);
     assertThat(sudoku.getCandidates(2, 3)).containsOnly(4);
+    assertThat(sudoku.getCandidatesCount(2, 3)).isEqualTo(1);
 
     assertThat(sudoku.getCandidates(3, 0)).containsOnly(2);
+    assertThat(sudoku.getCandidatesCount(3, 0)).isEqualTo(1);
     assertThat(sudoku.getCandidates(3, 1)).containsOnly(4);
+    assertThat(sudoku.getCandidatesCount(3, 1)).isEqualTo(1);
   }
 
   @Test

@@ -45,7 +45,7 @@ public class SequentialSolver {
     BigCounter count = new BigCounter();
     Stack<StackElement> stack = new Stack<>();
 
-    Board.Cell start = board.getNextToFill();
+    Board.Cell start = board.getBestNextToFill();
     stack.push(new StackElement(start.row, start.col, Board.EMPTY_CELL));
     board.getCandidates(start.row, start.col)
          .forEach(nval -> stack.push(new StackElement(start.row, start.col, nval)));
@@ -67,7 +67,7 @@ public class SequentialSolver {
         continue;
       }
 
-      Board.Cell ncell = board.getNextToFill();
+      Board.Cell ncell = board.getBestNextToFill();
       stack.push(new StackElement(ncell.row, ncell.col, Board.EMPTY_CELL));
       board.getCandidates(ncell.row, ncell.col)
            .forEach(nval -> stack.push(new StackElement(ncell.row, ncell.col, nval)));
