@@ -33,9 +33,9 @@ final class Board {
   private int nextFreeRow;
   private int[] nextFreeOnRow;
 
-  private BitSet[] rowUsed;
-  private BitSet[] colUsed;
-  private BitSet[] boxUsed;
+  private int[] rowUsed;
+  private int[] colUsed;
+  private int[] boxUsed;
 
   /**
    * Default Constructor.
@@ -59,14 +59,9 @@ final class Board {
     }
 
     this.board = new int[boardLength][boardLength];
-    rowUsed = new BitSet[boardLength];
-    colUsed = new BitSet[boardLength];
-    boxUsed = new BitSet[boardLength];
-    for (int i = 0; i < boardLength; i++) {
-      rowUsed[i] = new BitSet(boardLength + 1);
-      colUsed[i] = new BitSet(boardLength + 1);
-      boxUsed[i] = new BitSet(boardLength + 1);
-    }
+    rowUsed = new int[boardLength];
+    colUsed = new int[boardLength];
+    boxUsed = new int[boardLength];
 
     nextFreeRow = 0;
     nextFreeOnRow = new int[boardLength];
@@ -120,9 +115,10 @@ final class Board {
     }
 
     if (oldval != EMPTY_CELL) {
-      rowUsed[row].clear(oldval);
-      colUsed[col].clear(oldval);
-      boxUsed[box].clear(oldval);
+      int unsetbit = ~(1 << oldval);
+      rowUsed[row] &= unsetbit;
+      colUsed[col] &= unsetbit;
+      boxUsed[box] &= unsetbit;
       clueCount--;
     } else {
       if (col == nextFreeOnRow[row]) {
@@ -141,9 +137,10 @@ final class Board {
       }
     }
     if (val != EMPTY_CELL) {
-      rowUsed[row].set(val);
-      colUsed[col].set(val);
-      boxUsed[box].set(val);
+      int setbit = (1 << val);
+      rowUsed[row] |= setbit;
+      colUsed[col] |= setbit;
+      boxUsed[box] |= setbit;
       clueCount++;
     } else {
       if (col < nextFreeOnRow[row]) {
@@ -264,7 +261,10 @@ final class Board {
    * @throws IllegalArgumentException if the action cannot be taken.
    */
   private boolean isCandidateRaw(int row, int col, int box, int val) {
-    return !(rowUsed[row].get(val) || colUsed[col].get(val) || boxUsed[box].get(val));
+    int nthbit = 1 << val;
+    return ((rowUsed[row] & nthbit) == 0) &&
+           ((colUsed[col] & nthbit) == 0) &&
+           ((boxUsed[box] & nthbit) == 0);
   }
 
   /**
