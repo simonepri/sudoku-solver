@@ -406,33 +406,25 @@ final class Board {
       nextBestFreeOnRow[r] = nbrCol;
     }
 
-    // Update the new best on all the rows at the given col.
-    for (int r = nextFreeRow; r < boardLength; r++) {
-      if (board[r][col] != EMPTY_CELL || r == row) {
-        continue;
-      }
-      int nbrCol = nextBestFreeOnRow[r];
-      if (nbrCol == col) {
-        continue;
-      }
-      int nbrUse = getUsedCountRaw(r, nbrCol);
-      int ntrUse = getUsedCountRaw(r, col);
-      if (ntrUse > nbrUse || ntrUse == nbrUse && col < nbrCol) {
-        nextBestFreeOnRow[r] = col;
-      }
-    }
-
-    // Update the overall best cell.
     int nextBestFreeRowUse = -1;
+    // Update the new best on all the rows at the given col and the overall best cell.
     for (int r = nextFreeRow; r < boardLength; r++) {
       int nbrCol = nextBestFreeOnRow[r];
       if (nbrCol == boardLength) {
         continue;
       }
-      int ntrUse = getUsedCountRaw(r, nbrCol);
-      if (ntrUse > nextBestFreeRowUse) {
+      int nbrUse = getUsedCountRaw(r, nbrCol);
+      if (nbrCol != col && board[r][col] == EMPTY_CELL && r != row) {
+        int ntrUse = getUsedCountRaw(r, col);
+        if (ntrUse > nbrUse || ntrUse == nbrUse && col < nbrCol) {
+          nextBestFreeOnRow[r] = col;
+          nbrUse = ntrUse;
+        }
+      }
+
+      if (nbrUse > nextBestFreeRowUse) {
         nextBestFreeRow = r;
-        nextBestFreeRowUse = ntrUse;
+        nextBestFreeRowUse = nbrUse;
       }
     }
   }
