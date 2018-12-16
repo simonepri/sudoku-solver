@@ -118,7 +118,7 @@ final class Board {
       return;
     }
 
-    int box = getBoxIndex(row, col);
+    int box = getBoxIndexRaw(row, col);
     if (!isCandidateRaw(row, col, box, val)) {
       throw new IllegalArgumentException("Value already used");
     }
@@ -168,7 +168,7 @@ final class Board {
       return false;
     }
 
-    int box = getBoxIndex(row, col);
+    int box = getBoxIndexRaw(row, col);
     return isCandidateRaw(row, col, box, val);
   }
 
@@ -183,7 +183,7 @@ final class Board {
       throw new IllegalArgumentException("The cell specified is out of the board");
     }
 
-    int box = getBoxIndex(row, col);
+    int box = getBoxIndexRaw(row, col);
     return IntStream.rangeClosed(1, boardLength).filter(val -> isCandidateRaw(row, col, box, val));
   }
 
@@ -284,7 +284,11 @@ final class Board {
    * @param col a column of the board.
    */
   public int getBoxIndex(int row, int col) {
-    return (((row / boxLength) * boxLength) + (col / boxLength));
+    if (!isValidCell(row, col)) {
+      throw new IllegalArgumentException("The cell specified is out of the board");
+    }
+
+    return getBoxIndexRaw(row, col);
   }
 
   /**
@@ -307,7 +311,7 @@ final class Board {
    * @param col a column of the board.
    */
   private int getUsedCountRaw(int row, int col) {
-    return BITSET_COUNT[rowUsed[row] | colUsed[col] | boxUsed[getBoxIndex(row, col)]];
+    return BITSET_COUNT[rowUsed[row] | colUsed[col] | boxUsed[getBoxIndexRaw(row, col)]];
   }
 
   /**
@@ -318,6 +322,15 @@ final class Board {
    */
   private int getUsedCountRaw(int row, int col, int box) {
     return BITSET_COUNT[rowUsed[row] | colUsed[col] | boxUsed[box]];
+  }
+
+  /**
+   * Compute the box index for the given cell. (left to right, top to bottom)
+   * @param row a row of the board.
+   * @param col a column of the board.
+   */
+  private int getBoxIndexRaw(int row, int col) {
+    return (((row / boxLength) * boxLength) + (col / boxLength));
   }
 
   private void updateNextToFillOnSet(int row, int col, int box) {
