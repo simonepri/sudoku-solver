@@ -424,26 +424,134 @@ public class BoardTest {
     };
     Board sudoku = new Board(board);
 
+
     assertThat(sudoku.getNextToFill().toString()).isEqualTo("(0,2)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(0,2)");
     sudoku.setCell(0, 3, solution[0][3]);
     assertThat(sudoku.getNextToFill().toString()).isEqualTo("(0,2)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(0,2)");
     sudoku.setCell(0, 2, solution[0][2]);
     assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(1,0)");
     sudoku.setCell(1, 0, solution[1][0]);
     assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,2)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(1,2)");
     sudoku.setCell(1, 2, solution[1][2]);
     assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,3)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(1,3)");
     sudoku.setCell(2, 3, solution[2][3]);
     assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,3)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(1,3)");
     sudoku.setCell(1, 3, solution[1][3]);
     assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(2,0)");
     sudoku.setCell(2, 1, solution[2][1]);
     assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(2,0)");
     sudoku.setCell(3, 0, solution[3][0]);
     assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(2,0)");
     sudoku.setCell(2, 0, solution[2][0]);
     assertThat(sudoku.getNextToFill().toString()).isEqualTo("(3,1)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(3,1)");
     sudoku.setCell(3, 1, solution[3][1]);
     assertThat(sudoku.getNextToFill()).isEqualTo(null);
+    assertThat(sudoku.getBestNextToFill()).isEqualTo(null);
+
+    board = new int[][]{
+      {8, 0, 0, 2, 0, 3, 0, 0, 6},
+      {0, 5, 0, 7, 0, 0, 0, 0, 9},
+      {0, 0, 4, 0, 0, 0, 1, 0, 0},
+      {7, 9, 0, 0, 5, 0, 0, 0, 4},
+      {0, 0, 0, 8, 0, 6, 0, 0, 0},
+      {1, 0, 0, 0, 7, 0, 0, 9, 5},
+      {0, 0, 3, 0, 0, 0, 2, 0, 0},
+      {5, 0, 0, 0, 0, 7, 0, 6, 0},
+      {4, 0, 0, 6, 0, 9, 0, 0, 1}
+    };
+    solution = new int[][]{
+      {8, 7, 9, 2, 1, 3, 4, 5, 6},
+      {6, 5, 1, 7, 4, 8, 3, 2, 9},
+      {2, 3, 4, 9, 6, 5, 1, 7, 8},
+      {7, 9, 6, 1, 5, 2, 8, 3, 4},
+      {3, 4, 5, 8, 9, 6, 7, 1, 2},
+      {1, 8, 2, 3, 7, 4, 6, 9, 5},
+      {9, 6, 3, 5, 8, 1, 2, 4, 7},
+      {5, 1, 8, 4, 2, 7, 9, 6, 3},
+      {4, 2, 7, 6, 3, 9, 5, 8, 1}
+    };
+    sudoku = new Board(board);
+
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(0,1)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(0,1)");
+    sudoku.setCell(0, 1, solution[0][1]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(0,2)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(0,2)");
+    sudoku.setCell(0, 2, solution[0][2]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(0,4)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(0,4)");
+    sudoku.setCell(0, 4, solution[0][4]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(0,6)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(0,6)");
+    sudoku.setCell(0, 6, solution[0][6]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(0,7)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(0,7)");
+    sudoku.setCell(0, 7, solution[0][7]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(1,5)");
+    sudoku.setCell(1, 5, solution[1][5]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(1,6)");
+    sudoku.setCell(1, 6, solution[1][6]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(1,7)");
+    sudoku.setCell(1, 7, solution[1][7]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(1,0)");
+    sudoku.setCell(1, 0, solution[1][0]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,2)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(1,2)");
+    sudoku.setCell(1, 2, solution[1][2]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(1,4)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(1,4)");
+    sudoku.setCell(1, 4, solution[1][4]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(2,5)");
+    sudoku.setCell(2, 5, solution[2][5]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(2,3)");
+    sudoku.setCell(2, 3, solution[2][3]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(2,4)");
+    sudoku.setCell(2, 4, solution[2][4]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(4,6)");
+    sudoku.setCell(4, 6, solution[4][6]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(6,0)");
+    sudoku.setCell(6, 0, solution[6][0]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(6,4)");
+    sudoku.setCell(6, 4, solution[6][4]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(6,8)");
+    sudoku.setCell(6, 8, solution[6][8]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(2,8)");
+    sudoku.setCell(2, 8, solution[2][8]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(2,7)");
+    sudoku.setCell(2, 7, solution[2][7]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(6,7)");
+    sudoku.setCell(6, 7, solution[6][7]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(6,5)");
+    sudoku.setCell(6, 5, solution[6][5]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(3,5)");
+    sudoku.setCell(3, 5, solution[3][5]);
+    assertThat(sudoku.getNextToFill().toString()).isEqualTo("(2,0)");
+    assertThat(sudoku.getBestNextToFill().toString()).isEqualTo("(5,5)");
   }
 }
