@@ -198,8 +198,7 @@ final class Board {
       throw new IllegalArgumentException("The cell specified is out of the board");
     }
 
-    int box = getBoxIndex(row, col);
-    return boardLength - getUsedCountRaw(row, col, box);
+    return boardLength - getUsedCountRaw(row, col);
   }
 
   /**
