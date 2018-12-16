@@ -27,8 +27,15 @@ public class SequentialSolver {
    */
   public static BigInteger enumerate(Board board, Consumer<Board> onSolution) {
     class StackElement {
-      private final int row, col, val;
-      public StackElement(int r, int c, int v) { row = r; col = c; val = v; }
+      private final int row;
+      private final int col;
+      private final int val;
+      
+      public StackElement(int r, int c, int v) {
+        row = r;
+        col = c;
+        val = v;
+      }
     }
 
     if (board == null) {

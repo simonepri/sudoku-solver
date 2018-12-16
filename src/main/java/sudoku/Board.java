@@ -333,6 +333,12 @@ final class Board {
     return (((row / boxLength) * boxLength) + (col / boxLength));
   }
 
+  /**
+   * Helper function to update the next free cell when a cell is setted.
+   * @param row a row of the board.
+   * @param col a column of the board.
+   * @param box the box of the cell provided.
+   */
   private void updateNextToFillOnSet(int row, int col, int box) {
     if (col != nextFreeOnRow[row]) {
       return;
@@ -355,6 +361,12 @@ final class Board {
     }
   }
 
+  /**
+   * Helper function to update the next free cell when a cell is cleared.
+   * @param row a row of the board.
+   * @param col a column of the board.
+   * @param box the box of the cell provided.
+   */
   private void updateNextToFillOnUnset(int row, int col, int box) {
     // Update the next free cell on the given row.
     if (col < nextFreeOnRow[row]) {
@@ -367,6 +379,12 @@ final class Board {
     }
   }
 
+  /**
+   * Helper function to update the next bext free cell when a cell is setted.
+   * @param row a row of the board.
+   * @param col a column of the board.
+   * @param box the box of the cell provided.
+   */
   private void updateNextBestToFillOnSet(int row, int col, int box) {
     // Update the best cell on the given row.
     if (col == nextBestFreeOnRow[row]) {
@@ -442,6 +460,12 @@ final class Board {
     }
   }
 
+  /**
+   * Helper function to update the next bext free cell when a cell is cleared.
+   * @param row a row of the board.
+   * @param col a column of the board.
+   * @param box the box of the cell provided.
+   */
   private void updateNextBestToFillOnUnset(int row, int col, int box) {
     int uc = getUsedCountRaw(row, col, box);
 

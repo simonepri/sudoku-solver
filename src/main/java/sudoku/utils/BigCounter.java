@@ -6,16 +6,30 @@ public class BigCounter implements Comparable<BigCounter> {
   private BigInteger count = BigInteger.ZERO;
   private long modcount = 0L;
 
+  /**
+   * Default Constructor.
+   */
   public BigCounter() {}
 
+  /**
+   * Default Constructor.
+   * @param initial an initial value for the counter.
+   */
   public BigCounter(long initial) {
     modcount = initial;
   }
 
+  /**
+   * Default Constructor.
+   * @param initial an initial value for the counter.
+   */
   public BigCounter(BigInteger initial) {
     count = initial;
   }
 
+  /**
+   * Increment the counters.
+   */
   public void inc() {
     if (modcount == Long.MAX_VALUE) {
       count = count.add(BigInteger.valueOf(modcount));
@@ -25,6 +39,9 @@ public class BigCounter implements Comparable<BigCounter> {
     }
   }
 
+  /**
+   * Decrement the counters.
+   */
   public void dec() {
     if (modcount == Long.MIN_VALUE) {
       count = count.add(BigInteger.valueOf(modcount));
@@ -34,6 +51,9 @@ public class BigCounter implements Comparable<BigCounter> {
     }
   }
 
+  /**
+   * Get the value of the counter.
+   */
   public BigInteger get() {
     if (modcount != 0L) {
       count = count.add(BigInteger.valueOf(modcount));
