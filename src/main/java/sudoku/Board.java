@@ -35,6 +35,8 @@ final class Board {
 
   private int nextFreeRow;
   private int[] nextFreeOnRow;
+  private int nextBestFreeRow;
+  private int[] nextBestFreeOnRow;
 
   private int[] rowUsed;
   private int[] colUsed;
@@ -68,6 +70,8 @@ final class Board {
 
     nextFreeRow = 0;
     nextFreeOnRow = new int[boardLength];
+    nextBestFreeRow = 0;
+    nextBestFreeOnRow = new int[boardLength];
 
     this.board = new int[boardLength][boardLength];
     for (int row = 0; row < boardLength; row++) {
@@ -140,6 +144,13 @@ final class Board {
     }
 
     board[row][col] = val;
+
+    if (oldval == EMPTY_CELL) {
+      updateNextBestToFillOnSet(row, col, box);
+    }
+    if (val == EMPTY_CELL) {
+      updateNextBestToFillOnUnset(row, col, box);
+    }
   }
 
   /**
@@ -219,21 +230,7 @@ final class Board {
     if (nextFreeRow >= boardLength) {
       return null;
     }
-
-    int max = 0;
-    int maxr = 0, maxc = 0;
-    for (int r = nextFreeRow; r < boardLength; r++) {
-      for (int c = nextFreeOnRow[r]; c < boardLength; c++) {
-        if (board[r][c] != EMPTY_CELL) continue;
-        int pmax = getUsedCountRaw(r, c, getBoxIndex(r, c));
-        if (max < pmax) {
-          maxr = r;
-          maxc = c;
-          max = pmax;
-        }
-      }
-    }
-    return new Cell(maxr, maxc);
+    return new Cell(nextBestFreeRow, nextBestFreeOnRow[nextBestFreeRow]);
   }
 
   /**
@@ -309,6 +306,15 @@ final class Board {
    * Get the number of possible legal values to set for a particular cell.
    * @param row a row of the board.
    * @param col a column of the board.
+   */
+  private int getUsedCountRaw(int row, int col) {
+    return BITSET_COUNT[rowUsed[row] | colUsed[col] | boxUsed[getBoxIndex(row, col)]];
+  }
+
+  /**
+   * Get the number of possible legal values to set for a particular cell.
+   * @param row a row of the board.
+   * @param col a column of the board.
    * @param box the box of the cell provided.
    */
   private int getUsedCountRaw(int row, int col, int box) {
@@ -346,6 +352,118 @@ final class Board {
     // Update the overall next cell.
     if (row < nextFreeRow) {
       nextFreeRow = row;
+    }
+  }
+
+  private void updateNextBestToFillOnSet(int row, int col, int box) {
+    // Update the best cell on the given row.
+    if (col == nextBestFreeOnRow[row]) {
+      int nbrCol = nextFreeOnRow[row];
+      if (nbrCol < boardLength) {
+        int nbrUse = getUsedCountRaw(row, nbrCol);
+        for (int ntrCol = nbrCol + 1; ntrCol < boardLength; ntrCol++) {
+          if (board[row][ntrCol] != EMPTY_CELL) {
+            continue;
+          }
+          int ntrUse = getUsedCountRaw(row, ntrCol);
+          if (ntrUse > nbrUse || ntrUse == nbrUse && ntrCol < nbrCol) {
+            nbrCol = ntrCol;
+            nbrUse = ntrUse;
+          }
+        }
+      }
+      nextBestFreeOnRow[row] = nbrCol;
+    }
+
+    if (nextFreeRow == boardLength) {
+      nextBestFreeRow = boardLength;
+      return;
+    }
+
+    // Update the new best on all the rows of the given box.
+    int srow = row / boxLength * boxLength;
+    int erow = srow + boxLength;
+    int scol = col / boxLength * boxLength;
+    int ecol = scol + boxLength;
+    for (int r = Math.max(srow, nextFreeRow); r < erow; r++) {
+      if (r == row) {
+        continue;
+      }
+      int nbrCol = nextBestFreeOnRow[r];
+      if (nbrCol == boardLength) {
+        continue;
+      }
+      int nbrUse = getUsedCountRaw(r, nbrCol);
+      for (int ntrCol = Math.max(scol, nextFreeOnRow[r]); ntrCol < ecol; ntrCol++) {
+        if (board[r][ntrCol] != EMPTY_CELL || ntrCol == nbrCol) {
+          continue;
+        }
+        int ntrUse = getUsedCountRaw(r, ntrCol, box);
+        if (ntrUse > nbrUse || ntrUse == nbrUse && ntrCol < nbrCol) {
+          nbrCol = ntrCol;
+          nbrUse = ntrUse;
+        }
+      }
+      nextBestFreeOnRow[r] = nbrCol;
+    }
+
+    // Update the new best on all the rows at the given col.
+    for (int r = nextFreeRow; r < boardLength; r++) {
+      if (board[r][col] != EMPTY_CELL || r == row) {
+        continue;
+      }
+      int nbrCol = nextBestFreeOnRow[r];
+      if (nbrCol == col) {
+        continue;
+      }
+      int nbrUse = getUsedCountRaw(r, nbrCol);
+      int ntrUse = getUsedCountRaw(r, col);
+      if (ntrUse > nbrUse || ntrUse == nbrUse && col < nbrCol) {
+        nextBestFreeOnRow[r] = col;
+      }
+    }
+
+    // Update the overall best cell.
+    int nextBestFreeRowUse = -1;
+    for (int r = nextFreeRow; r < boardLength; r++) {
+      int nbrCol = nextBestFreeOnRow[r];
+      if (nbrCol == boardLength) {
+        continue;
+      }
+      int ntrUse = getUsedCountRaw(r, nbrCol);
+      if (ntrUse > nextBestFreeRowUse) {
+        nextBestFreeRow = r;
+        nextBestFreeRowUse = ntrUse;
+      }
+    }
+  }
+
+  private void updateNextBestToFillOnUnset(int row, int col, int box) {
+    int uc = getUsedCountRaw(row, col, box);
+
+    // Update the best cell on the given row.
+    int brcol = nextBestFreeOnRow[row];
+    if (brcol == boardLength) {
+      nextBestFreeOnRow[row] = col;
+    } else {
+      int bruc = getUsedCountRaw(row, brcol);
+      if (bruc < uc) {
+        nextBestFreeOnRow[row] = col;
+      } else {
+        return;
+      }
+    }
+
+    // Update the overall best cell.
+    if (nextBestFreeRow == boardLength) {
+      nextBestFreeRow = row;
+    } else {
+      int borow = nextBestFreeRow;
+      int bocol = nextBestFreeOnRow[borow];
+      int bouc = getUsedCountRaw(borow, bocol);
+      if (bouc < uc) {
+        nextBestFreeRow = row;
+      }
     }
   }
 
