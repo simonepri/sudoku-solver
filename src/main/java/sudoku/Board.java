@@ -279,6 +279,7 @@ final class Board {
    * Compute the box index for the given cell. (left to right, top to bottom)
    * @param row a row of the board.
    * @param col a column of the board.
+   * @throws IllegalArgumentException if the action cannot be taken.
    */
   public int getBoxIndex(int row, int col) {
     if (!isValidCell(row, col)) {
