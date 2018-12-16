@@ -129,8 +129,6 @@ final class Board {
       colUsed[col] &= unsetbit;
       boxUsed[box] &= unsetbit;
       clueCount--;
-    } else {
-      updateNextToFillOnSet(row, col, box);
     }
 
     if (val != EMPTY_CELL) {
@@ -139,16 +137,15 @@ final class Board {
       colUsed[col] |= setbit;
       boxUsed[box] |= setbit;
       clueCount++;
-    } else {
-      updateNextToFillOnUnset(row, col, box);
     }
 
     board[row][col] = val;
 
     if (oldval == EMPTY_CELL) {
+      updateNextToFillOnSet(row, col, box);
       updateNextBestToFillOnSet(row, col, box);
-    }
-    if (val == EMPTY_CELL) {
+    } else if (val == EMPTY_CELL) {
+      updateNextToFillOnUnset(row, col, box);
       updateNextBestToFillOnUnset(row, col, box);
     }
   }
