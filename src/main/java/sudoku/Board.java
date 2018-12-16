@@ -126,20 +126,7 @@ final class Board {
       boxUsed[box] &= unsetbit;
       clueCount--;
     } else {
-      if (col == nextFreeOnRow[row]) {
-        int ncol = nextFreeOnRow[row] + 1;
-        while (ncol < boardLength && board[row][ncol] != EMPTY_CELL) {
-          ncol++;
-        }
-        nextFreeOnRow[row] = ncol;
-        if (row == nextFreeRow) {
-          int nrow = nextFreeRow;
-          while (nrow < boardLength && nextFreeOnRow[nrow] == boardLength) {
-            nrow++;
-          }
-          nextFreeRow = nrow;
-        }
-      }
+      updateNextToFillOnSet(row, col, box);
     }
 
     if (val != EMPTY_CELL) {
@@ -149,12 +136,7 @@ final class Board {
       boxUsed[box] |= setbit;
       clueCount++;
     } else {
-      if (col < nextFreeOnRow[row]) {
-        nextFreeOnRow[row] = col;
-      }
-      if (row < nextFreeRow) {
-        nextFreeRow = row;
-      }
+      updateNextToFillOnUnset(row, col, box);
     }
 
     board[row][col] = val;
@@ -331,6 +313,40 @@ final class Board {
    */
   private int getUsedCountRaw(int row, int col, int box) {
     return BITSET_COUNT[rowUsed[row] | colUsed[col] | boxUsed[box]];
+  }
+
+  private void updateNextToFillOnSet(int row, int col, int box) {
+    if (col != nextFreeOnRow[row]) {
+      return;
+    }
+
+    // Update the next free cell on the given row.
+    int ncol = nextFreeOnRow[row] + 1;
+    while (ncol < boardLength && board[row][ncol] != EMPTY_CELL) {
+      ncol++;
+    }
+    nextFreeOnRow[row] = ncol;
+
+    // Update the overall next cell.
+    if (row == nextFreeRow) {
+      int nrow = nextFreeRow;
+      while (nrow < boardLength && nextFreeOnRow[nrow] == boardLength) {
+        nrow++;
+      }
+      nextFreeRow = nrow;
+    }
+  }
+
+  private void updateNextToFillOnUnset(int row, int col, int box) {
+    // Update the next free cell on the given row.
+    if (col < nextFreeOnRow[row]) {
+      nextFreeOnRow[row] = col;
+    }
+
+    // Update the overall next cell.
+    if (row < nextFreeRow) {
+      nextFreeRow = row;
+    }
   }
 
   /**
