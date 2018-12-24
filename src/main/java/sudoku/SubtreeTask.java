@@ -7,8 +7,8 @@ import java.util.function.Consumer;
 
 public class SubtreeTask extends RecursiveTask<BigInteger> {
     private static final long serialVersionUID = -3746632891759493367L;
-    private static final BigInteger CANDIDATES_COUNT_CUTOFF = BigInteger.valueOf(6);
-    private static final BigInteger SEARCH_SPACE_CUTOFF = BigInteger.valueOf(5000);
+    private static final long FILLABLE_COUNT_CUTOFF = 50;
+    private static final BigInteger SEARCH_SPACE_CUTOFF = BigInteger.valueOf(50000000);
     private Board board;
     private Consumer<Board> onSolution;
     private BigInteger searchSpace;
@@ -44,20 +44,23 @@ public class SubtreeTask extends RecursiveTask<BigInteger> {
             return BigInteger.ZERO;
         }
 
+
         ArrayList<SubtreeTask> tasks = new ArrayList<>();
-        BigInteger candidatesCount = BigInteger.valueOf(board.getCandidates(start.row, start.col).count());
-        if (candidatesCount.compareTo(CANDIDATES_COUNT_CUTOFF) <= 0) {
+        long fillablesCount = board.getFillables().count();
+
+        if (fillablesCount <= FILLABLE_COUNT_CUTOFF) {
             return SequentialSolver.enumerate(board);
         }
         if (searchSpace.compareTo(SEARCH_SPACE_CUTOFF) <= 0) {
             return SequentialSolver.enumerate(board);
         }
+        BigInteger candidatesCount = BigInteger.valueOf(board.getCandidates(start.row, start.col).count());
 
         if (candidatesCount.compareTo(BigInteger.ZERO) <= 0) {
             return BigInteger.ZERO;
         }
         BigInteger newSearchSpace = searchSpace.divide(candidatesCount);
-        board.getCandidates(start.row, start.col).parallel().forEach(nval -> {
+        board.getCandidates(start.row, start.col).forEach(nval -> {
             Board candidateBoard = board.copyBoard();
             candidateBoard.setCell(start.row, start.col, nval);
             tasks.add(new SubtreeTask(candidateBoard, newSearchSpace, onSolution));
