@@ -7,15 +7,22 @@ import java.util.function.Consumer;
 
 public class SubtreeTask extends RecursiveTask<BigInteger> {
     private static final long serialVersionUID = -3746632891759493367L;
+    private static final BigInteger CANDIDATES_COUNT_CUTOFF = BigInteger.valueOf(6);
+    private static final BigInteger SEARCH_SPACE_CUTOFF = BigInteger.valueOf(5000);
     private Board board;
     private Consumer<Board> onSolution;
+    private BigInteger searchSpace;
 
     public SubtreeTask(Board board) {
-        this(board, null);
+        this(board, board.getSearchSpace(), null);
+    }
+    public SubtreeTask(Board board, BigInteger searchSpace) {
+        this(board, searchSpace, null);
     }
 
-    public SubtreeTask(Board board, Consumer<Board> onSolution) {
+    public SubtreeTask(Board board, BigInteger searchSpace, Consumer<Board> onSolution) {
         this.board = board;
+        this.searchSpace = searchSpace;
         this.onSolution = onSolution;
     }
 
@@ -33,12 +40,27 @@ public class SubtreeTask extends RecursiveTask<BigInteger> {
         }
 
         Board.Cell start = board.getBestNextToFill();
+        if (start == null) {
+            return BigInteger.ZERO;
+        }
 
         ArrayList<SubtreeTask> tasks = new ArrayList<>();
-        board.getCandidates(start.row, start.col).forEach(nval -> {
+        BigInteger candidatesCount = BigInteger.valueOf(board.getCandidates(start.row, start.col).count());
+        if (candidatesCount.compareTo(CANDIDATES_COUNT_CUTOFF) <= 0) {
+            return SequentialSolver.enumerate(board);
+        }
+        if (searchSpace.compareTo(SEARCH_SPACE_CUTOFF) <= 0) {
+            return SequentialSolver.enumerate(board);
+        }
+
+        if (candidatesCount.compareTo(BigInteger.ZERO) <= 0) {
+            return BigInteger.ZERO;
+        }
+        BigInteger newSearchSpace = searchSpace.divide(candidatesCount);
+        board.getCandidates(start.row, start.col).parallel().forEach(nval -> {
             Board candidateBoard = board.copyBoard();
             candidateBoard.setCell(start.row, start.col, nval);
-            tasks.add(new SubtreeTask(candidateBoard, onSolution));
+            tasks.add(new SubtreeTask(candidateBoard, newSearchSpace, onSolution));
         });
         BigInteger count = BigInteger.ZERO;
         if (tasks.size() > 1) {

@@ -1,5 +1,6 @@
 package sudoku;
 
+import java.math.BigInteger;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -83,7 +84,7 @@ final class Board {
       }
     }
   }
-  
+
   /**
    * @return a copy of this board
    */
@@ -203,6 +204,13 @@ final class Board {
     return boardLength - getUsedCountRaw(row, col);
   }
 
+  public BigInteger getSearchSpace() {
+    BigInteger searchSpace = BigInteger.ONE;
+    for (Cell cell : this.getFillables().toArray(Cell[]::new)) {
+      searchSpace = searchSpace.multiply(BigInteger.valueOf(getCandidates(cell.row, cell.col).count()));
+    }
+    return searchSpace;
+  }
   /**
    * Get a stream of empty cells of the board. (left to right, top to bottom)
    */

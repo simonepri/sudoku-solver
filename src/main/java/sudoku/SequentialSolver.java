@@ -30,7 +30,7 @@ public class SequentialSolver {
       private final int row;
       private final int col;
       private final int val;
-      
+
       public StackElement(int r, int c, int v) {
         row = r;
         col = c;
@@ -75,6 +75,7 @@ public class SequentialSolver {
       }
 
       Board.Cell ncell = board.getBestNextToFill();
+
       stack.push(new StackElement(ncell.row, ncell.col, Board.EMPTY_CELL));
       board.getCandidates(ncell.row, ncell.col)
            .forEach(nval -> stack.push(new StackElement(ncell.row, ncell.col, nval)));
