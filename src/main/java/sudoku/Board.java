@@ -84,7 +84,13 @@ final class Board {
       }
     }
   }
-
+  
+  /**
+   * @return a copy of this board
+   */
+  public Board copyBoard() {
+    return new Board(board);
+  }
   /**
    * Get the value of a board's cell.
    * @param row a row of the board.
