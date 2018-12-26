@@ -62,6 +62,38 @@ public class BigCounter implements Comparable<BigCounter> {
     return count;
   }
 
+  /**
+   * Add a value to the counter.
+   * @param value a value to add to the counter.
+   */
+  public void add(long value) {
+    if (value > 0) {
+      if (modcount <= 0) {
+        modcount += value;
+        return;
+      }
+      long left = Long.MAX_VALUE - modcount;
+      if (left >= value) {
+        modcount += value;
+      } else {
+        count = count.add(BigInteger.valueOf(Long.MAX_VALUE));
+        modcount = value - left;
+      }
+    } else if (value < 0) {
+      if (modcount >= 0) {
+        modcount += value;
+        return;
+      }
+      long left = Long.MIN_VALUE - modcount;
+      if (left <= value) {
+        modcount += value;
+      } else {
+        count = count.add(BigInteger.valueOf(Long.MIN_VALUE));
+        modcount = value - left;
+      }
+    }
+  }
+
   @Override
   public String toString() {
     return get().toString();
