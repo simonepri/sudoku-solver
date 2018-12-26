@@ -1,5 +1,6 @@
 package sudoku;
 
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -82,6 +83,35 @@ final class Board {
       for (int col = 0; col < boardLength; col++) {
         setCell(row, col, board[row][col]);
       }
+    }
+  }
+
+  /**
+   * Clone Constructor.
+   * @param other the sudoku board to clone.
+   */
+  public Board(Board other) {
+    if (other == null) {
+      throw new IllegalArgumentException("The board size is too small");
+    }
+
+    boxLength = other.boxLength;
+    boardLength = other.boardLength;
+    cellCount = other.cellCount;
+    clueCount = other.clueCount;
+
+    rowUsed = Arrays.copyOf(other.rowUsed, boardLength);
+    colUsed = Arrays.copyOf(other.colUsed, boardLength);
+    boxUsed = Arrays.copyOf(other.boxUsed, boardLength);
+
+    nextFreeRow = other.nextFreeRow;
+    nextFreeOnRow = Arrays.copyOf(other.nextFreeOnRow, boardLength);
+    nextBestFreeRow = other.nextBestFreeRow;
+    nextBestFreeOnRow = Arrays.copyOf(other.nextBestFreeOnRow, boardLength);
+
+    board = new int[boardLength][];
+    for (int row = 0; row < boardLength; row++) {
+      board[row] = Arrays.copyOf(other.board[row], boardLength);
     }
   }
 
