@@ -209,6 +209,20 @@ final class Board {
   }
 
   /**
+   * Get the number of empty cells.
+   * @param row a row of the board.
+   * @param col a column of the board.
+   * @throws IllegalArgumentException if the action cannot be taken.
+   */
+  public int getFillablesCount(int row, int col) {
+    if (!isValidCell(row, col)) {
+      throw new IllegalArgumentException("The cell specified is out of the board");
+    }
+
+    return cellCount - clueCount;
+  }
+
+  /**
    * Get the next cell that is empty. (left to right, top to bottom)
    */
   public Cell getNextToFill() {
