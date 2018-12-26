@@ -126,7 +126,7 @@ final class Board {
 
     int box = getBoxIndexRaw(row, col);
     if (!isCandidateRaw(row, col, box, val)) {
-      throw new IllegalArgumentException("Value already used");
+      throw new IllegalArgumentException("Value " + val + " already used for row:col " + row + ":" + col);
     }
 
     if (oldval != EMPTY_CELL) {

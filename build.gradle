@@ -71,6 +71,7 @@ testlogger {
 task bench(type: Test) {
   group 'Verification'
   description 'Runs the benchmark tests'
+  outputs.upToDateWhen { false }
 
   filter {
     includeTestsMatching '*.*BenchTest'
