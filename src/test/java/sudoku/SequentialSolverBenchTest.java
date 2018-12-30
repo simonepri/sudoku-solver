@@ -99,7 +99,7 @@ public class SequentialSolverBenchTest {
       {5, 0, 0, 0, 0, 0, 0, 6, 0},
       {4, 0, 0, 6, 0, 0, 0, 0, 1}
     });
-    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("16269895");
+    assertThat(SequentialSolver.enumerate(sudoku).toString()).isEqualTo("16269895");
   }
 
   @Test
