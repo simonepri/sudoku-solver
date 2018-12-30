@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,17 +15,16 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
-import java.nio.file.NoSuchFileException;
 
 public class App {
   public static class Args {
     @Parameter(names = "--help", help = true)
     public boolean help = false;
 
-    @Parameter(names={"--print", "-p"}, description = "Print solutions")
+    @Parameter(names = {"--print", "-p"}, description = "Print solutions")
     public boolean print = false;
 
-    @Parameter(names={"--sequential", "-s"}, description = "Disable parallelism")
+    @Parameter(names = {"--sequential", "-s"}, description = "Disable parallelism")
     public boolean sequential = false;
 
     @Parameter(description = "<filename>[ <filename>]*")
@@ -64,11 +64,13 @@ public class App {
         } else if ('0' <= c && c <= '9') {
           row.add(c - '0');
         } else {
-          throw new IllegalArgumentException("Invalid character found: " + c + " in " + filename + "\n");
+          throw new IllegalArgumentException(
+            "Invalid character found: " + c + " in " + filename + "\n"
+          );
         }
       }
       matrix.add(
-        row.stream().mapToInt(Integer::intValue).toArray()
+          row.stream().mapToInt(Integer::intValue).toArray()
       );
     }
     scanner.close();
@@ -76,10 +78,19 @@ public class App {
     return matrix.toArray(new int[0][]);
   }
 
+  /**
+   * Enumerate all the legal solutions of the given board.
+   * @param board the board for which to enumerate all the solutions.
+   */
   public BigInteger enumerate(Board board) {
     return enumerate(board, null);
   }
 
+  /**
+   * Enumerate all the legal solutions of the given board.
+   * @param board the board for which to enumerate all the solutions.
+   * @param onSolution callback called each time a solution is found.
+   */
   public BigInteger enumerate(Board board, Consumer<Board> onSolution) {
     if (sequential) {
       return SequentialSolver.enumerate(board, onSolution);
@@ -94,11 +105,11 @@ public class App {
   public int run(Consumer<String> out) {
     if (help || filenames.size() == 0) {
       out.accept(
-        "Usage: sudoku [options] <filenames>[,<filenames>]*\n"
-        + "  Options:\n"
-        + "    --help               Print usage\n"
-        + "    --print, -p          Print solutions\n"
-        + "    --sequential, -s     Disable parallelism\n"
+          "Usage: sudoku [options] <filenames>[,<filenames>]*\n"
+          + "  Options:\n"
+          + "    --help               Print usage\n"
+          + "    --print, -p          Print solutions\n"
+          + "    --sequential, -s     Disable parallelism\n"
       );
       return 0;
     }
