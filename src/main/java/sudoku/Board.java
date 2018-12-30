@@ -268,23 +268,23 @@ final class Board {
       return BigInteger.ZERO;
     }
 
-    BigInteger searchSpace = BigInteger.ONE;
-
-    int[] count = new int[boardLength + 1];
+    int[] srow = new int[boardLength];
     for (int row = 0; row < boardLength; row++) {
+      srow[row] = 1;
       for (int col = 0; col < boardLength; col++) {
         if (board[row][col] != EMPTY_CELL) {
           continue;
         }
-        count[boardLength - getUsedCountRaw(row, col)]++;
+        srow[row] *= boardLength - getUsedCountRaw(row, col);
       }
     }
 
-    for (int val = 2; val <= boardLength; val++) {
-      if (count[val] == 0) {
+    BigInteger searchSpace = BigInteger.ONE;
+    for (int row = 0; row < boardLength; row++) {
+      if (srow[row] == 1) {
         continue;
       }
-      searchSpace = searchSpace.multiply(BigInteger.valueOf(val).pow(count[val]));
+      searchSpace = searchSpace.multiply(BigInteger.valueOf(srow[row]));
     }
 
     return searchSpace;
