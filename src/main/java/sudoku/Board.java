@@ -268,7 +268,7 @@ final class Board {
       return BigInteger.ZERO;
     }
     int max_cell_prod = 19; // (int)(Math.log(Long.MAX_VALUE) / Math.log(boardLength));
-    int max_parts = 5; // (int)((cellCount - clueCount) / max_cell_prod) + 1;
+    int max_parts = 5; // (int)((cellCount - clueCount) / max_cell_prod) + 2;
 
     int cells = 0;
     int parts = 0;
