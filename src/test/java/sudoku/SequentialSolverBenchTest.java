@@ -87,6 +87,22 @@ public class SequentialSolverBenchTest {
   }
 
   @Test
+  public void testBench_1f() {
+    Board sudoku = new Board(new int[][]{
+      {0, 0, 0, 2, 0, 0, 0, 0, 6},
+      {0, 0, 0, 0, 0, 0, 0, 0, 9},
+      {0, 0, 4, 0, 0, 0, 1, 0, 0},
+      {0, 9, 0, 0, 0, 0, 0, 0, 4},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {1, 0, 0, 0, 7, 0, 0, 0, 5},
+      {0, 0, 3, 0, 0, 0, 2, 0, 0},
+      {5, 0, 0, 0, 0, 0, 0, 6, 0},
+      {4, 0, 0, 6, 0, 0, 0, 0, 1}
+    });
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("16269895");
+  }
+
+  @Test
   public void testBench_2a() {
     Board sudoku = new Board(new int[][]{
       {0, 0, 9, 3, 0, 0, 0, 0, 1},
@@ -164,5 +180,21 @@ public class SequentialSolverBenchTest {
       {2, 0, 0, 0, 0, 0, 4, 0, 0}
     });
     assertThat(SequentialSolver.enumerate(sudoku).toString()).isEqualTo("7388360");
+  }
+
+  @Test
+  public void testBench_2s() {
+    Board sudoku = new Board(new int[][]{
+      {0, 0, 9, 0, 0, 0, 0, 0, 0},
+      {0, 6, 0, 0, 0, 8, 0, 0, 0},
+      {4, 0, 0, 0, 0, 0, 2, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 9},
+      {0, 0, 3, 0, 0, 0, 7, 0, 0},
+      {1, 0, 0, 0, 0, 6, 0, 0, 0},
+      {0, 0, 6, 0, 0, 0, 0, 0, 8},
+      {0, 0, 0, 0, 1, 0, 0, 3, 0},
+      {2, 0, 0, 0, 0, 0, 4, 0, 0}
+    });
+    assertThat(SequentialSolver.enumerate(sudoku).toString()).isEqualTo("48794239");
   }
 }
