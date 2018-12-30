@@ -77,6 +77,25 @@ task bench(type: Test) {
   }
 }
 
+task s_bench(type: Test) {
+  group 'Verification'
+  description 'Runs the benchmark tests'
+
+  filter {
+    includeTestsMatching '*.*Sequential*BenchTest'
+  }
+}
+
+task p_bench(type: Test) {
+  group 'Verification'
+  description 'Runs the benchmark tests'
+
+  filter {
+    includeTestsMatching '*.*Parallel*BenchTest'
+  }
+}
+
+
 // Execute jacocoTestReport on check.
 check.dependsOn 'jacocoTestReport'
 
