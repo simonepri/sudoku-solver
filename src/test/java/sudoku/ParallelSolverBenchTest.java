@@ -2,7 +2,6 @@ package sudoku;
 
 // checkstyle-disable-next-line AvoidStarImport
 import static org.assertj.core.api.Assertions.*;
-// checkstyle-disable-next-line AvoidStarImport
 
 import org.junit.Test;
 
@@ -20,7 +19,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 7, 0, 6, 0},
       {4, 0, 0, 6, 0, 9, 0, 0, 1}
     });
-    assertThat(new SubtreeTask(sudoku).compute().toString()).isEqualTo("1");
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("1");
   }
 
   @Test
@@ -36,7 +35,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 7, 0, 6, 0},
       {4, 0, 0, 6, 0, 0, 0, 0, 1}
     });
-    assertThat(new SubtreeTask(sudoku).compute().toString()).isEqualTo("4715");
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("4715");
   }
 
   @Test
@@ -52,7 +51,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 0, 0, 6, 0},
       {4, 0, 0, 6, 0, 0, 0, 0, 1}
     });
-    assertThat(new SubtreeTask(sudoku).compute().toString()).isEqualTo("132271");
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("132271");
   }
 
   @Test
@@ -68,7 +67,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 0, 0, 6, 0},
       {4, 0, 0, 6, 0, 0, 0, 0, 1}
     });
-    assertThat(new SubtreeTask(sudoku).compute().toString()).isEqualTo("587264");
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("587264");
   }
 
   @Test
@@ -84,7 +83,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 0, 0, 6, 0},
       {4, 0, 0, 6, 0, 0, 0, 0, 1}
     });
-    assertThat(new SubtreeTask(sudoku).compute().toString()).isEqualTo("3151964");
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("3151964");
   }
 
   @Test
@@ -100,7 +99,7 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 9, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 7, 4, 0, 0}
     });
-    assertThat(new SubtreeTask(sudoku).compute().toString()).isEqualTo("1");
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("1");
   }
 
   @Test
@@ -116,7 +115,7 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 9, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 0, 4, 0, 0}
     });
-    assertThat(new SubtreeTask(sudoku).compute().toString()).isEqualTo("276");
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("276");
   }
 
   @Test
@@ -132,7 +131,7 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 0, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 0, 4, 0, 0}
     });
-    assertThat(new SubtreeTask(sudoku).compute().toString()).isEqualTo("32128");
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("32128");
   }
 
   @Test
@@ -148,7 +147,7 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 0, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 0, 4, 0, 0}
     });
-    assertThat(new SubtreeTask(sudoku).compute().toString()).isEqualTo("1014785");
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("1014785");
   }
 
   @Test
@@ -164,6 +163,6 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 0, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 0, 4, 0, 0}
     });
-    assertThat(new SubtreeTask(sudoku).compute().toString()).isEqualTo("7388360");
+    assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("7388360");
   }
 }

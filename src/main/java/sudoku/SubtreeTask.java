@@ -60,7 +60,7 @@ public class SubtreeTask extends RecursiveTask<BigInteger> {
 
   public BigInteger compute() {
     if (move != null) {
-      board = board.copyBoard();
+      board = new Board(board);
       board.setCell(move.row, move.col, move.val);
     }
 

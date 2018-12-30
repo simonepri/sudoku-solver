@@ -31,6 +31,9 @@ dependencies {
 
   // Use AssertJ assert library.
   testCompile 'org.assertj:assertj-core:3.11.1'
+
+  // Use JCommander cli framework.
+  compile 'com.beust:jcommander:1.71'
 }
 
 test {
@@ -77,6 +80,27 @@ task bench(type: Test) {
     includeTestsMatching '*.*BenchTest'
   }
 }
+
+task s_bench(type: Test) {
+  group 'Verification'
+  description 'Runs the benchmark tests'
+  outputs.upToDateWhen { false }
+
+  filter {
+    includeTestsMatching '*.*Sequential*BenchTest'
+  }
+}
+
+task p_bench(type: Test) {
+  group 'Verification'
+  description 'Runs the benchmark tests'
+  outputs.upToDateWhen { false }
+
+  filter {
+    includeTestsMatching '*.*Parallel*BenchTest'
+  }
+}
+
 
 // Execute jacocoTestReport on check.
 check.dependsOn 'jacocoTestReport'

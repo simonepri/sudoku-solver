@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import sudoku.utils.BigCounter;
 
-public class SequentialSolverTest {
+public class ParallelSolverTest {
   @Test
   public void testEnumerate1() {
     Board sudoku = new Board(new int[][]{
@@ -20,14 +20,16 @@ public class SequentialSolverTest {
     });
 
     BigCounter c0 = new BigCounter(0);
-    BigInteger c1 = SequentialSolver.enumerate(sudoku, sol -> {
+    BigInteger c1 = ParallelSolver.enumerate(sudoku, sol -> {
       assertThat(sol.toString()).isEqualTo(
           "3142\n"
           + "4231\n"
           + "1324\n"
           + "2413\n"
       );
-      c0.inc();
+      synchronized (c0) {
+        c0.inc();
+      }
     });
     assertThat(c0.toString()).isEqualTo(c1.toString());
   }
@@ -47,7 +49,7 @@ public class SequentialSolverTest {
     });
 
     BigCounter c0 = new BigCounter(0);
-    BigInteger c1 = SequentialSolver.enumerate(sudoku, sol -> {
+    BigInteger c1 = ParallelSolver.enumerate(sudoku, sol -> {
       assertThat(sol.toString()).isEqualTo(
           "729486513\n"
           + "135792468\n"
@@ -59,7 +61,9 @@ public class SequentialSolverTest {
           + "586374129\n"
           + "243169857\n"
       );
-      c0.inc();
+      synchronized (c0) {
+        c0.inc();
+      }
     });
     assertThat(c0.toString()).isEqualTo(c1.toString());
   }
@@ -74,14 +78,16 @@ public class SequentialSolverTest {
     });
 
     BigCounter c0 = new BigCounter(0);
-    BigInteger c1 = SequentialSolver.enumerate(sudoku, sol -> {
+    BigInteger c1 = ParallelSolver.enumerate(sudoku, sol -> {
       assertThat(sol.toString()).isEqualTo(
           "3142\n"
           + "4231\n"
           + "1324\n"
           + "2413\n"
       );
-      c0.inc();
+      synchronized (c0) {
+        c0.inc();
+      }
     });
     assertThat(c0.toString()).isEqualTo(c1.toString());
   }

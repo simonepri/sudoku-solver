@@ -1,6 +1,7 @@
 package sudoku;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -47,7 +48,7 @@ final class Board {
    * @param board the sudoku board, empty cells are represented by 0.
    */
   public Board(int[][] board) {
-    if (board == null) {
+    if (board == null || board.length == 0) {
       throw new IllegalArgumentException("The board size is too small");
     }
     if (board.length > MAX_BOARD_LENGTH) {
@@ -86,11 +87,34 @@ final class Board {
   }
 
   /**
-   * @return a copy of this board
+   * Clone Constructor.
+   * @param other the sudoku board to clone.
    */
-  public Board copyBoard() {
-    return new Board(board);
+  public Board(Board other) {
+    if (other == null) {
+      throw new IllegalArgumentException("The board size is too small");
+    }
+
+    boxLength = other.boxLength;
+    boardLength = other.boardLength;
+    cellCount = other.cellCount;
+    clueCount = other.clueCount;
+
+    rowUsed = Arrays.copyOf(other.rowUsed, boardLength);
+    colUsed = Arrays.copyOf(other.colUsed, boardLength);
+    boxUsed = Arrays.copyOf(other.boxUsed, boardLength);
+
+    nextFreeRow = other.nextFreeRow;
+    nextFreeOnRow = Arrays.copyOf(other.nextFreeOnRow, boardLength);
+    nextBestFreeRow = other.nextBestFreeRow;
+    nextBestFreeOnRow = Arrays.copyOf(other.nextBestFreeOnRow, boardLength);
+
+    board = new int[boardLength][];
+    for (int row = 0; row < boardLength; row++) {
+      board[row] = Arrays.copyOf(other.board[row], boardLength);
+    }
   }
+
   /**
    * Get the value of a board's cell.
    * @param row a row of the board.
@@ -98,7 +122,9 @@ final class Board {
    */
   public int getCell(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     return board[row][col];
@@ -113,10 +139,14 @@ final class Board {
    */
   public void setCell(int row, int col, int val) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
     if (!isValidValue(val)) {
-      throw new IllegalArgumentException("The value specified is invalid");
+      throw new IllegalArgumentException(
+          "The value specified is invalid: " + val + " at " + row + ":" + col
+      );
     }
 
     int oldval = board[row][col];
@@ -126,7 +156,9 @@ final class Board {
 
     int box = getBoxIndexRaw(row, col);
     if (!isCandidateRaw(row, col, box, val)) {
-      throw new IllegalArgumentException("Value " + val + " already used for row:col " + row + ":" + col);
+      throw new IllegalArgumentException(
+          "Value already used: " + val + " at " + row + ":" + col
+      );
     }
 
     if (oldval != EMPTY_CELL) {
@@ -165,7 +197,9 @@ final class Board {
    */
   public boolean isCandidate(int row, int col, int val) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
     if (!isValidValue(val)) {
       return false;
@@ -183,7 +217,9 @@ final class Board {
    */
   public IntStream getCandidates(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     int box = getBoxIndexRaw(row, col);
@@ -198,19 +234,14 @@ final class Board {
    */
   public int getCandidatesCount(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     return boardLength - getUsedCountRaw(row, col);
   }
 
-  public BigInteger getSearchSpace() {
-    BigInteger searchSpace = BigInteger.ONE;
-    for (Cell cell : this.getFillables().toArray(Cell[]::new)) {
-      searchSpace = searchSpace.multiply(BigInteger.valueOf(getCandidates(cell.row, cell.col).count()));
-    }
-    return searchSpace;
-  }
   /**
    * Get a stream of empty cells of the board. (left to right, top to bottom)
    */
@@ -219,6 +250,44 @@ final class Board {
         .mapToObj(i -> IntStream.range(0, boardLength).mapToObj(j -> new Cell(i, j)))
         .flatMap(Function.identity())
         .filter(cell -> board[cell.row][cell.col] == EMPTY_CELL);
+  }
+
+  /**
+   * Get the number of empty cells.
+   */
+  public int getFillablesCount() {
+    return cellCount - clueCount;
+  }
+
+  /**
+   * Get the search space computed as the multiplication of the number of
+   * candidates of each empty cell.
+   */
+  public BigInteger getSearchSpace() {
+    if (isFull()) {
+      return BigInteger.ZERO;
+    }
+
+    BigInteger searchSpace = BigInteger.ONE;
+
+    int[] count = new int[boardLength + 1];
+    for (int row = 0; row < boardLength; row++) {
+      for (int col = 0; col < boardLength; col++) {
+        if (board[row][col] != EMPTY_CELL) {
+          continue;
+        }
+        count[boardLength - getUsedCountRaw(row, col)]++;
+      }
+    }
+
+    for (int val = 2; val <= boardLength; val++) {
+      if (count[val] == 0) {
+        continue;
+      }
+      searchSpace = searchSpace.multiply(BigInteger.valueOf(val).pow(count[val]));
+    }
+
+    return searchSpace;
   }
 
   /**
@@ -296,7 +365,9 @@ final class Board {
    */
   public int getBoxIndex(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     return getBoxIndexRaw(row, col);
