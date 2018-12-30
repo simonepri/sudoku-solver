@@ -3,6 +3,8 @@ package sudoku;
 // checkstyle-disable-next-line AvoidStarImport
 import static org.assertj.core.api.Assertions.*;
 
+import java.math.BigInteger;
+
 import org.junit.Test;
 
 public class BoardTest {
@@ -386,6 +388,40 @@ public class BoardTest {
     assertThat(sudoku.getBorderLength()).isEqualTo(9);
     assertThat(sudoku.getBoxLength()).isEqualTo(3);
     assertThat(sudoku.isFull()).isTrue();
+  }
+
+  @Test
+  public void testBoardSearchSpace() {
+    Board sudoku = new Board(new int[][]{
+      {3, 1, 0, 0},
+      {0, 2, 0, 0},
+      {0, 0, 2, 0},
+      {0, 0, 1, 3}
+    });
+    assertThat(sudoku.getSearchSpace()).isEqualTo(new BigInteger("64"));
+
+    sudoku = new Board(new int[][]{
+      {8, 0, 0, 2, 0, 3, 0, 0, 6},
+      {0, 5, 0, 7, 0, 0, 0, 0, 9},
+      {0, 0, 4, 0, 0, 0, 1, 0, 0},
+      {7, 9, 0, 0, 5, 0, 0, 0, 4},
+      {0, 0, 0, 8, 0, 6, 0, 0, 0},
+      {1, 0, 0, 0, 7, 0, 0, 9, 5},
+      {0, 0, 3, 0, 0, 0, 2, 0, 0},
+      {5, 0, 0, 0, 0, 7, 0, 6, 0},
+      {4, 0, 0, 6, 0, 9, 0, 0, 1}
+    });
+    assertThat(sudoku.getSearchSpace()).isEqualTo(new BigInteger("43129799915034095124480000"));
+
+    sudoku = new Board(new int[][]{
+      {0}
+    });
+    assertThat(sudoku.getSearchSpace()).isEqualTo(BigInteger.ONE);
+
+    sudoku = new Board(new int[][]{
+      {1}
+    });
+    assertThat(sudoku.getSearchSpace()).isEqualTo(BigInteger.ZERO);
   }
 
   @Test

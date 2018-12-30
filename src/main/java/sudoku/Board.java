@@ -1,5 +1,6 @@
 package sudoku;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -249,6 +250,37 @@ final class Board {
     }
 
     return cellCount - clueCount;
+  }
+
+  /**
+   * Get the search space computed as the multiplication of the number of
+   * candidates of each empty cell.
+   */
+  public BigInteger getSearchSpace() {
+    if (isFull()) {
+      return BigInteger.ZERO;
+    }
+
+    BigInteger searchSpace = BigInteger.ONE;
+
+    int[] count = new int[boardLength + 1];
+    for (int row = 0; row < boardLength; row++) {
+      for (int col = 0; col < boardLength; col++) {
+        if (board[row][col] != EMPTY_CELL) {
+          continue;
+        }
+        count[boardLength - getUsedCountRaw(row, col)]++;
+      }
+    }
+
+    for (int val = 2; val <= boardLength; val++) {
+      if (count[val] == 0) {
+        continue;
+      }
+      searchSpace = searchSpace.multiply(BigInteger.valueOf(val).pow(count[val]));
+    }
+
+    return searchSpace;
   }
 
   /**
