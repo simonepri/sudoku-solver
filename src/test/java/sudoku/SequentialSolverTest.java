@@ -1,11 +1,15 @@
 package sudoku;
 
+import java.math.BigInteger;
+
 // checkstyle-disable-next-line AvoidStarImport
 import static org.assertj.core.api.Assertions.*;
 // checkstyle-disable-next-line AvoidStarImport
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import sudoku.utils.BigCounter;
 
 public class SequentialSolverTest {
   @Test
@@ -17,14 +21,17 @@ public class SequentialSolverTest {
       {0, 0, 1, 3}
     });
 
-    SequentialSolver.enumerate(sudoku, sol -> {
+    BigCounter c0 = new BigCounter(0);
+    BigInteger c1 = SequentialSolver.enumerate(sudoku, sol -> {
       assertThat(sol.toString()).isEqualTo(
           "3142\n"
           + "4231\n"
           + "1324\n"
           + "2413\n"
       );
+      c0.inc();
     });
+    assertThat(c0.toString()).isEqualTo(c1.toString());
   }
 
   @Test
@@ -41,7 +48,8 @@ public class SequentialSolverTest {
       {2, 4, 3, 1, 6, 0, 8, 5, 7}
     });
 
-    SequentialSolver.enumerate(sudoku, sol -> {
+    BigCounter c0 = new BigCounter(0);
+    BigInteger c1 = SequentialSolver.enumerate(sudoku, sol -> {
       assertThat(sol.toString()).isEqualTo(
           "729486513\n"
           + "135792468\n"
@@ -53,7 +61,9 @@ public class SequentialSolverTest {
           + "586374129\n"
           + "243169857\n"
       );
+      c0.inc();
     });
+    assertThat(c0.toString()).isEqualTo(c1.toString());
   }
 
   @Test
@@ -65,13 +75,16 @@ public class SequentialSolverTest {
       {2, 4, 1, 3}
     });
 
-    SequentialSolver.enumerate(sudoku, sol -> {
+    BigCounter c0 = new BigCounter(0);
+    BigInteger c1 = SequentialSolver.enumerate(sudoku, sol -> {
       assertThat(sol.toString()).isEqualTo(
           "3142\n"
           + "4231\n"
           + "1324\n"
           + "2413\n"
       );
+      c0.inc();
     });
+    assertThat(c0.toString()).isEqualTo(c1.toString());
   }
 }
