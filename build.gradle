@@ -71,6 +71,7 @@ testlogger {
 task bench(type: Test) {
   group 'Verification'
   description 'Runs the benchmark tests'
+  outputs.upToDateWhen { false }
 
   filter {
     includeTestsMatching '*.*BenchTest'
@@ -80,6 +81,7 @@ task bench(type: Test) {
 task s_bench(type: Test) {
   group 'Verification'
   description 'Runs the benchmark tests'
+  outputs.upToDateWhen { false }
 
   filter {
     includeTestsMatching '*.*Sequential*BenchTest'
@@ -89,6 +91,7 @@ task s_bench(type: Test) {
 task p_bench(type: Test) {
   group 'Verification'
   description 'Runs the benchmark tests'
+  outputs.upToDateWhen { false }
 
   filter {
     includeTestsMatching '*.*Parallel*BenchTest'
