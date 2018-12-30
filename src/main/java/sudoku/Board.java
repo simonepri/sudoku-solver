@@ -122,7 +122,9 @@ final class Board {
    */
   public int getCell(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     return board[row][col];
@@ -137,10 +139,14 @@ final class Board {
    */
   public void setCell(int row, int col, int val) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
     if (!isValidValue(val)) {
-      throw new IllegalArgumentException("The value specified is invalid");
+      throw new IllegalArgumentException(
+          "The value specified is invalid: " + val + " at " + row + ":" + col
+      );
     }
 
     int oldval = board[row][col];
@@ -150,7 +156,9 @@ final class Board {
 
     int box = getBoxIndexRaw(row, col);
     if (!isCandidateRaw(row, col, box, val)) {
-      throw new IllegalArgumentException("Value already used");
+      throw new IllegalArgumentException(
+          "Value already used: " + val + " at " + row + ":" + col
+      );
     }
 
     if (oldval != EMPTY_CELL) {
@@ -189,7 +197,9 @@ final class Board {
    */
   public boolean isCandidate(int row, int col, int val) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
     if (!isValidValue(val)) {
       return false;
@@ -207,7 +217,9 @@ final class Board {
    */
   public IntStream getCandidates(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     int box = getBoxIndexRaw(row, col);
@@ -222,7 +234,9 @@ final class Board {
    */
   public int getCandidatesCount(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     return boardLength - getUsedCountRaw(row, col);
@@ -246,7 +260,9 @@ final class Board {
    */
   public int getFillablesCount(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     return cellCount - clueCount;
@@ -358,7 +374,9 @@ final class Board {
    */
   public int getBoxIndex(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board");
+      throw new IllegalArgumentException(
+          "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     return getBoxIndexRaw(row, col);
