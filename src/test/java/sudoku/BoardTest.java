@@ -440,6 +440,7 @@ public class BoardTest {
         "(2,0)", "(2,1)", "(2,3)",
         "(3,0)", "(3,1)"
     );
+    assertThat(sudoku.getFillablesCount()).isEqualTo(10);
   }
 
   @Test
