@@ -1,9 +1,9 @@
 package sudoku;
 
-import java.math.BigInteger;
-
 // checkstyle-disable-next-line AvoidStarImport
 import static org.assertj.core.api.Assertions.*;
+
+import java.math.BigInteger;
 
 import org.junit.Test;
 
@@ -27,7 +27,9 @@ public class ParallelSolverTest {
           + "1324\n"
           + "2413\n"
       );
-      synchronized(c0) { c0.inc(); }
+      synchronized (c0) {
+        c0.inc();
+      }
     });
     assertThat(c0.toString()).isEqualTo(c1.toString());
   }
@@ -59,7 +61,9 @@ public class ParallelSolverTest {
           + "586374129\n"
           + "243169857\n"
       );
-      synchronized(c0) { c0.inc(); }
+      synchronized (c0) {
+        c0.inc();
+      }
     });
     assertThat(c0.toString()).isEqualTo(c1.toString());
   }
@@ -81,7 +85,9 @@ public class ParallelSolverTest {
           + "1324\n"
           + "2413\n"
       );
-      synchronized(c0) { c0.inc(); }
+      synchronized (c0) {
+        c0.inc();
+      }
     });
     assertThat(c0.toString()).isEqualTo(c1.toString());
   }
