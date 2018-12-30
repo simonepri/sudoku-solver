@@ -120,7 +120,12 @@ public class App {
         if (print) {
           enumerate(board, b -> out.accept(b.toString()));
         } else {
-          out.accept(enumerate(board).toString());
+          BigInteger sp = board.getSearchSpace();
+          out.accept("Search space: " + sp + "\n");
+          double ff = 100.0 - (board.getFillablesCount() * 100.0) / board.getSize();
+          out.accept("Fill factor: " + String.format("%.2f", ff) + "%\n");
+          BigInteger sc = enumerate(board);
+          out.accept("Legal solutions: " + sc);
         }
       }
     } catch (NoSuchFileException e) {

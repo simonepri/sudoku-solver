@@ -51,7 +51,7 @@ public class AppTest {
 
     List<String> out = new LinkedList<>();
     main.run(out::add);
-    assertThat(out.toString()).contains("276");
+    assertThat(out.toString()).contains("261718015484414301673881600000000000", "25.93%", "276");
   }
 
   @Test
@@ -62,6 +62,6 @@ public class AppTest {
 
     List<String> out = new LinkedList<>();
     main.run(out::add);
-    assertThat(out.toString()).contains("276");
+    assertThat(out.toString()).contains("261718015484414301673881600000000000", "25.93%", "276");
   }
 }
