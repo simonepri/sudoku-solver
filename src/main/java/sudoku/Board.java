@@ -47,7 +47,7 @@ final class Board {
    * @param board the sudoku board, empty cells are represented by 0.
    */
   public Board(int[][] board) {
-    if (board == null) {
+    if (board == null || board.length == 0) {
       throw new IllegalArgumentException("The board size is too small");
     }
     if (board.length > MAX_BOARD_LENGTH) {
