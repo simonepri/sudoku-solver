@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 import sudoku.utils.BigCounter;
 
 public class ParallelSolver {
+  private static final BigInteger SEARCH_SPACE_CUTOFF = BigInteger.valueOf((long)1e13);
+
   /**
    * Default Constructor.
    */
@@ -31,10 +33,10 @@ public class ParallelSolver {
   }
 
   public static class SubtreeTask extends RecursiveTask<BigCounter> {
-    private static final long FILLABLES_COUNT_CUTOFF = 50;
     private Board board;
     private Consumer<Board> onSolution;
     private StackElement move;
+    private BigInteger space;
 
     private class StackElement {
       private final int row;
@@ -83,14 +85,15 @@ public class ParallelSolver {
         return new BigCounter(1);
       }
 
-      if (board.getFillablesCount() <= FILLABLES_COUNT_CUTOFF) {
+      if (board.getSearchSpace().compareTo(SEARCH_SPACE_CUTOFF) <= 0) {
         return new BigCounter(SequentialSolver.enumerate(board, onSolution));
       }
 
       ArrayList<SubtreeTask> tasks = new ArrayList<>();
       Board.Cell start = board.getBestNextToFill();
       board.getCandidates(start.row, start.col).forEach(nval -> {
-        tasks.add(new SubtreeTask(board, onSolution, new StackElement(start.row, start.col, nval)));
+        StackElement nmove = new StackElement(start.row, start.col, nval);
+        tasks.add(new SubtreeTask(board, onSolution, nmove));
       });
 
       BigCounter count = new BigCounter(0);
