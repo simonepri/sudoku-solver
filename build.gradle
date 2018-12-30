@@ -31,6 +31,9 @@ dependencies {
 
   // Use AssertJ assert library.
   testCompile 'org.assertj:assertj-core:3.11.1'
+
+  // Use JCommander cli framework.
+  compile 'com.beust:jcommander:1.71'
 }
 
 test {
