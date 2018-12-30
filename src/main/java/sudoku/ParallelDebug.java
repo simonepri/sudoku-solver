@@ -1,7 +1,7 @@
 package sudoku;
 
 
-public class App {
+public class ParallelDebug {
 
   public class ParallelSolverBenchTest {
     public void testBench_1a() {
@@ -97,6 +97,6 @@ public class App {
   }
 
   public static void main(String[] args) {
-    new App().compute();
+    new ParallelDebug().compute();
   }
 }
