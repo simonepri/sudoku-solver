@@ -25,6 +25,6 @@ public class ParallelSolver {
    * @param onSolution callback called each time a solution is found.
    */
   public static BigInteger enumerate(Board board, Consumer<Board> onSolution) {
-    return new SubtreeTask(board).compute();
+    return new SubtreeTask(board, onSolution).compute().get();
   }
 }
