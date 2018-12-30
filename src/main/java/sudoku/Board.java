@@ -267,27 +267,37 @@ final class Board {
     if (isFull()) {
       return BigInteger.ZERO;
     }
+    int max_cell_prod = 19; // (int)(Math.log(Long.MAX_VALUE) / Math.log(boardLength));
+    int max_parts = 5; // (int)((cellCount - clueCount) / max_cell_prod) + 1;
 
-    int[] srow = new int[boardLength];
+    int cells = 0;
+    int parts = 0;
+    long[] partialSpace = new long[max_parts];
+    partialSpace[parts] = 1;
     for (int row = 0; row < boardLength; row++) {
-      srow[row] = 1;
       for (int col = 0; col < boardLength; col++) {
         if (board[row][col] != EMPTY_CELL) {
           continue;
         }
-        srow[row] *= boardLength - getUsedCountRaw(row, col);
+        partialSpace[parts] *= boardLength - getUsedCountRaw(row, col);
+        cells++;
+        if (cells == max_cell_prod) {
+          cells = 0;
+          parts++;
+          partialSpace[parts] = 1;
+        }
       }
     }
 
-    BigInteger searchSpace = BigInteger.ONE;
-    for (int row = 0; row < boardLength; row++) {
-      if (srow[row] == 1) {
+    BigInteger fullSpace = BigInteger.valueOf(partialSpace[0]);
+    for (int i = 1; i <= parts; i++) {
+      if (partialSpace[i] == 1) {
         continue;
       }
-      searchSpace = searchSpace.multiply(BigInteger.valueOf(srow[row]));
+      fullSpace = fullSpace.multiply(BigInteger.valueOf(partialSpace[i]));
     }
 
-    return searchSpace;
+    return fullSpace;
   }
 
   /**
