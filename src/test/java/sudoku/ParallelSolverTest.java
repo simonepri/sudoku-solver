@@ -4,8 +4,6 @@ import java.math.BigInteger;
 
 // checkstyle-disable-next-line AvoidStarImport
 import static org.assertj.core.api.Assertions.*;
-// checkstyle-disable-next-line AvoidStarImport
-import static org.junit.Assert.*;
 
 import org.junit.Test;
 
