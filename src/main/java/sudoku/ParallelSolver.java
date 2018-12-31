@@ -85,7 +85,11 @@ public class ParallelSolver {
         return new BigCounter(1);
       }
 
-      if (board.getSearchSpace().compareTo(SEARCH_SPACE_CUTOFF) <= 0) {
+      BigInteger space = board.getSearchSpace();
+      if (space == BigInteger.ZERO) {
+        return new BigCounter(0);
+      }
+      if (space.compareTo(SEARCH_SPACE_CUTOFF) <= 0) {
         return new BigCounter(SequentialSolver.enumerate(board, onSolution));
       }
 
