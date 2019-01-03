@@ -11,7 +11,8 @@ millis() {
   if hash gdate 2>/dev/null; then
     gdate +%s%3N
   else
-    printf "${$(date +%s%3N)/3N/"000"}"
+    datestr="$(date +%s%3N)"
+    printf "${datestr/3N/"000"}"
   fi
 }
 
