@@ -53,6 +53,37 @@ test {
   }
 }
 
+jar {
+  // Configure the manifest fo the jar.
+  manifest {
+    attributes (
+      'Implementation-Title': 'Sudoku Solutions Enumerator',
+      'Implementation-Version': version,
+      'Main-Class': mainClassName
+    )
+  }
+  // Filename of the jar generated.
+  baseName = project.name
+}
+task fatJar(type: Jar) {
+  // Configure the manifest fo the jar.
+  manifest {
+    attributes (
+      'Implementation-Title': 'Sudoku Solutions Enumerator',
+      'Implementation-Version': version,
+      'Main-Class': mainClassName
+    )
+  }
+  // Filename of the jar generated.
+  baseName = project.name + '-all'
+  // Include dependencies in the jar.
+  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+  // Add license to the jar.
+  with jar
+}
+// Execute fatJar on assemble.
+assemble.dependsOn 'fatJar'
+
 jacoco {}
 jacocoTestReport {
   // Configure reports for jacoco plugin.
