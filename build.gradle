@@ -47,8 +47,8 @@ test {
   testLogging {
     exceptionFormat = 'full'
   }
+  // Exclude benchmark tests.
   filter {
-    // Exclude benchmark tests.
     excludeTestsMatching '*.*BenchTest'
   }
 }
@@ -61,6 +61,8 @@ jacocoTestReport {
     html.enabled true
   }
 }
+// Execute jacocoTestReport on check.
+check.dependsOn 'jacocoTestReport'
 
 checkstyle {
   showViolations = true
@@ -74,6 +76,7 @@ tasks.withType(Checkstyle) {
 }
 
 testlogger {
+  // Always show execution time for tests.
   slowThreshold 0
 }
 
@@ -106,7 +109,3 @@ task p_bench(type: Test) {
     includeTestsMatching '*.*Parallel*BenchTest'
   }
 }
-
-
-// Execute jacocoTestReport on check.
-check.dependsOn 'jacocoTestReport'
