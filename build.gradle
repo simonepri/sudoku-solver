@@ -15,6 +15,12 @@ plugins {
   id 'com.adarshr.test-logger' version '1.6.0'
 }
 
+// Set the project version.
+version = '0.0.0'
+
+// Define the main class for the application.
+mainClassName = 'sudoku.App'
+
 repositories {
   // Use jcenter for resolving your dependencies.
   jcenter()
@@ -104,6 +110,3 @@ task p_bench(type: Test) {
 
 // Execute jacocoTestReport on check.
 check.dependsOn 'jacocoTestReport'
-
-// Define the main class for the application.
-mainClassName = 'sudoku.App'
