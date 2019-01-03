@@ -45,7 +45,7 @@ A well-formed Sudoku puzzle is one that has a unique solution.
 A Sudoku puzzle, more in general, can have more than one solution and our goal
 is to enumerate them all, but this task is not always feasible.
 Indeed, if we were given an empty Sudoku table we would have to enumerate
-6670903752021072936960 solutions [[1]](#1) and this would take thousands of
+[6670903752021072936960 solutions][ref:sudoku-board-num] and this would take thousands of
 years.
 
 ## Solving Algorithm
