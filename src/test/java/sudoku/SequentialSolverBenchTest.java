@@ -183,7 +183,7 @@ public class SequentialSolverBenchTest {
   }
 
   @Test
-  public void testBench_2s() {
+  public void testBench_2f() {
     Board sudoku = new Board(new int[][]{
       {0, 0, 9, 0, 0, 0, 0, 0, 0},
       {0, 6, 0, 0, 0, 8, 0, 0, 0},
