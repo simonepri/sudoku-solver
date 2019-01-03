@@ -71,6 +71,16 @@ run_all() {
   stop=0
 }
 
+run_hwinfo() {
+  out="$(uname -s)"
+  case "${out}" in
+    Linux*)     cpu=$(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1');;
+    Darwin*)    cpu=$(sysctl -n machdep.cpu.brand_string);;
+    *)          cpu="unknown CPU"
+  esac
+  printf "${BOLD}Running benchmark tests on ${GREEN}$out${RST} with an ${CYAN}$cpu${RST}\n"
+}
+
 run_build() {
   ./gradlew assemble
 }
@@ -86,5 +96,6 @@ run_parallel() {
 trap "exit" SIGHUP
 
 run_build
+run_hwinfo
 run_serial
 run_parallel
