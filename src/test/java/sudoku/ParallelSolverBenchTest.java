@@ -19,6 +19,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 7, 0, 6, 0},
       {4, 0, 0, 6, 0, 9, 0, 0, 1}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("43129799915034095124480000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("1");
   }
 
@@ -35,6 +36,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 7, 0, 6, 0},
       {4, 0, 0, 6, 0, 0, 0, 0, 1}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("1947751863256350720000000000000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("4715");
   }
 
@@ -51,6 +53,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 0, 0, 6, 0},
       {4, 0, 0, 6, 0, 0, 0, 0, 1}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("13980445502865408000000000000000000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("132271");
   }
 
@@ -67,6 +70,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 0, 0, 6, 0},
       {4, 0, 0, 6, 0, 0, 0, 0, 1}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("477847258398720000000000000000000000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("587264");
   }
 
@@ -83,6 +87,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 0, 0, 6, 0},
       {4, 0, 0, 6, 0, 0, 0, 0, 1}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("23409163772243214336000000000000000000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("3151964");
   }
 
@@ -99,6 +104,7 @@ public class ParallelSolverBenchTest {
       {5, 0, 0, 0, 0, 0, 0, 6, 0},
       {4, 0, 0, 6, 0, 0, 0, 0, 1}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("1179821854121058002534400000000000000000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("16269895");
   }
 
@@ -115,6 +121,7 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 9, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 7, 4, 0, 0}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("24563768857859261988864000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("1");
   }
 
@@ -131,6 +138,7 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 9, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 0, 4, 0, 0}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("261718015484414301673881600000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("276");
   }
 
@@ -147,6 +155,7 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 0, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 0, 4, 0, 0}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("5546527766851092480000000000000000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("32128");
   }
 
@@ -163,6 +172,7 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 0, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 0, 4, 0, 0}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("54366191037898352756785152000000000000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("1014785");
   }
 
@@ -179,6 +189,7 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 0, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 0, 4, 0, 0}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("4281337544234495279596830720000000000000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("7388360");
   }
 
@@ -195,6 +206,7 @@ public class ParallelSolverBenchTest {
       {0, 0, 0, 0, 1, 0, 0, 3, 0},
       {2, 0, 0, 0, 0, 0, 0, 0, 0}
     });
+    assertThat((sudoku).getSearchSpace().toString()).isEqualTo("509895408914038847535316992000000000000000000000");
     assertThat(ParallelSolver.enumerate(sudoku).toString()).isEqualTo("48794239");
   }
 }
