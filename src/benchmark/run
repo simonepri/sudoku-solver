@@ -85,8 +85,8 @@ run_build() {
   ./gradlew assemble
 }
 
-run_serial() {
-  run_all "serial" "-s"
+run_sequential() {
+  run_all "sequential" "-s"
 }
 
 run_parallel() {
@@ -97,5 +97,5 @@ trap "exit" SIGHUP
 
 run_build
 run_hwinfo
-run_serial
+run_sequential
 run_parallel
