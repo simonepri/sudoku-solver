@@ -20,13 +20,17 @@ displaytime() {
   printf '%dms' $ms
 }
 
+run_app() {
+  java -jar build/libs/sudoku-solver-all-0.0.0.jar "$@"
+}
+
 run_one() {
   filepath="$1"
   args="$2"
   dirname=`basename "$(dirname "$filepath")"`
   filename=`basename "${filepath%.*}"`
   printf "Benchmark ${BOLD}$dirname$filename${RST} "
-  runtime=$(./gradlew run --console=plain --quiet --args="-t $args $filepath")
+  runtime=`run_app -t $args $filepath`
   if [ $stop -gt 0 ]; then
   printf "${RED}STOPPED${RST}\n"
   else
@@ -65,7 +69,7 @@ run_hwinfo() {
 }
 
 run_build() {
-  ./gradlew assemble
+  ./gradlew assemble --console=plain --quiet --no-daemon
 }
 
 run_sequential() {
