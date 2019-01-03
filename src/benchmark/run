@@ -6,23 +6,6 @@ RED='\033[00;31m'
 GREEN='\033[00;32m'
 CYAN='\033[00;36m'
 
-
-millis() {
-  if hash gdate 2>/dev/null; then
-    gdate +%s%3N
-  else
-    datestr="$(date +%s%3N)"
-    printf "${datestr/3N/"000"}"
-  fi
-}
-
-timeit() {
-  start=`millis`
-  bash -c "$@"
-  end=`millis`
-  runtime="$((end-start))"
-}
-
 displaytime() {
   T="$1"
   D="$((T/1000/60/60/24))"
@@ -43,7 +26,7 @@ run_one() {
   dirname=`basename "$(dirname "$filepath")"`
   filename=`basename "${filepath%.*}"`
   printf "Benchmark ${BOLD}$dirname$filename${RST} "
-  timeit "./gradlew run --args=\"$args $filepath\" > /dev/null 2>&1"
+  runtime=$(./gradlew run --console=plain --quiet --args="-t $args $filepath")
   if [ $stop -gt 0 ]; then
   printf "${RED}STOPPED${RST}\n"
   else

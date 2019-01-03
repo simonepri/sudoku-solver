@@ -27,6 +27,9 @@ public class App {
     @Parameter(names = {"--sequential", "-s"}, description = "Disable parallelism")
     public boolean sequential = false;
 
+    @Parameter(names = {"--time", "-t"}, description = "Print execution time in ms")
+    public boolean time = false;
+
     @Parameter(description = "<filename>[ <filename>]*")
     public List<String> filenames = new ArrayList<>();
   }
@@ -34,6 +37,7 @@ public class App {
   private final boolean help;
   private final boolean print;
   private final boolean sequential;
+  private final boolean time;
   private final List<String> filenames;
 
   /**
@@ -43,6 +47,7 @@ public class App {
   public App(Args args) {
     help = args.help;
     print = args.print;
+    time = args.time;
     sequential = args.sequential;
     filenames = new ArrayList<>(args.filenames);
   }
@@ -110,6 +115,7 @@ public class App {
           + "    --help               Print usage\n"
           + "    --print, -p          Print solutions\n"
           + "    --sequential, -s     Disable parallelism\n"
+          + "    --time, -t           Print execution time in ms\n"
       );
       return 0;
     }
@@ -119,13 +125,18 @@ public class App {
         Board board = new Board(parse(filename));
         if (print) {
           enumerate(board, b -> out.accept(b.toString()));
+        } else if (time) {
+          long start = System.currentTimeMillis();
+          BigInteger sc = enumerate(board);
+          long end = System.currentTimeMillis();
+          out.accept((end - start) + "\n");
         } else {
           BigInteger sp = board.getSearchSpace();
           out.accept("Search space: " + sp + "\n");
           double ff = 100.0 - (board.getFillablesCount() * 100.0) / board.getSize();
           out.accept("Fill factor: " + String.format("%.2f", ff) + "%\n");
           BigInteger sc = enumerate(board);
-          out.accept("Legal solutions: " + sc);
+          out.accept("Legal solutions: " + sc + "\n");
         }
       }
     } catch (NoSuchFileException e) {
