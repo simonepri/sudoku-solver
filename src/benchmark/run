@@ -74,11 +74,11 @@ run_all() {
 run_hwinfo() {
   out="$(uname -s)"
   case "${out}" in
-    Linux*)     cpu=$(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1');;
-    Darwin*)    cpu=$(sysctl -n machdep.cpu.brand_string);;
+    Linux*)     cpu="$(nproc) x $(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1')";;
+    Darwin*)    cpu="$(gnproc) x $(sysctl -n machdep.cpu.brand_string)";;
     *)          cpu="unknown CPU"
   esac
-  printf "${BOLD}Running benchmark tests on ${GREEN}$out${RST} with an ${CYAN}$cpu${RST}\n"
+  printf "${BOLD}Running benchmark tests on ${GREEN}$out${RST} with ${CYAN}$cpu${RST}\n"
 }
 
 run_build() {
