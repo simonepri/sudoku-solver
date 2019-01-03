@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+RST='\033[0m'
+BOLD='\e[1m'
+RED='\033[00;31m'
+GREEN='\033[00;32m'
+CYAN='\033[00;36m'
+
+
+millis() {
+  if hash gdate 2>/dev/null; then
+    gdate +%s%3N
+  else
+    printf "${$(date +%s%3N)/3N/"000"}"
+  fi
+}
+
+timeit() {
+  start=`millis`
+  bash -c "$@"
+  end=`millis`
+  runtime="$((end-start))"
+}
+
+displaytime() {
+  T="$1"
+  D="$((T/1000/60/60/24))"
+  H="$((T/1000/60/60%24))"
+  M="$((T/1000/60%60))"
+  S="$((T/1000%60))"
+  ms="$((T%1000))"
+  [ $D -gt 0 ] && printf '%dd ' $D
+  [ $H -gt 0 ] && printf '%dh ' $H
+  [ $M -gt 0 ] && printf '%dm ' $M
+  [ $S -gt 0 ] && printf '%ds ' $S
+  printf '%dms' $ms
+}
+
+run_one() {
+  filepath="$1"
+  args="$2"
+  dirname=`basename "$(dirname "$filepath")"`
+  filename=`basename "${filepath%.*}"`
+  printf "Benchmark ${BOLD}$dirname$filename${RST} "
+  timeit "./gradlew run --args=\"$args $filepath\" > /dev/null 2>&1"
+  if [ $stop -gt 0 ]; then
+  printf "${RED}STOPPED${RST}\n"
+  else
+    humanrt=`displaytime "$runtime"`
+    printf "${GREEN}OK${RST} ${CYAN}($humanrt)${RST}\n"
+  fi
+}
+
+run_all() {
+  trap "stop=1;" SIGINT
+  stty -echoctl
+
+  stop=0
+  mode="$1"
+  args="$2"
+  printf "${BOLD}Running benchmark tests in ${GREEN}$mode${RST}${BOLD} mode${RST}\n"
+  for dirpath in src/benchmark/boards/* ; do
+    dirname=`basename "${dirpath}"`
+    for filepath in `ls $dirpath/*.txt | sort -r`; do
+      if [ $stop -gt 0 ]; then stop=0; continue; fi
+      run_one "$filepath" "$args"
+      if [ $stop -gt 0 ]; then stop=0; continue; fi
+    done
+  done
+  stop=0
+}
+
+run_build() {
+  ./gradlew assemble
+}
+
+run_serial() {
+  run_all "serial" "-s"
+}
+
+run_parallel() {
+  run_all "parallel"
+}
+
+trap "exit" SIGHUP
+
+run_build
+run_serial
+run_parallel
