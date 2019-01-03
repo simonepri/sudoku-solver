@@ -32,7 +32,7 @@ run_one() {
   printf "Benchmark ${BOLD}$dirname$filename${RST} "
   runtime=`run_app -t $args $filepath`
   if [ $stop -gt 0 ]; then
-  printf "${RED}STOPPED${RST}\n"
+    printf "${RED}STOPPED${RST}\n"
   else
     humanrt=`displaytime "$runtime"`
     printf "${GREEN}OK${RST} ${CYAN}($humanrt)${RST}\n"
