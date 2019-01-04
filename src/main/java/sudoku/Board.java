@@ -267,12 +267,12 @@ final class Board {
     if (isFull()) {
       return BigInteger.ZERO;
     }
-    int max_cell_prod = 19; // (int)(Math.log(Long.MAX_VALUE) / Math.log(boardLength));
-    int max_parts = 5; // (int)((cellCount - clueCount) / max_cell_prod) + 2;
+    int maxCellProd = 19; // (int)(Math.log(Long.MAX_VALUE) / Math.log(boardLength));
+    int maxParts = 5; // (int)((cellCount - clueCount) / maxCellProd) + 2;
 
     int cells = 0;
     int parts = 0;
-    long[] partialSpace = new long[max_parts];
+    long[] partialSpace = new long[maxParts];
     partialSpace[parts] = 1;
     for (int row = 0; row < boardLength; row++) {
       for (int col = 0; col < boardLength; col++) {
@@ -285,7 +285,7 @@ final class Board {
         }
         partialSpace[parts] *= boardLength - getUsedCountRaw(row, col);
         cells++;
-        if (cells == max_cell_prod) {
+        if (cells == maxCellProd) {
           cells = 0;
           parts++;
           partialSpace[parts] = 1;
