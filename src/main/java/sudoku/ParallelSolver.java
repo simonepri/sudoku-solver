@@ -9,7 +9,7 @@ import sudoku.util.BigCounter;
 
 public class ParallelSolver {
   private static BigInteger SEARCH_SPACE_CUTOFF =
-      new BigInteger("1000000000000000");
+      new BigInteger("10000000000000000000000000000");
 
   /**
    * Default Constructor.
