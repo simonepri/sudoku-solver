@@ -4,6 +4,7 @@ RST='\033[0m'
 BOLD='\e[1m'
 RED='\033[00;31m'
 GREEN='\033[00;32m'
+YELLOW='\033[00;33m'
 CYAN='\033[00;36m'
 
 displaytime() {
@@ -25,64 +26,109 @@ run_app() {
 }
 
 run_one() {
-  filepath="$1"
-  args="$2"
+  mode="$1"
+  filepath="$2"
+  iterations="$3"
+  excluded="$4"
+  included="$5"
+
   dirname=`basename "$(dirname "$filepath")"`
   filename=`basename "${filepath%.*}"`
-  printf "Benchmark ${BOLD}$dirname$filename${RST} "
-  runtime=`run_app -t $args $filepath`
-  if [ $stop -gt 0 ]; then
+  testname="$dirname$filename"
+
+  if [ $mode = "sequential" ]; then args='-s -t'; else args='-t'; fi
+
+  printf "Benchmark ${BOLD}$testname${RST} "
+  if [[ ! $testname =~ $included || $testname =~ $excluded ]]; then
+    printf "${YELLOW}SKIPPED${RST}\n"
+    return
+  fi
+  trt=0
+  minrt=-1
+  maxrt=-1
+  for ((n = 0; n < iterations; n++)); do
+    if [ $STOP -gt 0 ]; then break; fi
+    runtime=`run_app $args $filepath`
+    trt=$((trt + runtime))
+    if [ $maxrt -eq -1 ] || [ $runtime -gt $maxrt ]; then maxrt="$runtime"; fi
+    if [ $minrt -eq -1 ] || [ $runtime -lt $minrt ]; then minrt="$runtime"; fi
+  done
+  if [ $STOP -gt 0 ]; then
     printf "${RED}STOPPED${RST}\n"
   else
-    humanrt=`displaytime "$runtime"`
-    printf "${GREEN}OK${RST} ${CYAN}($humanrt)${RST}\n"
+    hrt=`displaytime "$((trt / iterations))"`
+    hrtmin=`displaytime "$minrt"`
+    hrtmax=`displaytime "$maxrt"`
+    printf "${GREEN}OK${RST} ${CYAN}(avg: $hrt\t\tmin: $hrtmin\t\tmax: $hrtmax)${RST}\n"
   fi
 }
 
 run_all() {
-  trap "stop=1;" SIGINT
-  stty -echoctl
-
-  stop=0
   mode="$1"
-  args="$2"
-  printf "${BOLD}Running benchmark tests in ${GREEN}$mode${RST}${BOLD} mode${RST}\n"
+  iterations="$2"
+  excluded="$3"
+  included="$4"
+
+  trap "STOP=1" SIGINT
+  stty -echoctl
+  STOP=0
+  printf "${BOLD}Running benchmark tests in ${GREEN}$mode${RST}${BOLD} mode${RST}${BOLD} with ${CYAN}${iterations}${RST}${BOLD} iterations${RST}\n"
   for dirpath in src/benchmark/boards/* ; do
     dirname=`basename "${dirpath}"`
     for filepath in `ls $dirpath/*.txt | sort -r`; do
-      if [ $stop -gt 0 ]; then stop=0; continue; fi
-      run_one "$filepath" "$args"
-      if [ $stop -gt 0 ]; then stop=0; continue; fi
+      if [ $STOP -gt 0 ]; then STOP=0; continue; fi
+      run_one "$mode" "$filepath" "$iterations" "$excluded" "$included"
+      if [ $STOP -gt 0 ]; then STOP=0; continue; fi
     done
   done
-  stop=0
-}
-
-run_hwinfo() {
-  out="$(uname -s)"
-  case "${out}" in
-    Linux*)     cpu="$(nproc) x $(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1')";;
-    Darwin*)    cpu="$(gnproc) x $(sysctl -n machdep.cpu.brand_string)";;
-    *)          cpu="unknown CPU"
-  esac
-  printf "${BOLD}Running benchmark tests on ${GREEN}$out${RST} with ${CYAN}$cpu${RST}\n"
-}
-
-run_build() {
-  ./gradlew assemble --console=plain --quiet --no-daemon
-}
-
-run_sequential() {
-  run_all "sequential" "-s"
-}
-
-run_parallel() {
-  run_all "parallel"
+  STOP=0
 }
 
 trap "exit" SIGHUP
 
-run_build
-run_hwinfo
-run_sequential
-run_parallel
+run() {
+  # Parse options
+  iterations=1
+  excluded=""
+  included=".*"
+  notpar=0
+  notseq=0
+  while [[ $1 != "" ]]; do
+    case "$1" in
+      -n ) iterations=$2; shift 2;;
+      -nm ) excluded=$2; shift 2;;
+      -m ) included=$2; shift 2;;
+      -np ) notpar=1; shift 1;;
+      -ns ) notseq=1; shift 1;;
+      * ) shift 1;;
+    esac
+  done
+  if [[ ! $iterations =~ ^[1-9][0-9]*$ ]]; then
+    iterations=1;
+  fi
+
+  # Build the project
+  ./gradlew assemble --console=plain --quiet --no-daemon
+
+  # Print cpu info
+  out="$(uname -s)"
+  case "${out}" in
+    Linux* )     cpu="$(nproc) x $(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1')";;
+    Darwin* )    cpu="$(gnproc) x $(sysctl -n machdep.cpu.brand_string)";;
+    * )          cpu="unknown CPU";;
+  esac
+  printf "${BOLD}Running benchmark tests on ${GREEN}$out${RST} with ${CYAN}$cpu${RST}\n"
+
+
+  if [ $notseq -eq 0 ]; then
+    # Sequential tests
+    run_all "sequential" "$iterations" "$excluded" "$included"
+  fi
+
+  if [ $notpar -eq 0 ]; then
+    # Parallel tests
+    run_all "parallel" "$iterations" "$excluded" "$included"
+  fi
+}
+
+run "$@"

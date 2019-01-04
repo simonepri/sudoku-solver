@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-exec ./src/benchmark/run
+shift 0
+exec ./src/benchmark/run "$@"
