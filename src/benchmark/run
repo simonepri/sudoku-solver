@@ -53,22 +53,27 @@ run_one() {
     return
   fi
   trt=0
+  trtsq=0
   minrt=-1
   maxrt=-1
   for ((n = 0; n < iterations; n++)); do
     if [ $STOP -gt 0 ]; then break; fi
     runtime=`run_app $args $filepath`
     trt=$((trt + runtime))
+    trtsq=$((trtsq + runtime * runtime))
     if [ $maxrt -eq -1 ] || [ $runtime -gt $maxrt ]; then maxrt="$runtime"; fi
     if [ $minrt -eq -1 ] || [ $runtime -lt $minrt ]; then minrt="$runtime"; fi
   done
   if [ $STOP -gt 0 ]; then
     printf "${RED}STOPPED${RST}\n"
   else
+    stdev=$(echo "scale=16; sqrt($trtsq/$iterations - ($trt/$iterations)^2)" | bc)
+    stdev=$(echo "scale=0; $stdev/1" | bc)
     hrt=`displaytime "$((trt / iterations))"`
     hrtmin=`displaytime "$minrt"`
     hrtmax=`displaytime "$maxrt"`
-    printf "${GREEN}OK${RST} ${CYAN}(avg: $hrt\t\tmin: $hrtmin\t\tmax: $hrtmax)${RST}\n"
+    hrtdev=`displaytime "$stdev"`
+    printf "${GREEN}OK${RST} ${CYAN}(avg: $hrt\tdev: ${hrtdev}\t\tmin: $hrtmin\t\tmax: $hrtmax)${RST}\n"
   fi
 }
 
