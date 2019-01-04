@@ -8,12 +8,24 @@ import java.util.function.Consumer;
 import sudoku.util.BigCounter;
 
 public class ParallelSolver {
-  private static final BigInteger SEARCH_SPACE_CUTOFF = BigInteger.valueOf((long)1e13);
+  private static BigInteger SEARCH_SPACE_CUTOFF =
+      new BigInteger("1000000000000000");
 
   /**
    * Default Constructor.
    */
   private ParallelSolver() {}
+
+  /**
+   * Configure the sequential cutoff for the solver.
+   * @param cutoff the sequential cutoff for the search space.
+   */
+  public static void setSequentialCutoff(BigInteger cutoff) {
+    if (cutoff == null || cutoff.signum() != 1) {
+      return;
+    }
+    SEARCH_SPACE_CUTOFF = cutoff;
+  }
 
   /**
    * Enumerate all the legal solutions of the given board.

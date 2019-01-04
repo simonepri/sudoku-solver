@@ -31,12 +31,21 @@ run_one() {
   iterations="$3"
   excluded="$4"
   included="$5"
+  cutoff="$6"
 
   dirname=`basename "$(dirname "$filepath")"`
   filename=`basename "${filepath%.*}"`
   testname="$dirname$filename"
 
-  if [ $mode = "sequential" ]; then args='-s -t'; else args='-t'; fi
+  if [ $mode = "parallel" ]; then
+    if [ "$cutoff" != "" ]; then
+      args="-t -cf $cutoff";
+    else
+      args="-t";
+    fi
+  else
+    args="-s -t";
+  fi
 
   printf "Benchmark ${BOLD}$testname${RST} "
   if [[ ! $testname =~ $included || $testname =~ $excluded ]]; then
@@ -68,6 +77,7 @@ run_all() {
   iterations="$2"
   excluded="$3"
   included="$4"
+  cutoff="$5"
 
   trap "STOP=1" SIGINT
   stty -echoctl
@@ -77,7 +87,7 @@ run_all() {
     dirname=`basename "${dirpath}"`
     for filepath in `ls $dirpath/*.txt | sort -r`; do
       if [ $STOP -gt 0 ]; then STOP=0; continue; fi
-      run_one "$mode" "$filepath" "$iterations" "$excluded" "$included"
+      run_one "$mode" "$filepath" "$iterations" "$excluded" "$included" "$cutoff"
       if [ $STOP -gt 0 ]; then STOP=0; continue; fi
     done
   done
@@ -93,6 +103,7 @@ run() {
   included="^.*$"
   notpar=0
   notseq=0
+  cutoff=""
   while [[ $1 != "" ]]; do
     case "$1" in
       -n ) iterations=$2; shift 2;;
@@ -100,11 +111,15 @@ run() {
       -m ) included=$2; shift 2;;
       -np ) notpar=1; shift 1;;
       -ns ) notseq=1; shift 1;;
+      -cf ) cutoff=$2; shift 2;;
       * ) shift 1;;
     esac
   done
   if [[ ! $iterations =~ ^[1-9][0-9]*$ ]]; then
     iterations=1;
+  fi
+  if [[ ! $cutoff =~ ^[1-9][0-9]*$ ]]; then
+    cutoff="";
   fi
 
   # Build the project
@@ -127,7 +142,7 @@ run() {
 
   if [ $notpar -eq 0 ]; then
     # Parallel tests
-    run_all "parallel" "$iterations" "$excluded" "$included"
+    run_all "parallel" "$iterations" "$excluded" "$included" "$cutoff"
   fi
 }
 

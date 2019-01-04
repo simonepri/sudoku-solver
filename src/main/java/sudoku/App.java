@@ -5,6 +5,7 @@ import com.beust.jcommander.Parameter;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -30,6 +31,9 @@ public class App {
     @Parameter(names = {"--time", "-t"}, description = "Print execution time in ms")
     public boolean time = false;
 
+    @Parameter(names = {"--cutoff", "-cf"}, description = "Sequential cutoff")
+    public BigDecimal cutoff = null;
+
     @Parameter(description = "<filename>[ <filename>]*")
     public List<String> filenames = new ArrayList<>();
   }
@@ -38,6 +42,7 @@ public class App {
   private final boolean print;
   private final boolean sequential;
   private final boolean time;
+  private final BigDecimal cutoff;
   private final List<String> filenames;
 
   /**
@@ -48,6 +53,7 @@ public class App {
     help = args.help;
     print = args.print;
     time = args.time;
+    cutoff = args.cutoff;
     sequential = args.sequential;
     filenames = new ArrayList<>(args.filenames);
   }
@@ -100,6 +106,9 @@ public class App {
     if (sequential) {
       return SequentialSolver.enumerate(board, onSolution);
     }
+    if (cutoff != null) {
+      ParallelSolver.setSequentialCutoff(cutoff.toBigInteger());
+    }
     return ParallelSolver.enumerate(board, onSolution);
   }
 
@@ -115,6 +124,7 @@ public class App {
           + "    --help               Print usage\n"
           + "    --print, -p          Print solutions\n"
           + "    --sequential, -s     Disable parallelism\n"
+          + "    --cutoff, -cf        Sequential cutoff\n"
           + "    --time, -t           Print execution time in ms\n"
       );
       return 0;
