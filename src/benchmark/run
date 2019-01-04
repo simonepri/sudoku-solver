@@ -14,10 +14,10 @@ displaytime() {
   M="$((T/1000/60%60))"
   S="$((T/1000%60))"
   ms="$((T%1000))"
-  [ $D -gt 0 ] && printf '%dd ' $D
-  [ $H -gt 0 ] && printf '%dh ' $H
-  [ $M -gt 0 ] && printf '%dm ' $M
-  [ $S -gt 0 ] && printf '%ds ' $S
+  [ "$D" -gt 0 ] && printf '%dd ' $D
+  [ "$H" -gt 0 ] && printf '%dh ' $H
+  [ "$M" -gt 0 ] && printf '%dm ' $M
+  [ "$S" -gt 0 ] && printf '%ds ' $S
   printf '%dms' $ms
 }
 
@@ -37,39 +37,39 @@ run_one() {
   filename=`basename "${filepath%.*}"`
   testname="$dirname$filename"
 
-  if [ $mode = "parallel" ]; then
-    if [ "$cutoff" != "" ]; then
-      args="-t -cf $cutoff";
-    else
-      args="-t";
-    fi
-  else
-    args="-s -t";
-  fi
-
   printf "Benchmark ${BOLD}$testname${RST} "
   if [[ ! $testname =~ $included || $testname =~ $excluded ]]; then
     printf "${YELLOW}SKIPPED${RST}\n"
     return
   fi
-  trt=0
-  trtsq=0
+
+  if [ $mode = "parallel" ]; then
+    args="-t";
+    if [ "$cutoff" != "" ]; then
+      args="$args -cf $cutoff";
+    fi
+  else
+    args="-s -t";
+  fi
+
+  totrt=0
+  totrtsq=0
   minrt=-1
   maxrt=-1
   for ((n = 0; n < iterations; n++)); do
     if [ $STOP -gt 0 ]; then break; fi
     runtime=`run_app $args $filepath`
-    trt=$((trt + runtime))
-    trtsq=$((trtsq + runtime * runtime))
-    if [ $maxrt -eq -1 ] || [ $runtime -gt $maxrt ]; then maxrt="$runtime"; fi
-    if [ $minrt -eq -1 ] || [ $runtime -lt $minrt ]; then minrt="$runtime"; fi
+    totrt=$((totrt + runtime))
+    totrtsq=$((totrtsq + runtime * runtime))
+    if [ "$maxrt" -eq -1 ] || [ "$runtime" -gt "$maxrt" ]; then maxrt="$runtime"; fi
+    if [ "$minrt" -eq -1 ] || [ "$runtime" -lt "$minrt" ]; then minrt="$runtime"; fi
   done
   if [ $STOP -gt 0 ]; then
     printf "${RED}STOPPED${RST}\n"
   else
-    stdev=$(echo "scale=16; sqrt($trtsq/$iterations - ($trt/$iterations)^2)" | bc)
-    stdev=$(echo "scale=0; $stdev/1" | bc)
-    hrt=`displaytime "$((trt / iterations))"`
+    stdev=`echo "scale=16; sqrt($totrtsq/$iterations - ($totrt/$iterations)^2)" | bc`
+    stdev=`echo "scale=0; $stdev/1" | bc`
+    hrt=`displaytime "$((totrt / iterations))"`
     hrtmin=`displaytime "$minrt"`
     hrtmax=`displaytime "$maxrt"`
     hrtdev=`displaytime "$stdev"`
@@ -131,7 +131,7 @@ run() {
   ./gradlew assemble --console=plain --quiet --no-daemon
 
   # Print cpu info
-  out="$(uname -s)"
+  out=`uname -s`
   case "${out}" in
     Linux* )     cpu="$(nproc) x $(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1')";;
     Darwin* )    cpu="$(gnproc) x $(sysctl -n machdep.cpu.brand_string)";;
