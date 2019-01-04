@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Stack;
 import java.util.function.Consumer;
 
-import sudoku.utils.BigCounter;
+import sudoku.util.BigCounter;
 
 public class SequentialSolver {
   /**

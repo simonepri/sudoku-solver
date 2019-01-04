@@ -7,7 +7,7 @@ import java.math.BigInteger;
 
 import org.junit.Test;
 
-import sudoku.utils.BigCounter;
+import sudoku.util.BigCounter;
 
 public class SequentialSolverTest {
   @Test

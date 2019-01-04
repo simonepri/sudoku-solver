@@ -1,4 +1,4 @@
-package sudoku.utils;
+package sudoku.util;
 
 import java.math.BigInteger;
 
@@ -93,7 +93,7 @@ public class BigCounter implements Comparable<BigCounter> {
       }
     }
   }
-  
+
   /**
    * Sum another counter to this counter.
    * @param other a value to add to the counter.

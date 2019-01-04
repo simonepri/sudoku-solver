@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.concurrent.RecursiveTask;
 import java.util.function.Consumer;
 
-import sudoku.utils.BigCounter;
+import sudoku.util.BigCounter;
 
 public class ParallelSolver {
   private static final BigInteger SEARCH_SPACE_CUTOFF = BigInteger.valueOf((long)1e13);
