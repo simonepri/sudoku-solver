@@ -89,8 +89,8 @@ trap "exit" SIGHUP
 run() {
   # Parse options
   iterations=1
-  excluded=""
-  included=".*"
+  excluded="^$"
+  included="^.*$"
   notpar=0
   notseq=0
   while [[ $1 != "" ]]; do
