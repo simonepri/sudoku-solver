@@ -7,6 +7,18 @@ GREEN='\033[00;32m'
 YELLOW='\033[00;33m'
 CYAN='\033[00;36m'
 
+usage() {
+  printf "Usage: bench [options]\n"
+  printf "  Options:\n"
+  printf "    --help               Print usage\n"
+  printf "    -n <integer>         Number of iteration to execute for each test\n"
+  printf "    -m <regex>           Run only the tests whose name match the regex\n"
+  printf "    -nm <regex>          Don't run the tests whose name match the regex\n"
+  printf "    -np                  Skip parallel mode benchmark\n"
+  printf "    -ns                  Skip sequential mode benchmark\n"
+  printf "    -cf <integer>        Custom sequential cutoff for parallel mode\n"
+}
+
 displaytime() {
   T="$1"
   D="$((T/1000/60/60/24))"
@@ -111,6 +123,7 @@ run() {
   cutoff=""
   while [[ $1 != "" ]]; do
     case "$1" in
+      --help ) usage; exit 0;;
       -n ) iterations=$2; shift 2;;
       -nm ) excluded=$2; shift 2;;
       -m ) included=$2; shift 2;;
