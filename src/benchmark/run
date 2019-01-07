@@ -16,6 +16,7 @@ usage() {
   printf "    -np                  Skip parallel mode benchmark\n"
   printf "    -ns                  Skip sequential mode benchmark\n"
   printf "    -cf <integer>        Custom sequential cutoff for parallel mode\n"
+  printf "    -nh                  Display time in ms instead of humanizing it\n"
 }
 
 displaytime() {
@@ -42,7 +43,8 @@ run_one() {
   iterations="$3"
   excluded="$4"
   included="$5"
-  cutoff="$6"
+  nothuman="$6"
+  cutoff="$7"
 
   dirname=`basename "$(dirname "$filepath")"`
   filename=`basename "${filepath%.*}"`
@@ -80,11 +82,16 @@ run_one() {
   else
     stdev=`echo "scale=16; sqrt($totrtsq/$iterations - ($totrt/$iterations)^2)" | bc`
     stdev=`echo "scale=0; $stdev/1" | bc`
-    hrt=`displaytime "$((totrt / iterations))"`
-    hrtmin=`displaytime "$minrt"`
-    hrtmax=`displaytime "$maxrt"`
-    hrtdev=`displaytime "$stdev"`
-    printf "${GREEN}OK${RST} ${CYAN}(avg: $hrt\tdev: ${hrtdev}\t\tmin: $hrtmin\t\tmax: $hrtmax)${RST}\n"
+    avgrt="$((totrt / iterations))"
+
+    if [ $nothuman -eq 0 ]; then
+      avgrt=`displaytime "$avgrt"`
+      minrt=`displaytime "$minrt"`
+      maxrt=`displaytime "$maxrt"`
+      stdev=`displaytime "$stdev"`
+    fi
+
+    printf "${GREEN}OK${RST} ${CYAN}(avg: $avgrt | dev: ${stdev} | min: $minrt | max: $maxrt)${RST}\n"
   fi
 }
 
@@ -93,7 +100,8 @@ run_all() {
   iterations="$2"
   excluded="$3"
   included="$4"
-  cutoff="$5"
+  nothuman="$5"
+  cutoff="$6"
 
   trap "STOP=1" SIGINT
   stty -echoctl
@@ -103,7 +111,7 @@ run_all() {
     dirname=`basename "${dirpath}"`
     for filepath in `ls $dirpath/*.txt | sort -r`; do
       if [ $STOP -gt 0 ]; then STOP=0; continue; fi
-      run_one "$mode" "$filepath" "$iterations" "$excluded" "$included" "$cutoff"
+      run_one "$mode" "$filepath" "$iterations" "$excluded" "$included" "$nothuman" "$cutoff"
       if [ $STOP -gt 0 ]; then STOP=0; continue; fi
     done
   done
@@ -119,6 +127,7 @@ run() {
   included="^.*$"
   notpar=0
   notseq=0
+  nothuman=0
   cutoff=""
   while [[ $1 != "" ]]; do
     case "$1" in
@@ -129,6 +138,7 @@ run() {
       -np ) notpar=1; shift 1;;
       -ns ) notseq=1; shift 1;;
       -cf ) cutoff=$2; shift 2;;
+      -nh ) nothuman=1; shift 1;;
       * ) shift 1;;
     esac
   done
@@ -159,12 +169,12 @@ run() {
 
   if [ $notseq -eq 0 ]; then
     # Sequential tests
-    run_all "sequential" "$iterations" "$excluded" "$included"
+    run_all "sequential" "$iterations" "$excluded" "$included" "$nothuman" ""
   fi
 
   if [ $notpar -eq 0 ]; then
     # Parallel tests
-    run_all "parallel" "$iterations" "$excluded" "$included" "$cutoff"
+    run_all "parallel" "$iterations" "$excluded" "$included" "$nothuman" "$cutoff"
   fi
 }
 
