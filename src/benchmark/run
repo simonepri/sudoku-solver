@@ -149,7 +149,7 @@ run() {
     Darwin* )    cpu="$(gnproc) x $(sysctl -n machdep.cpu.brand_string)";;
     * )          cpu="unknown CPU";;
   esac
-  printf "${BOLD}Running benchmark tests on ${GREEN}$out${RST} with ${CYAN}$cpu${RST}\n"
+  printf "${BOLD}Running benchmark tests on ${GREEN}$out${RST}${BOLD} with ${CYAN}$cpu${RST}\n"
 
 
   if [ $notseq -eq 0 ]; then
