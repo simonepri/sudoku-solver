@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Build the project if the jar is not available
+if ! ls build/libs/sudoku-solver-all-*.*.*.jar > /dev/null 2>&1; then
+  ./gradlew assemble --quiet --no-daemon
+fi
+
+# Run the app
+shift 0
+java -jar build/libs/sudoku-solver-all-*.*.*.jar "$@"
