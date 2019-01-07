@@ -4,7 +4,6 @@ RST='\033[0m'
 BOLD='\e[1m'
 RED='\033[00;31m'
 GREEN='\033[00;32m'
-YELLOW='\033[00;33m'
 CYAN='\033[00;36m'
 
 usage() {
@@ -49,11 +48,11 @@ run_one() {
   filename=`basename "${filepath%.*}"`
   testname="$dirname$filename"
 
-  printf "Benchmark ${BOLD}$testname${RST} "
   if [[ ! $testname =~ $included || $testname =~ $excluded ]]; then
-    printf "${YELLOW}SKIPPED${RST}\n"
     return
   fi
+
+  printf "Benchmark ${BOLD}$testname${RST} "
 
   if [ $mode = "parallel" ]; then
     args="-t";
