@@ -33,7 +33,7 @@ displaytime() {
 }
 
 run_app() {
-  java -jar build/libs/sudoku-solver-all-0.0.0.jar "$@"
+  java -jar build/libs/sudoku-solver-all-*.*.*.jar "$@"
 }
 
 run_one() {
@@ -143,7 +143,9 @@ run() {
   fi
 
   # Build the project
-  ./gradlew assemble --console=plain --quiet --no-daemon
+  if ! ls build/libs/sudoku-solver-all-*.*.*.jar > /dev/null 2>&1; then
+    ./gradlew assemble --quiet --no-daemon
+  fi
 
   # Print cpu info
   out=`uname -s`
