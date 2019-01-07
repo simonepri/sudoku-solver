@@ -1,26 +1,7 @@
 <h1 align="center">
   <b>sudoku-solver</b>
 </h1>
-<p align="center">
-  <!-- CI - TravisCI -->
-  <a href="https://travis-ci.com/simonepri/sudoku-solver">
-    <img src="https://img.shields.io/travis/com/simonepri/sudoku-solver/master.svg?label=MacOS%20%26%20Linux" alt="Mac/Linux Build Status" />
-  </a>
-  <!-- CI - AppVeyor -->
-  <a href="https://ci.appveyor.com/project/simonepri/sudoku-solver">
-    <img src="https://img.shields.io/appveyor/ci/simonepri/sudoku-solver/master.svg?label=Windows" alt="Windows Build status" />
-  </a>
-  <!-- Coverage - Codecov -->
-  <a href="https://codecov.io/gh/simonepri/sudoku-solver">
-    <img src="https://img.shields.io/codecov/c/github/simonepri/sudoku-solver/master.svg" alt="Codecov Coverage report" />
-  </a>
-  <!-- License - MIT -->
-  <a href="https://github.com/simonepri/sudoku-solver/tree/master/license">
-    <img src="https://img.shields.io/github/license/simonepri/sudoku-solver.svg" alt="Project license" />
-  </a>
 
-  <br/>
-</p>
 <p align="center">
   🔢 Sudoku Solutions Enumerator (Sequential and Parallel)
   <br/>
