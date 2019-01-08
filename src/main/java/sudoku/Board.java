@@ -43,8 +43,11 @@ final class Board {
   private int[] colUsed;
   private int[] boxUsed;
 
+  private BigInteger searchSpace;
+
   /**
    * Default Constructor.
+   *
    * @param board the sudoku board, empty cells are represented by 0.
    */
   public Board(int[][] board) {
@@ -88,6 +91,7 @@ final class Board {
 
   /**
    * Clone Constructor.
+   *
    * @param other the sudoku board to clone.
    */
   public Board(Board other) {
@@ -113,18 +117,19 @@ final class Board {
     for (int row = 0; row < boardLength; row++) {
       board[row] = Arrays.copyOf(other.board[row], boardLength);
     }
+
+    searchSpace = other.getSearchSpace();
   }
 
   /**
    * Get the value of a board's cell.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    */
   public int getCell(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException(
-          "The cell specified is out of the board: " + row + ":" + col
-      );
+      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
     }
 
     return board[row][col];
@@ -132,6 +137,7 @@ final class Board {
 
   /**
    * Set the value of a board's cell.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @param val the value to place at the position.
@@ -139,14 +145,10 @@ final class Board {
    */
   public void setCell(int row, int col, int val) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException(
-          "The cell specified is out of the board: " + row + ":" + col
-      );
+      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
     }
     if (!isValidValue(val)) {
-      throw new IllegalArgumentException(
-          "The value specified is invalid: " + val + " at " + row + ":" + col
-      );
+      throw new IllegalArgumentException("The value specified is invalid: " + val + " at " + row + ":" + col);
     }
 
     int oldval = board[row][col];
@@ -156,10 +158,10 @@ final class Board {
 
     int box = getBoxIndexRaw(row, col);
     if (!isCandidateRaw(row, col, box, val)) {
-      throw new IllegalArgumentException(
-          "Value already used: " + val + " at " + row + ":" + col
-      );
+      throw new IllegalArgumentException("Value already used: " + val + " at " + row + ":" + col);
     }
+
+    BigInteger oldAffectedSearchSpace = getAffectedSearchSpace(row, col);
 
     if (oldval != EMPTY_CELL) {
       int unsetbit = ~(1 << oldval);
@@ -186,10 +188,13 @@ final class Board {
       updateNextToFillOnUnset(row, col, box);
       updateNextBestToFillOnUnset(row, col, box);
     }
+    BigInteger newAffectedSearchSpace = getAffectedSearchSpace(row, col);
+    searchSpace = searchSpace.divide(oldAffectedSearchSpace).multiply(newAffectedSearchSpace);
   }
 
   /**
    * Check whether a certain value can be legally placed in a cell.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @param val the value to place at the position.
@@ -197,9 +202,7 @@ final class Board {
    */
   public boolean isCandidate(int row, int col, int val) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException(
-          "The cell specified is out of the board: " + row + ":" + col
-      );
+      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
     }
     if (!isValidValue(val)) {
       return false;
@@ -211,15 +214,14 @@ final class Board {
 
   /**
    * Get a stream of possible legal values to set for a particular cell.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @throws IllegalArgumentException if the action cannot be taken.
    */
   public IntStream getCandidates(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException(
-          "The cell specified is out of the board: " + row + ":" + col
-      );
+      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
     }
 
     int box = getBoxIndexRaw(row, col);
@@ -228,15 +230,14 @@ final class Board {
 
   /**
    * Get the number of possible legal values to set for a particular cell.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @throws IllegalArgumentException if the action cannot be taken.
    */
   public int getCandidatesCount(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException(
-          "The cell specified is out of the board: " + row + ":" + col
-      );
+      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
     }
 
     return boardLength - getUsedCountRaw(row, col);
@@ -246,10 +247,8 @@ final class Board {
    * Get a stream of empty cells of the board. (left to right, top to bottom)
    */
   public Stream<Cell> getFillables() {
-    return IntStream.range(0, boardLength)
-        .mapToObj(i -> IntStream.range(0, boardLength).mapToObj(j -> new Cell(i, j)))
-        .flatMap(Function.identity())
-        .filter(cell -> board[cell.row][cell.col] == EMPTY_CELL);
+    return IntStream.range(0, boardLength).mapToObj(i -> IntStream.range(0, boardLength).mapToObj(j -> new Cell(i, j)))
+        .flatMap(Function.identity()).filter(cell -> board[cell.row][cell.col] == EMPTY_CELL);
   }
 
   /**
@@ -264,8 +263,18 @@ final class Board {
    * candidates of each empty cell.
    */
   public BigInteger getSearchSpace() {
+    if (searchSpace == null)
+      searchSpace = computeSearchSpace();
+    return searchSpace;
+  }
+
+  /**
+   * Get the search space computed as the multiplication of the number of
+   * candidates of each empty cell.
+   */
+  private BigInteger computeSearchSpace() {
     if (isFull()) {
-      return BigInteger.ZERO;
+      return BigInteger.ONE;
     }
     int maxCellProd = 19; // (int)(Math.log(Long.MAX_VALUE) / Math.log(boardLength));
     int maxParts = 5; // (int)((cellCount - clueCount) / maxCellProd) + 2;
@@ -292,7 +301,6 @@ final class Board {
         }
       }
     }
-
     BigInteger fullSpace = BigInteger.valueOf(partialSpace[0]);
     for (int i = 1; i <= parts; i++) {
       if (partialSpace[i] == 1) {
@@ -302,6 +310,36 @@ final class Board {
     }
 
     return fullSpace;
+  }
+
+  /**
+   * @return BigInteger the total search space affected by a change at cell (row, index)
+   */
+  private BigInteger getAffectedSearchSpace(int row, int col) {
+
+    long rowSpace = 1;
+    long colSpace = 1;
+    long boxSpace = 1;
+    for (int i = 0; i < boardLength; i++) {
+      if (board[row][i] == EMPTY_CELL)
+        rowSpace *= getCandidatesCount(row, i);
+    }
+    for (int i = 0; i < boardLength; i++) {
+      if (board[i][col] == EMPTY_CELL)
+        colSpace *= getCandidatesCount(i, col);
+    }
+    int boxIndex = getBoxIndex(row, col);
+    for (int i = 0; i < boxLength; i++) {
+      for (int j = 0; j < boxLength; j++) {
+        if (board[boxLength * boxIndex + i][boxLength * boxIndex + j] == EMPTY_CELL)
+          boxSpace *= getCandidatesCount(i, col);
+      }
+    }
+    BigInteger affectedSearchSpace = BigInteger.ONE;
+    return affectedSearchSpace.multiply(BigInteger.valueOf(rowSpace))
+      .multiply(BigInteger.valueOf(colSpace))
+      .multiply(BigInteger.valueOf(boxSpace));
+
   }
 
   /**
@@ -315,8 +353,8 @@ final class Board {
   }
 
   /**
-   * Get the next cell that is empty and has the least number of candidates.
-   * (left to right, top to bottom)
+   * Get the next cell that is empty and has the least number of candidates. (left
+   * to right, top to bottom)
    */
   public Cell getBestNextToFill() {
     if (nextFreeRow >= boardLength) {
@@ -355,6 +393,7 @@ final class Board {
 
   /**
    * Check whether the given cell belongs to the board.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    */
@@ -364,6 +403,7 @@ final class Board {
 
   /**
    * Check whether the given value can ve used in the board.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    */
@@ -373,15 +413,14 @@ final class Board {
 
   /**
    * Compute the box index for the given cell. (left to right, top to bottom)
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @throws IllegalArgumentException if the action cannot be taken.
    */
   public int getBoxIndex(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException(
-          "The cell specified is out of the board: " + row + ":" + col
-      );
+      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
     }
 
     return getBoxIndexRaw(row, col);
@@ -389,6 +428,7 @@ final class Board {
 
   /**
    * Check whether a certain value can be legally placed in a cell.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @param box the box of the cell provided.
@@ -396,13 +436,12 @@ final class Board {
    */
   private boolean isCandidateRaw(int row, int col, int box, int val) {
     int nthbit = 1 << val;
-    return ((rowUsed[row] & nthbit) == 0)
-        && ((colUsed[col] & nthbit) == 0)
-        && ((boxUsed[box] & nthbit) == 0);
+    return ((rowUsed[row] & nthbit) == 0) && ((colUsed[col] & nthbit) == 0) && ((boxUsed[box] & nthbit) == 0);
   }
 
   /**
    * Get the number of possible legal values to set for a particular cell.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    */
@@ -412,6 +451,7 @@ final class Board {
 
   /**
    * Get the number of possible legal values to set for a particular cell.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @param box the box of the cell provided.
@@ -422,6 +462,7 @@ final class Board {
 
   /**
    * Compute the box index for the given cell. (left to right, top to bottom)
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    */
@@ -431,6 +472,7 @@ final class Board {
 
   /**
    * Helper function to update the next free cell when a cell is setted.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @param box the box of the cell provided.
@@ -459,6 +501,7 @@ final class Board {
 
   /**
    * Helper function to update the next free cell when a cell is cleared.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @param box the box of the cell provided.
@@ -477,6 +520,7 @@ final class Board {
 
   /**
    * Helper function to update the next bext free cell when a cell is setted.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @param box the box of the cell provided.
@@ -534,7 +578,8 @@ final class Board {
     }
 
     int nextBestFreeRowUse = -1;
-    // Update the new best on all the rows at the given col and the overall best cell.
+    // Update the new best on all the rows at the given col and the overall best
+    // cell.
     for (int r = nextFreeRow; r < boardLength; r++) {
       int nbrCol = nextBestFreeOnRow[r];
       if (nbrCol == boardLength) {
@@ -558,6 +603,7 @@ final class Board {
 
   /**
    * Helper function to update the next bext free cell when a cell is cleared.
+   *
    * @param row a row of the board.
    * @param col a column of the board.
    * @param box the box of the cell provided.
@@ -593,6 +639,7 @@ final class Board {
 
   /**
    * Build a lookup table to be able to count set bits of a bitset faster.
+   *
    * @param size the number of bits of the bitset.
    */
   private static void buildCountBitSetLookupTable(int size) {
