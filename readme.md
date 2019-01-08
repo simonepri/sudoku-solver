@@ -130,10 +130,10 @@ In addition to those, it's worth mentioning that two new methods have been
 introduced (`get_search_space_size` and `clone`).
 
 The presence of those new methods and the creation of a thread for each branch
-of the backtracking are the major cause of overhead in comparison with the
-sequential version.
-To overcome them, the sequential algorithm is used as sub-routine, when the
-remaining search space is below a certain threshold empirically found.
+of the backtracking are the major cause of overhead.
+The sequential algorithm is indeed used as sub-routine to speedup the
+computation, when the remaining search space is below a certain threshold
+empirically found.
 
 More details about the computational complexity of the operations and the idea
 behind their implementation can be found in the
