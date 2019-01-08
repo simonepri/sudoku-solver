@@ -140,27 +140,58 @@ behind their implementation can be found in the
 [implementation details](#implementation-details) section.
 
 ### Implementation details
+
 #### Check if the board is completed in constant time
 TODO
+<!-- Keep the count of empty and total cells. -->
+
 #### Check if a value is legal for a cell in constant time
 TODO
+<!-- Keep an bit-set of size S for each column row and box. -->
+<!-- Update the bit-set after during set operation. -->
+<!-- Use the bit-set to understand if a specific value has already been used. -->
+
 #### Count the number of candidates of a cell in constant time
 TODO
+<!-- Count the number of ones of the or of the bit-sets of the used values. -->
+<!-- Precompute the number of ones for all the possible int value of the bit-set. -->
+
 #### Get the next empty cell in constant time
 TODO
+<!-- Keep an array of S elements that contains the column index of the next empty cell of each row. -->
+<!-- On set, update the next empty cell for the row where the value has been set. -->
+
 #### Get the cell with the lowest number of candidates in constant time
 TODO
+<!-- Keep an array of S elements that contains the column index of the cell with the lowest number of candidates of each row. -->
+<!-- On set, for each row try to update the column index of the cell with the lowest number of candidates with the the column where the value has been set. -->
+<!-- On set, for the row where the value has been set try to update the column index with all the columns of that row. -->
+<!-- On set, for the rows of the box where the value has been set try to update the column index with all the columns of that box. -->
+
 #### Count using BigInteger in constant amortized time
 TODO
+<!-- Counter modulo Long.MAX_VALUE. -->
+
 #### Parallelizing the branches using the fork/join framework
 TODO
+<!-- Thread "halving". -->
+<!-- Work stealing thread pool. -->
+
+#### Compute the search space
+TODO
+<!-- Multiply at groups of log(Long.MAX_VALUE)/log(9). -->
+
 #### Choose of the appropriate sequential cut-off
 TODO
 
+#### Addition using BigInteger in constant amortized time
+TODO
+<!-- Adder modulo Long.MAX_VALUE. -->
+
 ## Experiments
 TODO
-<!-- Le caratteristiche della/e piattaforma/e su cui avete eseguito l’analisi sperimentale -->
-<!-- I risultati sperimentali ottenuti, tramite tabelle o grafici opportunamente commentati -->
+<!-- Le caratteristiche della/e piattaforma/e su cui avete eseguito l’analisi sperimentale. -->
+<!-- I risultati sperimentali ottenuti, tramite tabelle o grafici opportunamente commentati. -->
 <!-- Lo speedup è sempre maggiore di 1? Perché? -->
 <!-- Quali istanze richiedono più tempo? -->
 <!-- Esiste una correlazione tra fattore di riempimento, spazio delle soluzioni e tempo di esecuzione? -->
