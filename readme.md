@@ -96,7 +96,44 @@ behind their implementation can be found in the
 [implementation details](#implementation-details) section.
 
 ### Parallel Backtracking
-TODO
+
+```python
+def parallel_solutions_counter(board, move):
+  if move is not null:
+    (row, col, val) = move
+    board = board.clone()
+    board.set_cell(row, col, val);
+
+  if board.is_full(): return 1
+
+  space = board.get_search_space_size()
+  if space == 0: return 0
+  if space <= SEQUENTIAL_CUTOFF:
+    return sequential_solutions_counter(board)
+
+  count = 0
+  (row, col) = board.get_empty_cell()
+  for val in board.get_candidates(row, col) paralelly:
+    count += parallel_solutions_counter(board,(row, col, val))
+
+  return count
+```
+
+The same consideration given for the
+[sequential backtracking](#sequential-backtracking) also holds for the parallel
+version.
+In addition to those, it's worth mentioning that two new methods have been
+introduced (`get_search_space_size` and `clone`).
+
+The presence of those new methods and the creation of a thread for each branch
+of the backtracking are the major cause of overhead in comparison with the
+sequential version.
+To overcome them, the sequential algorithm is used as sub-routine, when the
+remaining search space is below a certain threshold empirically found.
+
+More details about the computational complexity of the operations and the idea
+behind their implementation can be found in the
+[implementation details](#implementation-details) section.
 
 ### Implementation details
 TODO
