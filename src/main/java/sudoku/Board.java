@@ -343,7 +343,7 @@ final class Board {
     for (int i = 0; i < boxLength; i++) {
       for (int j = 0; j < boxLength; j++) {
         if (board[boxLength * boxIndex + i][boxLength * boxIndex + j] == EMPTY_CELL)
-          boxSpace *= getCandidatesCount(i, col);
+          boxSpace *= getCandidatesCount(boxLength * boxIndex + i, boxLength * boxIndex + j);
       }
     }
     BigInteger affectedSearchSpace = BigInteger.ONE;
