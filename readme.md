@@ -12,7 +12,7 @@
 </p>
 
 ## Introduction to Sudoku
-<img src="media/sudoku.png" width="250" align="right" alt="Example Sudoku Board" />
+<img src="media/sudoku.gif" width="250" align="right" alt="Example Sudoku Board" />
 
 Sudoku is a popular puzzle game usually played on a 9x9 board of numbers between
 1 and 9.
@@ -30,7 +30,6 @@ Indeed, if we were given an empty Sudoku table we would have to enumerate
 years.
 
 ## Solving Algorithm
-
 A common algorithm to solve Sudoku boards is called backtracking. This algorithm
 is essentially a depth first search in the tree of all possible guesses in the
 empty cells of the Sudoku board.
@@ -135,4 +134,4 @@ This project is licensed under the MIT License - see the [license][license] file
 [download:git]: https://git-scm.com/downloads
 [download:jjdk]: https://www.oracle.com/technetwork/pt/java/javase/downloads/index.html
 
-[ref:sudoku-board-num]: http://www.afjarvis.staff.shef.ac.uk/sudoku/
+[ref:sudoku-board-num]: http://www.afjarvis.staff.shef.ac.uk/sudoku
