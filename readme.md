@@ -30,7 +30,22 @@ Indeed, if we were given an empty Sudoku table, we would have to enumerate
 thousands of years.
 
 ### Definitions
-TODO
+In the following sections we will use some letters or words to refer to specific
+aspects of the Sudoku problem. The following table summarizes the most important.
+
+Term | Description
+-----|------------
+S | A perfect square indicating the number of columns, rows, and boxes of a Sudoku board.
+N | The total number of cells of a board given as N = S * S.
+Board | An instance of Sudoku represented with a S x S matrix.
+Row | A row of a board's matrix that can only contain one of each of the numbers in [1, S].
+Column | A column of a board's matrix that can only contain one of each of the numbers in [1, S].
+Box | A particular √S x √S sub-matrix of a board's matrix that can only contain one of each of the numbers in [1, S].
+Cell | A single entry of a board's matrix either empty or with a legal assignment.
+Empty Cell | A cell whose assignment has still to be found.
+Cell's Candidates | A list of values in [1, S] which can be legally placed in a particular cell.
+Search Space | The productory of the candidates of all the empty cells.
+Solution | An assignment of values for all the empty cells of a board that satisfies the constraints.
 
 ## Solving Algorithm
 A common algorithm to solve Sudoku boards is called
