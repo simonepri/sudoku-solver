@@ -96,6 +96,10 @@ behind their implementation can be found in the
 [implementation details](#implementation-details) section.
 
 ### Parallel Backtracking
+The parallel algorithm, that can be found in
+[`src/main/java/sudoku/ParallelSolver.java`][source:parallel], is
+implemented by parallelizing the recursive guesses of each empty cell and can be
+summarized by the following pseudo-code.
 
 ```python
 def parallel_solutions_counter(board, move):
@@ -114,7 +118,7 @@ def parallel_solutions_counter(board, move):
   count = 0
   (row, col) = board.get_empty_cell()
   for val in board.get_candidates(row, col) paralelly:
-    count += parallel_solutions_counter(board,(row, col, val))
+    count += parallel_solutions_counter(board, (row, col, val))
 
   return count
 ```
@@ -224,6 +228,7 @@ This project is licensed under the MIT License - see the [license][license] file
 [source:test]: https://github.com/simonepri/sudoku-solver/tree/master/src/test/java/sudoku
 [source:benchmark]: https://github.com/simonepri/sudoku-solver/tree/master/src/benchmark
 [source:sequential]: https://github.com/simonepri/sudoku-solver/tree/master/src/main/java/sudoku/SequentialSolver.java
+[source:parallel]: https://github.com/simonepri/sudoku-solver/tree/master/src/main/java/sudoku/ParallelSolver.java
 
 [github:simonepri]: https://github.com/simonepri
 [twitter:simoneprimarosa]: http://twitter.com/intent/user?screen_name=simoneprimarosa
