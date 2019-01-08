@@ -283,7 +283,7 @@ final class Board {
         if (candidates == 0) {
           return BigInteger.ZERO;
         }
-        partialSpace[parts] *= boardLength - getUsedCountRaw(row, col);
+        partialSpace[parts] *= candidates;
         cells++;
         if (cells == maxCellProd) {
           cells = 0;
