@@ -159,8 +159,8 @@ TODO
 
 ## Experiments
 TODO
-<!-- le caratteristiche della/e piattaforma/e su cui avete eseguito l’analisi sperimentale -->
-<!-- i risultati sperimentali ottenuti, tramite tabelle o grafici opportunamente commentati -->
+<!-- Le caratteristiche della/e piattaforma/e su cui avete eseguito l’analisi sperimentale -->
+<!-- I risultati sperimentali ottenuti, tramite tabelle o grafici opportunamente commentati -->
 <!-- Lo speedup è sempre maggiore di 1? Perché? -->
 <!-- Quali istanze richiedono più tempo? -->
 <!-- Esiste una correlazione tra fattore di riempimento, spazio delle soluzioni e tempo di esecuzione? -->
