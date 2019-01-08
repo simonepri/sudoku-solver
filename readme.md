@@ -157,7 +157,7 @@ TODO
 #### Choose of the appropriate sequential cut-off
 TODO
 
-## Results
+## Experiments
 TODO
 
 ## Usage
