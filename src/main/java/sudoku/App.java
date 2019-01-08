@@ -22,16 +22,19 @@ public class App {
     @Parameter(names = "--help", help = true)
     public boolean help = false;
 
-    @Parameter(names = {"--print", "-p"}, description = "Print solutions")
+    @Parameter(names = {"-p"}, description = "Print all the solutions")
     public boolean print = false;
 
-    @Parameter(names = {"--sequential", "-s"}, description = "Disable parallelism")
+    @Parameter(names = {"-s"}, description = "Disable parallelism")
     public boolean sequential = false;
 
-    @Parameter(names = {"--time", "-t"}, description = "Print execution time in ms")
-    public boolean time = false;
+    @Parameter(names = {"-i"}, description = "Enable benchmarking mode with iterations")
+    public int iterations = 0;
 
-    @Parameter(names = {"--cutoff", "-cf"}, description = "Sequential cutoff")
+    @Parameter(names = {"-t"}, description = "Enable benchmarking mode with time")
+    public int time = 0;
+
+    @Parameter(names = {"-cf"}, description = "Sequential cutoff")
     public BigDecimal cutoff = null;
 
     @Parameter(description = "<filename>[ <filename>]*")
@@ -41,7 +44,8 @@ public class App {
   private final boolean help;
   private final boolean print;
   private final boolean sequential;
-  private final boolean time;
+  private final int iterations;
+  private final int time;
   private final BigDecimal cutoff;
   private final List<String> filenames;
 
@@ -52,6 +56,7 @@ public class App {
   public App(Args args) {
     help = args.help;
     print = args.print;
+    iterations = args.iterations;
     time = args.time;
     cutoff = args.cutoff;
     sequential = args.sequential;
@@ -122,10 +127,11 @@ public class App {
           "Usage: sudoku [options] <filenames>[,<filenames>]*\n"
           + "  Options:\n"
           + "    --help               Print usage\n"
-          + "    --print, -p          Print solutions\n"
-          + "    --sequential, -s     Disable parallelism\n"
-          + "    --cutoff, -cf        Sequential cutoff\n"
-          + "    --time, -t           Print execution time in ms\n"
+          + "    -p                   Print all the solutions\n"
+          + "    -s                   Disable parallelism\n"
+          + "    -cf <integer>        Change default sequential cutoff\n"
+          + "    -i <integer>         Enable benchmarking mode with iterations\n"
+          + "    -t <integer>         Enable benchmarking mode with time\n"
       );
       return 0;
     }
@@ -133,14 +139,44 @@ public class App {
     try {
       for (String filename : filenames) {
         Board board = new Board(parse(filename));
-        if (print) {
-          enumerate(board, b -> out.accept(b.toString()));
-        } else if (time) {
-          long start = System.currentTimeMillis();
-          BigInteger sc = enumerate(board);
-          long end = System.currentTimeMillis();
-          out.accept((end - start) + "\n");
+        if (iterations > 0 || time > 0) {
+          int executions = 0;
+          // Benchmarking mode
+          long timeSum = 0;
+          long timeSumSquared = 0;
+          long timeMin = -1;
+          long timeMax = -1;
+          while (true) {
+            long start = System.nanoTime();
+            BigInteger sc = enumerate(board);
+            long end = System.nanoTime();
+            long etime = (end - start) / 1000;
+            timeSum += etime;
+            timeSumSquared += etime * etime;
+            if (timeMin == -1 || timeMin > etime) {
+              timeMin = etime;
+            }
+            if (timeMax == -1 || timeMax < etime) {
+              timeMax = etime;
+            }
+            executions++;
+            if (iterations > 0 && executions >= iterations) {
+              break;
+            }
+            if (time > 0 && timeSum + timeSum / executions >= time) {
+              break;
+            }
+          }
+          long timeAvg = Math.round(timeSum / (double)executions);
+          long timeDev = Math.round(Math.sqrt(
+              timeSumSquared / (double)executions - Math.pow(timeSum / (double)executions, 2)
+          ));
+          out.accept(executions + "," + timeAvg + "," + timeDev + "," + timeMin + "," + timeMax);
+        } else if (print) {
+          // Print mode
+          enumerate(board, b -> out.accept(b.toString() + "\n"));
         } else {
+          // Normal mode
           BigInteger sp = board.getSearchSpace();
           out.accept("Search space: " + sp + "\n");
           double ff = 100.0 - (board.getFillablesCount() * 100.0) / board.getSize();

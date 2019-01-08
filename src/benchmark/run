@@ -1,181 +1,237 @@
 #!/usr/bin/env bash
 
-RST='\033[0m'
-BOLD='\e[1m'
+BLD='\e[1m'
 RED='\033[00;31m'
-GREEN='\033[00;32m'
-CYAN='\033[00;36m'
+GRN='\033[00;32m'
+CYN='\033[00;36m'
+RST='\033[0m'
 
-usage() {
-  printf "Usage: bench [options]\n"
-  printf "  Options:\n"
-  printf "    --help               Print usage\n"
-  printf "    -n <integer>         Number of iteration to execute for each test\n"
-  printf "    -m <regex>           Run only the tests whose name match the regex\n"
-  printf "    -nm <regex>          Don't run the tests whose name match the regex\n"
-  printf "    -np                  Skip parallel mode benchmark\n"
-  printf "    -ns                  Skip sequential mode benchmark\n"
-  printf "    -cf <integer>        Custom sequential cutoff for parallel mode\n"
-  printf "    -nh                  Display time in ms instead of humanizing it\n"
-}
-
-displaytime() {
+humanize_time() {
   T="$1"
-  D="$((T/1000/60/60/24))"
-  H="$((T/1000/60/60%24))"
-  M="$((T/1000/60%60))"
-  S="$((T/1000%60))"
-  ms="$((T%1000))"
+  D="$((T/1000/1000/60/60/24))"
+  H="$((T/1000/1000/60/60%24))"
+  M="$((T/1000/1000/60%60))"
+  S="$((T/1000/1000%60))"
+  ms="$((T/1000%1000))"
+  mus="$((T%1000))"
   [ "$D" -gt 0 ] && printf '%dd ' $D
   [ "$H" -gt 0 ] && printf '%dh ' $H
   [ "$M" -gt 0 ] && printf '%dm ' $M
   [ "$S" -gt 0 ] && printf '%ds ' $S
-  printf '%dms' $ms
+  [ "$ms" -gt 0 ] && printf '%dms ' $ms
+  printf '%dμs' $mus
+}
+
+con_printf() {
+  printf "$@"
+}
+
+csv_printf() {
+  if [ "$OPTS_CSV" != "" ]; then
+    printf "$@" >> "$OPTS_CSV"
+  fi
 }
 
 run_app() {
-  java -jar build/libs/sudoku-solver-all-*.*.*.jar "$@"
-}
+  running_mode="$1"
+  file_path="$2"
+  iterations="${3:-0}"
+  time="${4:-0}"
+  cutoff="${5:-0}"
 
-run_one() {
-  mode="$1"
-  filepath="$2"
-  iterations="$3"
-  excluded="$4"
-  included="$5"
-  nothuman="$6"
-  cutoff="$7"
-
-  dirname=`basename "$(dirname "$filepath")"`
-  filename=`basename "${filepath%.*}"`
-  testname="$dirname$filename"
-
-  if [[ ! $testname =~ $included || $testname =~ $excluded ]]; then
-    return
+  # Setup cli app arguments.
+  cli_args=""
+  if [ "$iterations" -gt 0 ]; then
+    cli_args="$cli_args -i $iterations";
+  fi
+  if [ "$time" -gt 0 ]; then
+    cli_args="$cli_args -t $time";
+  fi
+  if [ $running_mode = "sequential" ]; then
+    cli_args="$cli_args -s";
+  elif [ "$cutoff" -gt 0 ]; then
+    cli_args="$cli_args -cf $cutoff";
   fi
 
-  printf "Benchmark ${BOLD}$testname${RST} "
-
-  if [ $mode = "parallel" ]; then
-    args="-t";
-    if [ "$cutoff" != "" ]; then
-      args="$args -cf $cutoff";
-    fi
-  else
-    args="-s -t";
-  fi
-
-  totrt=0
-  totrtsq=0
-  minrt=-1
-  maxrt=-1
-  for ((n = 0; n < iterations; n++)); do
-    if [ $STOP -gt 0 ]; then break; fi
-    runtime=`run_app $args $filepath`
-    totrt=$((totrt + runtime))
-    totrtsq=$((totrtsq + runtime * runtime))
-    if [ "$maxrt" -eq -1 ] || [ "$runtime" -gt "$maxrt" ]; then maxrt="$runtime"; fi
-    if [ "$minrt" -eq -1 ] || [ "$runtime" -lt "$minrt" ]; then minrt="$runtime"; fi
-  done
-  if [ $STOP -gt 0 ]; then
-    printf "${RED}STOPPED${RST}\n"
-  else
-    stdev=`echo "scale=16; sqrt($totrtsq/$iterations - ($totrt/$iterations)^2)" | bc`
-    stdev=`echo "scale=0; $stdev/1" | bc`
-    avgrt="$((totrt / iterations))"
-
-    if [ $nothuman -eq 0 ]; then
-      avgrt=`displaytime "$avgrt"`
-      minrt=`displaytime "$minrt"`
-      maxrt=`displaytime "$maxrt"`
-      stdev=`displaytime "$stdev"`
-    fi
-
-    printf "${GREEN}OK${RST} ${CYAN}(avg: $avgrt | dev: ${stdev} | min: $minrt | max: $maxrt)${RST}\n"
-  fi
+  # Execute the app.
+  ./sudoku $cli_args "$file_path"
 }
-
-run_all() {
-  mode="$1"
-  iterations="$2"
-  excluded="$3"
-  included="$4"
-  nothuman="$5"
-  cutoff="$6"
-
-  trap "STOP=1" SIGINT
-  stty -echoctl
-  STOP=0
-  printf "${BOLD}Running benchmark tests in ${GREEN}$mode${RST}${BOLD} mode${RST}${BOLD} with ${CYAN}${iterations}${RST}${BOLD} iterations${RST}\n"
-  for dirpath in src/benchmark/boards/* ; do
-    dirname=`basename "${dirpath}"`
-    for filepath in `ls $dirpath/*.txt | sort -r`; do
-      if [ $STOP -gt 0 ]; then STOP=0; continue; fi
-      run_one "$mode" "$filepath" "$iterations" "$excluded" "$included" "$nothuman" "$cutoff"
-      if [ $STOP -gt 0 ]; then STOP=0; continue; fi
-    done
-  done
-  STOP=0
-}
-
-trap "exit" SIGHUP
 
 run() {
-  # Parse options
-  iterations=1
-  excluded="^$"
-  included="^.*$"
-  notpar=0
-  notseq=0
-  nothuman=0
-  cutoff=""
+  # Default values for options.
+  OPTS_HELP=false
+  OPTS_CSV=""
+  OPTS_ITERATIONS=0
+  OPTS_TIME=0
+  OPTS_EXCLUDE_REGEX="^$"
+  OPTS_INCLUDE_REGEX="^.*$"
+  OPTS_SKIP_PARALLEL=false
+  OPTS_SKIP_SEQUENTIAL=false
+  OPTS_CUSTOM_CUTOFF=0
+
+  # Parse cli options.
   while [[ $1 != "" ]]; do
     case "$1" in
-      --help ) usage; exit 0;;
-      -n ) iterations=$2; shift 2;;
-      -nm ) excluded=$2; shift 2;;
-      -m ) included=$2; shift 2;;
-      -np ) notpar=1; shift 1;;
-      -ns ) notseq=1; shift 1;;
-      -cf ) cutoff=$2; shift 2;;
-      -nh ) nothuman=1; shift 1;;
-      * ) shift 1;;
+      --help ) OPTS_HELP=true;            shift 1;;
+      --csv  ) OPTS_CSV=$2;               shift 2;;
+      -i     ) OPTS_ITERATIONS=$2;        shift 2;;
+      -t     ) OPTS_TIME=$2;              shift 2;;
+      -nm    ) OPTS_EXCLUDE_REGEX=$2;     shift 2;;
+      -m     ) OPTS_INCLUDE_REGEX=$2;     shift 2;;
+      -np    ) OPTS_SKIP_PARALLEL=true;   shift 1;;
+      -ns    ) OPTS_SKIP_SEQUENTIAL=true; shift 1;;
+      -cf    ) OPTS_CUSTOM_CUTOFF=$2;     shift 2;;
+      *      )                            shift 1;;
     esac
   done
-  if [ "$notpar" -eq 1 ] && [ "$notseq" -eq 1 ]; then
+
+  # Print help.
+  if [ "$OPTS_HELP" = true ]; then
+    con_printf "Usage: bench [options]\n"
+    con_printf "  Options:\n"
+    con_printf "    --help               Print usage\n"
+    con_printf "    --csv <filename>     Export the results in a csv file\n"
+    con_printf "    -i <integer>         Number of iteration to execute for each test\n"
+    con_printf "    -t <integer>         Maximum time in seconds to execute each test\n"
+    con_printf "    -m <regex>           Run only the tests whose name match the regex\n"
+    con_printf "    -nm <regex>          Don't run the tests whose name match the regex\n"
+    con_printf "    -np                  Skip parallel mode benchmark\n"
+    con_printf "    -ns                  Skip sequential mode benchmark\n"
+    con_printf "    -cf <integer>        Custom sequential cutoff for parallel mode\n"
     exit 0
   fi
-  if [[ ! $iterations =~ ^[1-9][0-9]*$ ]]; then
-    iterations=1;
-  fi
-  if [[ ! $cutoff =~ ^[1-9][0-9]*$ ]]; then
-    cutoff="";
+
+  # Exit if not test to run.
+  if [ "$OPTS_SKIP_PARALLEL" = true ] && [ "$OPTS_SKIP_SEQUENTIAL" = true ]; then
+    exit 0
   fi
 
-  # Build the project
+  # Reset defaults if invalid options provided.
+  if [[ ! "$OPTS_ITERATIONS" =~ ^[1-9][0-9]*$ ]]; then
+    OPTS_ITERATIONS=0;
+  fi
+  if [[ ! "$OPTS_TIME" =~ ^[1-9][0-9]*$ ]]; then
+    OPTS_TIME=0;
+  fi
+  if [[ ! "$OPTS_CUSTOM_CUTOFF" =~ ^[1-9][0-9]*$ ]]; then
+    OPTS_CUSTOM_CUTOFF=0;
+  fi
+
+  # If neither time or iteration is provided set default.
+  if [ "$OPTS_ITERATIONS" -eq 0 ] && [ "$OPTS_TIME" -eq 0 ]; then
+    OPTS_ITERATIONS=5
+  fi
+
+  # Convert seconds to micro seconds.
+  OPTS_TIME=$((OPTS_TIME*1000*1000))
+
+  # Build the project if needed.
   if ! ls build/libs/sudoku-solver-all-*.*.*.jar > /dev/null 2>&1; then
     ./gradlew assemble --quiet --no-daemon
   fi
 
-  # Print cpu info
-  out=`uname -s`
-  case "${out}" in
-    Linux* )     cpu="$(nproc) x $(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1')";;
-    Darwin* )    cpu="$(gnproc) x $(sysctl -n machdep.cpu.brand_string)";;
-    * )          cpu="unknown CPU";;
+  # Print hwinfo info.
+  os_name=`uname -s`
+  case "${os_name}" in
+    Linux*  ) cpu_core=`nproc`;  cpu_name=`lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1'`;;
+    Darwin* ) cpu_core=`gnproc`; cpu_name=`sysctl -n machdep.cpu.brand_string`;;
+    *       ) cpu_core="?";      cpu_name="CPU";;
   esac
-  printf "${BOLD}Running benchmark tests on ${GREEN}$out${RST}${BOLD} with ${CYAN}$cpu${RST}\n"
+  con_printf "Running benchmarking suite on ${GRN}$os_name${RST} with ${CYN}$cpu_core x $cpu_name${RST}\n"
+  csv_printf "os,core,cpu\n"
+  csv_printf "$os_name,$cpu_core,$cpu_name\n"
 
+  # Disable echoing of control chars.
+  stty -echoctl
 
-  if [ $notseq -eq 0 ]; then
-    # Sequential tests
-    run_all "sequential" "$iterations" "$excluded" "$included" "$nothuman" ""
-  fi
+  # Override default behaviour for CTRL+C.
+  ABORT=0
+  trap "ABORT=1" SIGINT
 
-  if [ $notpar -eq 0 ]; then
-    # Parallel tests
-    run_all "parallel" "$iterations" "$excluded" "$included" "$nothuman" "$cutoff"
-  fi
+  csv_printf "test name,serial iterations,serial time,serial stdev,serial min,serial max,parallel iterations,parallel time,parallel stdev,parallel min,parallel max,speedup\n"
+  # Iterate on all the folders.
+  for dir_path in src/benchmark/boards/*; do
+    # Iterate on all .txt file in the folder.
+    for file_path in `ls $dir_path/*.txt | sort -r`; do
+      # Create the test name.
+      dir_name=`basename "$(dirname "$file_path")"`
+      file_name=`basename "${file_path%.*}"`
+      test_name="$dir_name$file_name"
+
+      # Check if the test has to be skipped.
+      if [[ ! "$test_name" =~ $OPTS_INCLUDE_REGEX || "$test_name" =~ $OPTS_EXCLUDE_REGEX ]]; then
+        continue
+      fi
+
+      if [ "$ABORT" -gt 0 ]; then ABORT=0; continue; fi
+
+      con_printf "Benchmarking ${BLD}$test_name${RST} "
+
+      sequential_out="invalid"
+      parallel_out="invalid"
+      if [ "$OPTS_SKIP_SEQUENTIAL" = false ]; then
+        sequential_out=`run_app "sequential" "$file_path" "$OPTS_ITERATIONS" "$OPTS_TIME" "$OPTS_CUSTOM_CUTOFF"`
+        con_printf "."
+      fi
+      if [ $ABORT -gt 0 ]; then sequential_out="invalid"; ABORT=0; fi
+      if [ "$OPTS_SKIP_PARALLEL" = false ]; then
+        parallel_out=`run_app "parallel" "$file_path" "$OPTS_ITERATIONS" "$OPTS_TIME" "$OPTS_CUSTOM_CUTOFF"`
+        con_printf "."
+      fi
+      if [ $ABORT -gt 0 ]; then parallel_out="invalid"; ABORT=0; fi
+
+      if [ "$sequential_out" = "invalid" ] && [ "$parallel_out" = "invalid" ]; then
+        con_printf " ${RED}STOPPED${RST}\n"
+        csv_printf "$test_name,,,,,,,,,,,\n"
+        continue
+      fi
+
+      con_printf " ${GRN}DONE${RST}\n"
+      csv_printf "$test_name"
+
+      if [ "$OPTS_SKIP_SEQUENTIAL" = false ] && [ "$sequential_out" != "invalid" ]; then
+        seq_iterations=`echo $sequential_out | cut -d ',' -f 1`
+        seq_time_avg=`echo $sequential_out | cut -d ',' -f 2`
+        seq_time_dev=`echo $sequential_out | cut -d ',' -f 3`
+        seq_time_min=`echo $sequential_out | cut -d ',' -f 4`
+        seq_time_max=`echo $sequential_out | cut -d ',' -f 5`
+        hum_seq_time_avg=`humanize_time "$seq_time_avg"`
+        hum_seq_time_dev=`humanize_time "$seq_time_dev"`
+        hum_seq_time_min=`humanize_time "$seq_time_min"`
+        hum_seq_time_max=`humanize_time "$seq_time_max"`
+
+        con_printf "○ Sequential x $seq_iterations: ${CYN}$hum_seq_time_avg${RST} ± ${CYN}$hum_seq_time_dev${RST} | ▽ ${CYN}$hum_seq_time_min${RST} △ ${CYN}$hum_seq_time_max${RST}${RST}\n"
+        csv_printf ",$seq_iterations,$seq_time_avg,$seq_time_dev,$seq_time_min,$seq_time_max"
+      else
+        csv_printf ",,,,,"
+      fi
+      if [ "$OPTS_SKIP_PARALLEL" = false ] && [ "$parallel_out" != "invalid" ]; then
+        par_iterations=`echo $parallel_out | cut -d ',' -f 1`
+        par_time_avg=`echo $parallel_out | cut -d ',' -f 2`
+        par_time_dev=`echo $parallel_out | cut -d ',' -f 3`
+        par_time_min=`echo $parallel_out | cut -d ',' -f 4`
+        par_time_max=`echo $parallel_out | cut -d ',' -f 5`
+        hum_par_time_avg=`humanize_time "$par_time_avg"`
+        hum_par_time_dev=`humanize_time "$par_time_dev"`
+        hum_par_time_min=`humanize_time "$par_time_min"`
+        hum_par_time_max=`humanize_time "$par_time_max"`
+
+        con_printf "○ Parallel   x $par_iterations: ${CYN}$hum_par_time_avg${RST} ± ${CYN}$hum_par_time_dev${RST} | ▽ ${CYN}$hum_par_time_min${RST} △ ${CYN}$hum_par_time_max${RST}${RST}\n"
+        csv_printf ",$par_iterations,$par_time_avg,$par_time_dev,$par_time_min,$par_time_max"
+      else
+        csv_printf ",,,,,"
+      fi
+      if [ "$OPTS_SKIP_SEQUENTIAL" = false ] && [ "$sequential_out" != "invalid" ] && [ "$OPTS_SKIP_PARALLEL" = false ] && [ "$parallel_out" != "invalid" ]; then
+        speedup=`echo "scale=3; $seq_time_avg/$par_time_avg" | bc | sed "s/^\./0./"`
+        con_printf "○ Speedup: ${CYN}$speedup${RST}\n"
+        csv_printf ",$speedup\n"
+      else
+        csv_printf ",\n"
+      fi
+    done
+  done
+  ABORT=0
 }
 
+trap "exit" SIGHUP
 run "$@"
