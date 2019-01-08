@@ -195,7 +195,7 @@ The source code for the sudoku solver can be found in
 and the benchmarking suite can be found in [`src/test/java/sudoku`][source:test]
 and [`src/benchmark`][source:benchmark] respectively.
 
-Build the project, run the unit tests and run the cli.
+Build the project, run the unit tests and run the CLI.
 ```bash
 # On Linux and Darwin
 ./gradlew build
