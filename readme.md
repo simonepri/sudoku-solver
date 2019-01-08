@@ -140,6 +140,21 @@ behind their implementation can be found in the
 [implementation details](#implementation-details) section.
 
 ### Implementation details
+#### Check if the board is completed in constant time
+TODO
+#### Check if a value is legal for a cell in constant time
+TODO
+#### Count the number of candidates of a cell in constant time
+TODO
+#### Get the next empty cell in constant time
+TODO
+#### Get the cell with the lowest number of candidates in constant time
+TODO
+#### Count using BigInteger in constant amortized time
+TODO
+#### Parallelizing the branches using the fork/join framework
+TODO
+#### Choose of the appropriate sequential cut-off
 TODO
 
 ## Results
