@@ -30,14 +30,57 @@ Indeed, if we were given an empty Sudoku table we would have to enumerate
 years.
 
 ## Solving Algorithm
-A common algorithm to solve Sudoku boards is called backtracking. This algorithm
-is essentially a depth first search in the tree of all possible guesses in the
-empty cells of the Sudoku board.
+A common algorithm to solve Sudoku boards is called
+[backtracking][ref:backtracking]. This algorithm is essentially a
+[depth first search][ref:dfs] in the tree of all possible guesses in the empty
+cells of the Sudoku board.
 
 ### Sequential Backtracking
-TODO
+The sequential algorithm, that can be found in
+[`src/main/java/sudoku/SequentialSolver.java`][source:sequential], is
+implemented as an iterative DFS and can be summarized by the following pseudo
+code.
+```python
+def count_solutions(board):
+  stack = []
+
+  if board.is_full(): return 1
+  (row, col) = board.get_empty_cell()
+  stack.push((row, col, 0))
+  for val in board.get_candidates(row, col): stack.push((row, col, val))
+
+  count = 0
+  while len(stack) > 0:
+    (row, col, val) = stack.pop()
+    board.set_cell(row, col, val)
+    if val == 0: continue
+
+    if board.is_full(): count+=1; continue
+    (row, col) = board.get_empty_cell()
+    stack.push((row, col, 0))
+    for val in board.get_candidates(row, col): stack.push((row, col, val))
+
+  return count
+```
+
+It's important to notice that the strategy used to pick the empty cell by the
+`get_empty_cell` can lead to [significant reduction][ref:look-ahead] of the
+total search space and thus in the time needed to enumerate all the solutions.
+
+Another notable thing to consider, is that the time complexity and space
+complexity of all the operations on the board inside the while loop
+(`is_full`, `set_cell`, `get_empty_cell`, `get_candidates`)
+can significantly impact the overall performance of the backtracking and thus
+has to be kept as efficient as possible.
+
+More details about the computational complexity of the operations and the idea
+behind their implementation can be found in the
+[implementation details](#implementation-details) section.
 
 ### Parallel Backtracking
+TODO
+
+### Implementation details
 TODO
 
 ## Results
@@ -125,6 +168,7 @@ This project is licensed under the MIT License - see the [license][license] file
 [source:main]: https://github.com/simonepri/sudoku-solver/tree/master/src/main/java/sudoku
 [source:test]: https://github.com/simonepri/sudoku-solver/tree/master/src/test/java/sudoku
 [source:benchmark]: https://github.com/simonepri/sudoku-solver/tree/master/src/benchmark
+[source:sequential]: https://github.com/simonepri/sudoku-solver/tree/master/src/main/java/sudoku/SequentialSolver.java
 
 [github:simonepri]: https://github.com/simonepri
 [twitter:simoneprimarosa]: http://twitter.com/intent/user?screen_name=simoneprimarosa
@@ -135,3 +179,6 @@ This project is licensed under the MIT License - see the [license][license] file
 [download:jjdk]: https://www.oracle.com/technetwork/pt/java/javase/downloads/index.html
 
 [ref:sudoku-board-num]: http://www.afjarvis.staff.shef.ac.uk/sudoku
+[ref:backtracking]: https://en.wikipedia.org/wiki/backtracking
+[ref:dfs]: https://en.wikipedia.org/wiki/depth-first_search
+[ref:look-ahead]: https://en.wikipedia.org/wiki/look-ahead_(backtracking)
