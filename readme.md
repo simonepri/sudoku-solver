@@ -117,7 +117,7 @@ def parallel_solutions_counter(board, move):
 
   count = 0
   (row, col) = board.get_empty_cell()
-  for val in board.get_candidates(row, col) paralelly:
+  parallel for val in board.get_candidates(row, col):
     count += parallel_solutions_counter(board, (row, col, val))
 
   return count
@@ -176,6 +176,10 @@ TODO
 TODO
 <!-- Thread "halving". -->
 <!-- Work stealing thread pool. -->
+
+#### Parallelize board copy
+<!-- Pass the "delta" rather than a modified board -->
+TODO
 
 #### Compute the search space
 TODO

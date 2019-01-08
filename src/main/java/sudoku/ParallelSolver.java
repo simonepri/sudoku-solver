@@ -87,6 +87,7 @@ public class ParallelSolver {
     public BigCounter compute() {
       if (move != null) {
         board = new Board(board);
+        board.setCachingSearchSpace(true);
         board.setCell(move.row, move.col, move.val);
       }
 
@@ -102,6 +103,7 @@ public class ParallelSolver {
         return new BigCounter(0);
       }
       if (space.compareTo(SEARCH_SPACE_CUTOFF) <= 0) {
+        board.setCachingSearchSpace(false);
         return new BigCounter(SequentialSolver.enumerate(board, onSolution));
       }
 
