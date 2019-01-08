@@ -44,6 +44,7 @@ final class Board {
   private int[] boxUsed;
 
   private BigInteger searchSpace;
+  private boolean cachingSearchSpace = false;
 
   /**
    * Default Constructor.
@@ -121,6 +122,10 @@ final class Board {
     searchSpace = other.getSearchSpace();
   }
 
+  public void setCachingSearchSpace(boolean caching) {
+    cachingSearchSpace = caching;
+  }
+
   /**
    * Get the value of a board's cell.
    *
@@ -161,7 +166,9 @@ final class Board {
       throw new IllegalArgumentException("Value already used: " + val + " at " + row + ":" + col);
     }
 
-    BigInteger oldAffectedSearchSpace = getAffectedSearchSpace(row, col);
+    BigInteger oldAffectedSearchSpace = BigInteger.ONE;
+    if (cachingSearchSpace)
+      oldAffectedSearchSpace = getAffectedSearchSpace(row, col);
 
     if (oldval != EMPTY_CELL) {
       int unsetbit = ~(1 << oldval);
@@ -188,8 +195,11 @@ final class Board {
       updateNextToFillOnUnset(row, col, box);
       updateNextBestToFillOnUnset(row, col, box);
     }
-    BigInteger newAffectedSearchSpace = getAffectedSearchSpace(row, col);
-    searchSpace = searchSpace.divide(oldAffectedSearchSpace).multiply(newAffectedSearchSpace);
+    BigInteger newAffectedSearchSpace;
+    if (cachingSearchSpace) {
+      newAffectedSearchSpace = getAffectedSearchSpace(row, col);
+      searchSpace = searchSpace.divide(oldAffectedSearchSpace).multiply(newAffectedSearchSpace);
+    }
   }
 
   /**
@@ -263,6 +273,7 @@ final class Board {
    * candidates of each empty cell.
    */
   public BigInteger getSearchSpace() {
+    if (!cachingSearchSpace) return computeSearchSpace();
     if (searchSpace == null)
       searchSpace = computeSearchSpace();
     return searchSpace;
