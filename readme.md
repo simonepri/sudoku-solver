@@ -25,21 +25,22 @@ This makes for an engaging and challenging puzzle game.
 A well-formed Sudoku puzzle is one that has a unique solution.
 A Sudoku puzzle, more in general, can have more than one solution and our goal
 is to enumerate them all, but this task is not always feasible.
-Indeed, if we were given an empty Sudoku table we would have to enumerate
-[6670903752021072936960 solutions][ref:sudoku-board-num] and this would take thousands of
-years.
+Indeed, if we were given an empty Sudoku table, we would have to enumerate
+[6670903752021072936960 solutions][ref:sudoku-board-num], and this would take
+thousands of years.
 
 ## Solving Algorithm
 A common algorithm to solve Sudoku boards is called
 [backtracking][ref:backtracking]. This algorithm is essentially a
-[depth first search][ref:dfs] in the tree of all possible guesses in the empty
+[depth-first search][ref:dfs] in the tree of all possible guesses in the empty
 cells of the Sudoku board.
 
 ### Sequential Backtracking
 The sequential algorithm, that can be found in
 [`src/main/java/sudoku/SequentialSolver.java`][source:sequential], is
-implemented as an iterative DFS and can be summarized by the following pseudo
-code.
+implemented as an iterative DFS and can be summarized by the following
+pseudo-code.
+
 ```python
 def count_solutions(board):
   stack = []
@@ -67,7 +68,7 @@ It's important to notice that the strategy used to pick the empty cell by the
 `get_empty_cell` can lead to [significant reduction][ref:look-ahead] of the
 total search space and thus in the time needed to enumerate all the solutions.
 
-Another notable thing to consider, is that the time complexity and space
+Another notable thing to consider is that the time complexity and space
 complexity of all the operations on the board inside the while loop
 (`is_full`, `set_cell`, `get_empty_cell`, `get_candidates`)
 can significantly impact the overall performance of the backtracking and thus
