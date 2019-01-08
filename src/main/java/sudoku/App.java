@@ -189,10 +189,10 @@ public class App {
       out.accept("No such file: " + e.getFile() + "\n");
       return 1;
     } catch (IllegalArgumentException e) {
-      out.accept(e.getMessage() + "\n");
+      out.accept("Illegal argument: " + e.getMessage() + "\n");
       return 2;
     } catch (Exception e) {
-      out.accept("An unexpected error occurred: " + e.getMessage() + "\n");
+      out.accept("An unexpected error occurred: " + e.toString() + "\n");
       return -1;
     }
 
@@ -206,7 +206,13 @@ public class App {
   public static void main(String[] argv) {
     Args args = new Args();
     JCommander jct = JCommander.newBuilder().addObject(args).build();
-    jct.parse(argv);
+
+    try {
+      jct.parse(argv);
+    } catch (Exception e) {
+      System.out.print(e.getMessage() + "\n");
+      System.exit(3);
+    }
 
     App main = new App(args);
     System.exit(main.run(System.out::print));
