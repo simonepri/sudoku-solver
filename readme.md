@@ -189,12 +189,25 @@ TODO
 <!-- Adder modulo Long.MAX_VALUE. -->
 
 ## Experiments
+
+### Testing environment
 TODO
-<!-- Le caratteristiche della/e piattaforma/e su cui avete eseguito l’analisi sperimentale. -->
-<!-- I risultati sperimentali ottenuti, tramite tabelle o grafici opportunamente commentati. -->
-<!-- Lo speedup è sempre maggiore di 1? Perché? -->
-<!-- Quali istanze richiedono più tempo? -->
-<!-- Esiste una correlazione tra fattore di riempimento, spazio delle soluzioni e tempo di esecuzione? -->
+<!-- CPU model and other hardware info. -->
+
+### Test cases
+TODO
+<!-- Table or Graphs showing the number of empty cells and the search space of each test. -->
+
+### Execution times
+TODO
+<!-- Table or Graphs showing the execution times of each test. -->
+<!-- Which instances does require more time? -->
+<!-- Is there a correlation between the fill factor, the search space and execution time? -->
+
+### Speedups obtained
+TODO
+<!-- Table or Graphs showing the speedups of each test. -->
+<!-- Is the speedup always greater than 1? Why? -->
 
 ## Usage
 The project is provided with a [CLI][bin:run-cli] that allows you
