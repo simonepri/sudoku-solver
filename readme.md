@@ -41,8 +41,7 @@ cells of the Sudoku board.
 ### Sequential Backtracking
 The sequential algorithm, that can be found in
 [`src/main/java/sudoku/SequentialSolver.java`][source:sequential], is
-implemented as an iterative DFS and can be summarized by the following
-pseudo-code.
+implemented iteratively and can be summarized by the following pseudo-code.
 
 ```python
 def sequential_solutions_counter(board):
@@ -50,14 +49,14 @@ def sequential_solutions_counter(board):
 
   if board.is_full(): return 1
   (row, col) = board.get_empty_cell()
-  stack.push((row, col, 0))
+  stack.push((row, col, EMPTY_CELL_VALUE))
   for val in board.get_candidates(row, col): stack.push((row, col, val))
 
   count = 0
   while len(stack) > 0:
     (row, col, val) = stack.pop()
     board.set_cell(row, col, val)
-    if val == 0: continue
+    if val == EMPTY_CELL_VALUE: continue
 
     if board.is_full(): count += 1; continue
     (row, col) = board.get_empty_cell()
