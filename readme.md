@@ -29,6 +29,9 @@ Indeed, if we were given an empty Sudoku table, we would have to enumerate
 [6670903752021072936960 solutions][ref:sudoku-board-num], and this would take
 thousands of years.
 
+### Definitions
+TODO
+
 ## Solving Algorithm
 A common algorithm to solve Sudoku boards is called
 [backtracking][ref:backtracking]. This algorithm is essentially a
@@ -42,7 +45,7 @@ implemented as an iterative DFS and can be summarized by the following
 pseudo-code.
 
 ```python
-def count_solutions(board):
+def sequential_solutions_counter(board):
   stack = []
 
   if board.is_full(): return 1
@@ -56,7 +59,7 @@ def count_solutions(board):
     board.set_cell(row, col, val)
     if val == 0: continue
 
-    if board.is_full(): count+=1; continue
+    if board.is_full(): count += 1; continue
     (row, col) = board.get_empty_cell()
     stack.push((row, col, 0))
     for val in board.get_candidates(row, col): stack.push((row, col, val))
