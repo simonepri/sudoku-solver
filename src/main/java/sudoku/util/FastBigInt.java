@@ -5,8 +5,8 @@ import java.math.BigInteger;
 public class FastBigInt implements Comparable<FastBigInt> {
   private BigInteger bigValue = BigInteger.ZERO;
   private long modSum = 0L;
-  private int modMul = 1;
-  private int modDiv = 1;
+  private long modMul = 1L;
+  private long modDiv = 1L;
 
   /**
    * Default Constructor.
@@ -27,6 +27,17 @@ public class FastBigInt implements Comparable<FastBigInt> {
    */
   public FastBigInt(BigInteger initial) {
     bigValue = initial;
+  }
+
+  /**
+   * Clone Constructor.
+   * @param other an other instance of this class.
+   */
+  public FastBigInt(FastBigInt other) {
+    bigValue = other.bigValue;
+    modSum = other.modSum;
+    modMul = other.modMul;
+    modDiv = other.modDiv;
   }
 
   /**
@@ -142,7 +153,7 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * Multiply for a value.
    * @param value a value to multiply for.
    */
-  public FastBigInt multiply(int value) {
+  public FastBigInt multiply(long value) {
     applyModSum();
     if (multiplyOverflows(modMul, value)) {
       applyModMul();
@@ -177,7 +188,7 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * Divide for a value.
    * @param value to value to divide for.
    */
-  public FastBigInt divide(int value) {
+  public FastBigInt divide(long value) {
     if (value == 0) {
       throw new ArithmeticException("FastBigInt: division by zero");
     }
@@ -214,6 +225,17 @@ public class FastBigInt implements Comparable<FastBigInt> {
     return this;
   }
 
+  /**
+   * Return the signum function on the value stored.
+   */
+  public int signum() {
+    applyModSum();
+    return Long.signum(modMul) * Long.signum(modDiv) * bigValue.signum();
+  }
+
+  /**
+   * Helper function.
+   */
   private void applyModSum() {
     if (modSum == 0L) {
       return;
@@ -222,6 +244,9 @@ public class FastBigInt implements Comparable<FastBigInt> {
     modSum = 0L;
   }
 
+  /**
+   * Helper function.
+   */
   private void applyModMul() {
     if (modMul == 1) {
       return;
@@ -230,6 +255,9 @@ public class FastBigInt implements Comparable<FastBigInt> {
     modMul = 1;
   }
 
+  /**
+   * Helper function.
+   */
   private void applyModDiv() {
     if (modDiv == 1) {
       return;
@@ -238,12 +266,15 @@ public class FastBigInt implements Comparable<FastBigInt> {
     modDiv = 1;
   }
 
+  /**
+   * Helper function.
+   */
   private void applyModMulDiv() {
     if (modMul == modDiv) {
       if (modMul == 1) {
         return;
       }
-      int comDiv = gcd(modMul, modDiv);
+      long comDiv = gcd(modMul, modDiv);
       modMul /= comDiv;
       modDiv /= comDiv;
     }
@@ -251,27 +282,44 @@ public class FastBigInt implements Comparable<FastBigInt> {
     applyModDiv();
   }
 
+  /**
+   * Check if the sum of two values overflows.
+   * @param a first value.
+   * @param b second value.
+   */
   private static boolean additionOverflows(final long a, final long b) {
     return (b > 0L && a > Long.MAX_VALUE - b)
         || (b < 0L && a < Long.MIN_VALUE - b);
   }
 
+  /**
+   * Check if the subtraction of two values overflows.
+   * @param a first value.
+   * @param b second value.
+   */
   private static boolean subtractionOverflows(final long a, final long b) {
     return (b == Long.MIN_VALUE && a > -1)
         || (b > 0L && a > Long.MAX_VALUE - b)
         || (b < 0L && a < Long.MIN_VALUE - b);
   }
 
-  private static boolean multiplyOverflows(final int a, final int b) {
-    if (b == 0) {
-      return false;
-    }
-    long result = a * b;
-    return a == result / b;
+  /**
+   * Check if the product of two values overflows.
+   * @param a first value.
+   * @param b second value.
+   */
+  private static boolean multiplyOverflows(final long a, final long b) {
+    long max = Long.signum(a) == Long.signum(b) ? Long.MAX_VALUE : Long.MIN_VALUE;
+    return (a != 0 && (b > 0 && b > max / a || b < 0 && b < max / a));
   }
 
-  private static int gcd(int a, int b) {
-    int r;
+  /**
+   * GCD of two values.
+   * @param a first value.
+   * @param b second value.
+   */
+  private static long gcd(long a, long b) {
+    long r;
     while (b != 0) {
       r = a % b;
       a = b;
