@@ -285,7 +285,7 @@ final class Board {
    */
   private BigInteger computeSearchSpace() {
     if (isFull()) {
-      return BigInteger.ONE;
+      return BigInteger.ZERO;
     }
     int maxCellProd = 19; // (int)(Math.log(Long.MAX_VALUE) / Math.log(boardLength));
     int maxParts = 5; // (int)((cellCount - clueCount) / maxCellProd) + 2;
