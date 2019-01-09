@@ -125,10 +125,8 @@ run() {
   # Convert seconds to micro seconds.
   OPTS_TIME=$((OPTS_TIME*1000*1000))
 
-  # Build the project if needed.
-  if ! ls build/libs/sudoku-solver-all-*.*.*.jar > /dev/null 2>&1; then
-    ./gradlew assemble --quiet --no-daemon
-  fi
+  # Build the project.
+  ./gradlew assemble --quiet --no-daemon
 
   # Print hwinfo info.
   os_name=`uname -s`
