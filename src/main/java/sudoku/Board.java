@@ -703,7 +703,7 @@ final class Board {
     if (dividend == BigInteger.ZERO) {
       return;
     }
-    searchSpace.divide(dividend);
+    searchSpace = searchSpace.divide(dividend);
   }
 
   /**
@@ -722,7 +722,7 @@ final class Board {
       searchSpace = null;
       return;
     }
-    searchSpace.multiply(multiplier);
+    searchSpace = searchSpace.multiply(multiplier);
   }
 
   /**
