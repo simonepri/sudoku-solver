@@ -421,7 +421,7 @@ public class BoardTest {
     sudoku = new Board(new int[][]{
       {1}
     });
-    assertThat(sudoku.getSearchSpace()).isEqualTo(BigInteger.ZERO);
+    assertThat(sudoku.getSearchSpace()).isNull();
   }
 
   @Test

@@ -6,7 +6,7 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import sudoku.util.FastBigInt;
+import sudoku.util.BigIntProd;
 
 final class Board {
   final class Cell {
@@ -45,7 +45,7 @@ final class Board {
   private int[] colUsed;
   private int[] boxUsed;
 
-  private FastBigInt searchSpace;
+  private BigInteger searchSpace;
   private boolean searchSpaceCaching = false;
 
   /**
@@ -122,9 +122,7 @@ final class Board {
     }
 
     searchSpaceCaching = other.searchSpaceCaching;
-    if (other.searchSpace != null) {
-      searchSpace = new FastBigInt(other.searchSpace);
-    }
+    searchSpace = other.searchSpace;
   }
 
   /**
@@ -294,9 +292,9 @@ final class Board {
       if (searchSpace == null) {
         searchSpace = computeSearchSpace();
       }
-      return searchSpace.get();
+      return searchSpace;
     }
-    return computeSearchSpace().get();
+    return computeSearchSpace();
   }
 
   /**
@@ -446,12 +444,12 @@ final class Board {
    * Get the search space computed as the multiplication of the number of
    * candidates of each empty cell.
    */
-  private FastBigInt computeSearchSpace() {
+  private BigInteger computeSearchSpace() {
     if (isFull()) {
-      return new FastBigInt();
+      return null;
     }
 
-    FastBigInt space = new FastBigInt(BigInteger.ONE);
+    BigIntProd space = new BigIntProd(BigInteger.ONE);
     for (int row = nextFreeRow; row < boardLength; row++) {
       long rowSpace = 1L;
       for (int col = nextFreeOnRow[row]; col < boardLength; col++) {
@@ -461,12 +459,12 @@ final class Board {
         rowSpace *= boardLength - getUsedCountRaw(row, col);
       }
       if (rowSpace == 0L) {
-        return new FastBigInt();
+        return BigInteger.ZERO;
       }
       space.multiply(rowSpace);
     }
 
-    return space;
+    return space.get();
   }
 
   /**
@@ -475,8 +473,8 @@ final class Board {
    * @param row a row of the board.
    * @param col a column of the board.
    */
-  private FastBigInt getAffectedSearchSpace(int row, int col) {
-    FastBigInt space = new FastBigInt(BigInteger.ONE);
+  private BigInteger getAffectedSearchSpace(int row, int col) {
+    BigIntProd space = new BigIntProd(BigInteger.ONE);
 
     long rowSpace = 1L;
     for (int c = nextFreeOnRow[row]; c < boardLength; c++) {
@@ -486,7 +484,7 @@ final class Board {
       rowSpace *= boardLength - getUsedCountRaw(row, c);
     }
     if (rowSpace == 0L) {
-      return new FastBigInt();
+      return BigInteger.ZERO;
     }
     space.multiply(rowSpace);
 
@@ -498,7 +496,7 @@ final class Board {
       colSpace *= boardLength - getUsedCountRaw(r, col);
     }
     if (colSpace == 0L) {
-      return new FastBigInt();
+      return BigInteger.ZERO;
     }
     space.multiply(colSpace);
 
@@ -516,11 +514,11 @@ final class Board {
       }
     }
     if (boxSpace == 0L) {
-      return new FastBigInt();
+      return BigInteger.ZERO;
     }
     space.multiply(boxSpace);
 
-    return space;
+    return space.get();
   }
 
   /**
@@ -701,8 +699,8 @@ final class Board {
       return;
     }
 
-    FastBigInt dividend = getAffectedSearchSpace(row, col);
-    if (dividend.signum() == 0) {
+    BigInteger dividend = getAffectedSearchSpace(row, col);
+    if (dividend == BigInteger.ZERO) {
       return;
     }
     searchSpace.divide(dividend);
@@ -719,7 +717,7 @@ final class Board {
       return;
     }
 
-    FastBigInt multiplier = getAffectedSearchSpace(row, col);
+    BigInteger multiplier = getAffectedSearchSpace(row, col);
     if (searchSpace.signum() < multiplier.signum()) {
       searchSpace = null;
       return;

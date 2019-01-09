@@ -7,7 +7,7 @@ import java.math.BigInteger;
 
 import org.junit.Test;
 
-import sudoku.util.FastBigInt;
+import sudoku.util.BigIntSum;
 
 public class ParallelSolverTest {
   @Test
@@ -19,7 +19,7 @@ public class ParallelSolverTest {
       {0, 0, 1, 3}
     });
 
-    FastBigInt c0 = new FastBigInt(0);
+    BigIntSum c0 = new BigIntSum(0);
     BigInteger c1 = ParallelSolver.enumerate(sudoku, sol -> {
       assertThat(sol.toString()).isEqualTo(
           "3142\n"
@@ -48,7 +48,7 @@ public class ParallelSolverTest {
       {2, 4, 3, 1, 6, 0, 8, 5, 7}
     });
 
-    FastBigInt c0 = new FastBigInt(0);
+    BigIntSum c0 = new BigIntSum(0);
     BigInteger c1 = ParallelSolver.enumerate(sudoku, sol -> {
       assertThat(sol.toString()).isEqualTo(
           "729486513\n"
@@ -77,7 +77,7 @@ public class ParallelSolverTest {
       {2, 4, 1, 3}
     });
 
-    FastBigInt c0 = new FastBigInt(0);
+    BigIntSum c0 = new BigIntSum(0);
     BigInteger c1 = ParallelSolver.enumerate(sudoku, sol -> {
       assertThat(sol.toString()).isEqualTo(
           "3142\n"

@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Stack;
 import java.util.function.Consumer;
 
-import sudoku.util.FastBigInt;
+import sudoku.util.BigIntSum;
 
 public class SequentialSolver {
   /**
@@ -49,7 +49,7 @@ public class SequentialSolver {
       return BigInteger.ONE;
     }
 
-    FastBigInt count = new FastBigInt();
+    BigIntSum count = new BigIntSum();
     Stack<StackElement> stack = new Stack<>();
 
     Board.Cell start = board.getBestNextToFill();
