@@ -70,7 +70,6 @@ public class ParallelSolver {
       this.board = new Board(board);
       this.move = null;
       this.onSolution = onSolution;
-      this.board.setSearchSpaceCachingStatus(true);
     }
 
     /**
@@ -104,7 +103,6 @@ public class ParallelSolver {
         return new BigIntSum(0);
       }
       if (space.compareTo(SEARCH_SPACE_CUTOFF) <= 0) {
-        board.setSearchSpaceCachingStatus(false);
         return new BigIntSum(SequentialSolver.enumerate(board, onSolution));
       }
 
