@@ -178,9 +178,9 @@ public class FastBigInt implements Comparable<FastBigInt> {
    */
   public FastBigInt multiply(FastBigInt other) {
     applyModSum();
-    multiply(other.modDiv);
+    multiply(other.modMul);
     multiply(other.bigValue);
-    divide(other.modMul);
+    divide(other.modDiv);
     return this;
   }
 
@@ -271,9 +271,9 @@ public class FastBigInt implements Comparable<FastBigInt> {
    */
   private void applyModMulDiv() {
     if (modMul == modDiv) {
-      if (modMul == 1) {
-        return;
-      }
+      modMul = 1L;
+      modDiv = 1L;
+    } else if (modMul != 0L && modDiv != 0L) {
       long comDiv = gcd(modMul, modDiv);
       modMul /= comDiv;
       modDiv /= comDiv;
