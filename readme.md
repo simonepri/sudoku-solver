@@ -172,7 +172,7 @@ TODO
 TODO
 <!-- Counter modulo Long.MAX_VALUE. -->
 
-#### Parallelizing the branches using the fork/join framework
+#### Parallelize branches using the fork/join framework
 TODO
 <!-- Thread "halving". -->
 <!-- Work stealing thread pool. -->
@@ -184,6 +184,7 @@ TODO
 #### Compute the search space
 TODO
 <!-- Multiply at groups of log(Long.MAX_VALUE)/log(9). -->
+<!-- Update on set with by dividend. -->
 
 #### Choose of the appropriate sequential cut-off
 TODO
