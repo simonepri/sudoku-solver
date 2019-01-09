@@ -28,6 +28,14 @@ public class FastBigInt implements Comparable<FastBigInt> {
   }
 
   /**
+   * Get the value.
+   */
+  public BigInteger get() {
+    applyModSum();
+    return bigValue;
+  }
+
+  /**
    * Increment.
    */
   public FastBigInt inc() {
@@ -49,14 +57,6 @@ public class FastBigInt implements Comparable<FastBigInt> {
     }
     modSum--;
     return this;
-  }
-
-  /**
-   * Get the value.
-   */
-  public BigInteger get() {
-    applyModSum();
-    return bigValue;
   }
 
   /**
