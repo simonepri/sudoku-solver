@@ -46,6 +46,7 @@ final class Board {
   private int[] boxUsed;
 
   private FastBigInt searchSpace;
+  private boolean searchSpaceCaching = false;
 
   /**
    * Default Constructor.
@@ -120,6 +121,7 @@ final class Board {
       board[row] = Arrays.copyOf(other.board[row], boardLength);
     }
 
+    searchSpaceCaching = other.searchSpaceCaching;
     if (other.searchSpace != null) {
       searchSpace = new FastBigInt(other.searchSpace);
     }
@@ -173,8 +175,8 @@ final class Board {
       );
     }
 
-    if (searchSpace != null) {
-      updateSearchSpaceBeforeSet(row, col, box);
+    if (searchSpaceCaching) {
+      updateSearchSpaceBeforeSet(row, col);
     }
 
     if (oldval != EMPTY_CELL) {
@@ -195,8 +197,8 @@ final class Board {
 
     board[row][col] = val;
 
-    if (searchSpace != null) {
-      updateSearchSpaceAfterSet(row, col, box);
+    if (searchSpaceCaching) {
+      updateSearchSpaceAfterSet(row, col);
     }
 
     if (oldval == EMPTY_CELL) {
@@ -288,24 +290,24 @@ final class Board {
    * candidates of each empty cell.
    */
   public BigInteger getSearchSpace() {
+    if (searchSpaceCaching) {
+      if (searchSpace == null) {
+        searchSpace = computeSearchSpace();
+      }
+      return searchSpace.get();
+    }
     return computeSearchSpace().get();
   }
 
   /**
-   * Get the search space computed as the multiplication of the number of
-   * candidates of each empty cell.
-   *
-   * @param cache if true the search space value is kept internally for future uses.
+   * Set the search space caching state.
+   * @param status if true subsequent calls to getSearchSpace will be faster.
    */
-  public BigInteger getSearchSpace(boolean cache) {
-    if (!cache) {
+  public void setSearchSpaceCachingStatus(boolean status) {
+    if (!status) {
       searchSpace = null;
-      return getSearchSpace();
     }
-    if (searchSpace == null) {
-      searchSpace = computeSearchSpace();
-    }
-    return searchSpace.get();
+    searchSpaceCaching = status;
   }
 
   /**
@@ -472,9 +474,8 @@ final class Board {
    *
    * @param row a row of the board.
    * @param col a column of the board.
-   * @param box the box of the cell provided.
    */
-  private FastBigInt getAffectedSearchSpace(int row, int col, int box) {
+  private FastBigInt getAffectedSearchSpace(int row, int col) {
     FastBigInt space = new FastBigInt(BigInteger.ONE);
 
     long rowSpace = 1L;
@@ -694,10 +695,13 @@ final class Board {
    *
    * @param row a row of the board.
    * @param col a column of the board.
-   * @param box the box of the cell provided.
    */
-  private void updateSearchSpaceBeforeSet(int row, int col, int box) {
-    FastBigInt dividend = getAffectedSearchSpace(row, col, box);
+  private void updateSearchSpaceBeforeSet(int row, int col) {
+    if (searchSpace == null) {
+      return;
+    }
+
+    FastBigInt dividend = getAffectedSearchSpace(row, col);
     if (dividend.signum() == 0) {
       return;
     }
@@ -709,10 +713,13 @@ final class Board {
    *
    * @param row a row of the board.
    * @param col a column of the board.
-   * @param box the box of the cell provided.
    */
-  private void updateSearchSpaceAfterSet(int row, int col, int box) {
-    FastBigInt multiplier = getAffectedSearchSpace(row, col, box);
+  private void updateSearchSpaceAfterSet(int row, int col) {
+    if (searchSpace == null) {
+      return;
+    }
+
+    FastBigInt multiplier = getAffectedSearchSpace(row, col);
     if (searchSpace.signum() < multiplier.signum()) {
       searchSpace = null;
       return;

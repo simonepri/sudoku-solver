@@ -67,7 +67,10 @@ public class ParallelSolver {
      * @param onSolution callback called each time a solution is found.
      */
     public SubtreeTask(Board board, Consumer<Board> onSolution) {
-      this(board, onSolution, null);
+      this.board = new Board(board);
+      this.move = null;
+      this.onSolution = onSolution;
+      this.board.setSearchSpaceCachingStatus(true);
     }
 
     /**
@@ -96,11 +99,12 @@ public class ParallelSolver {
         return new FastBigInt(1);
       }
 
-      BigInteger space = board.getSearchSpace(true);
+      BigInteger space = board.getSearchSpace();
       if (space == BigInteger.ZERO) {
         return new FastBigInt(0);
       }
       if (space.compareTo(SEARCH_SPACE_CUTOFF) <= 0) {
+        board.setSearchSpaceCachingStatus(false);
         return new FastBigInt(SequentialSolver.enumerate(board, onSolution));
       }
 
