@@ -3,8 +3,8 @@ package sudoku.util;
 import java.math.BigInteger;
 
 public class BigCounter implements Comparable<BigCounter> {
-  private BigInteger count = BigInteger.ZERO;
-  private long modcount = 0L;
+  private BigInteger bigValue = BigInteger.ZERO;
+  private long modSum = 0L;
 
   /**
    * Default Constructor.
@@ -13,113 +13,139 @@ public class BigCounter implements Comparable<BigCounter> {
 
   /**
    * Default Constructor.
-   * @param initial an initial value for the counter.
+   * @param initial an initial value.
    */
   public BigCounter(long initial) {
-    modcount = initial;
+    modSum = initial;
   }
 
   /**
    * Default Constructor.
-   * @param initial an initial value for the counter.
+   * @param initial an initial value.
    */
   public BigCounter(BigInteger initial) {
-    count = initial;
+    bigValue = initial;
   }
 
   /**
-   * Increment the counters.
+   * Increment.
    */
-  public void inc() {
-    if (modcount == Long.MAX_VALUE) {
-      count = count.add(BigInteger.valueOf(modcount));
-      modcount = 1L;
-    } else {
-      modcount++;
+  public BigCounter inc() {
+    if (modSum == Long.MAX_VALUE) {
+      bigValue = bigValue.add(BigInteger.valueOf(modSum));
+      modSum = 0L;
     }
+    modSum++;
+    return this;
   }
 
   /**
-   * Decrement the counters.
+   * Decrement.
    */
-  public void dec() {
-    if (modcount == Long.MIN_VALUE) {
-      count = count.add(BigInteger.valueOf(modcount));
-      modcount = -1L;
-    } else {
-      modcount--;
+  public BigCounter dec() {
+    if (modSum == Long.MIN_VALUE) {
+      bigValue = bigValue.add(BigInteger.valueOf(modSum));
+      modSum = 0L;
     }
+    modSum--;
+    return this;
   }
 
   /**
-   * Get the value of the counter.
+   * Get the value.
    */
   public BigInteger get() {
-    if (modcount != 0L) {
-      count = count.add(BigInteger.valueOf(modcount));
-      modcount = 0L;
-    }
-    return count;
+    applyModSum();
+    return bigValue;
   }
 
   /**
-   * Add a value to the counter.
-   * @param value a value to add to the counter.
+   * Add a value.
+   * @param value a value to add.
    */
-  public void add(long value) {
-    if (value > 0) {
-      if (modcount <= 0) {
-        modcount += value;
-        return;
-      }
-      long left = Long.MAX_VALUE - modcount;
-      if (left >= value) {
-        modcount += value;
-      } else {
-        count = count.add(BigInteger.valueOf(Long.MAX_VALUE));
-        modcount = value - left;
-      }
-    } else if (value < 0) {
-      if (modcount >= 0) {
-        modcount += value;
-        return;
-      }
-      long left = Long.MIN_VALUE - modcount;
-      if (left <= value) {
-        modcount += value;
-      } else {
-        count = count.add(BigInteger.valueOf(Long.MIN_VALUE));
-        modcount = value - left;
-      }
+  public BigCounter add(long value) {
+    if (additionOverflows(modSum, value)) {
+      applyModSum();
     }
+    modSum += value;
+    return this;
   }
 
   /**
-   * Sum another counter to this counter.
-   * @param other a value to add to the counter.
+   * Add a value.
+   * @param value a value to add.
    */
-  public void add(BigCounter other) {
-    if (other.count == BigInteger.ONE) {
-      inc();
-    } else if (other.count != BigInteger.ZERO) {
-      count = count.add(other.count);
+  public BigCounter add(BigInteger value) {
+    if (value == BigInteger.ONE) {
+      return inc();
     }
-    add(other.modcount);
+    bigValue = bigValue.add(value);
+    return this;
   }
 
   /**
-   * Add a value to the counter.
-   * @param value a value to add to the counter.
+   * Add a value.
+   * @param other another instance of this class to add.
    */
-  public void add(BigInteger value) {
-    if (value == BigInteger.ZERO) {
+  public BigCounter add(BigCounter other) {
+    add(other.bigValue);
+    add(other.modSum);
+    return this;
+  }
+
+  /**
+   * Subtract a value.
+   * @param value a value to subtract.
+   */
+  public BigCounter sub(long value) {
+    if (subtractionOverflows(modSum, value)) {
+      applyModSum();
+    }
+    modSum -= value;
+    return this;
+  }
+
+  /**
+   * Add a value.
+   * @param value a value to subtract.
+   */
+  public BigCounter sub(BigInteger value) {
+    if (value == BigInteger.ONE) {
+      return dec();
+    }
+    bigValue = bigValue.subtract(value);
+    return this;
+  }
+
+  /**
+   * Add a value.
+   * @param other another instance of this class to subtract.
+   */
+  public BigCounter sub(BigCounter other) {
+    sub(other.bigValue);
+    sub(other.modSum);
+    return this;
+  }
+
+  private void applyModSum() {
+    if (modSum == 0L) {
       return;
-    } else if (value == BigInteger.ONE) {
-      inc();
-    } else {
-      count = count.add(value);
     }
+    bigValue = bigValue.add(BigInteger.valueOf(modSum));
+    modSum = 0L;
   }
+
+  private static boolean additionOverflows(final long a, final long b) {
+    return (b > 0L && a > Long.MAX_VALUE - b)
+        || (b < 0L && a < Long.MIN_VALUE - b);
+  }
+
+  private static boolean subtractionOverflows(final long a, final long b) {
+    return (b == Long.MIN_VALUE && a > -1)
+        || (b > 0L && a > Long.MAX_VALUE - b)
+        || (b < 0L && a < Long.MIN_VALUE - b);
+  }
+
 
   @Override
   public String toString() {
