@@ -5,6 +5,8 @@ import java.math.BigInteger;
 public class FastBigInt implements Comparable<FastBigInt> {
   private BigInteger bigValue = BigInteger.ZERO;
   private long modSum = 0L;
+  private int modMul = 1;
+  private int modDiv = 1;
 
   /**
    * Default Constructor.
@@ -31,6 +33,7 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * Get the value.
    */
   public BigInteger get() {
+    applyModMulDiv();
     applyModSum();
     return bigValue;
   }
@@ -39,6 +42,7 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * Increment.
    */
   public FastBigInt inc() {
+    applyModMulDiv();
     if (modSum == Long.MAX_VALUE) {
       bigValue = bigValue.add(BigInteger.valueOf(modSum));
       modSum = 0L;
@@ -51,6 +55,7 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * Decrement.
    */
   public FastBigInt dec() {
+    applyModMulDiv();
     if (modSum == Long.MIN_VALUE) {
       bigValue = bigValue.add(BigInteger.valueOf(modSum));
       modSum = 0L;
@@ -64,6 +69,7 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * @param value a value to add.
    */
   public FastBigInt add(long value) {
+    applyModMulDiv();
     if (additionOverflows(modSum, value)) {
       applyModSum();
     }
@@ -76,6 +82,7 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * @param value a value to add.
    */
   public FastBigInt add(BigInteger value) {
+    applyModMulDiv();
     if (value == BigInteger.ONE) {
       return inc();
     }
@@ -88,6 +95,7 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * @param other another instance of this class to add.
    */
   public FastBigInt add(FastBigInt other) {
+    applyModMulDiv();
     add(other.bigValue);
     add(other.modSum);
     return this;
@@ -97,7 +105,8 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * Subtract a value.
    * @param value a value to subtract.
    */
-  public FastBigInt sub(long value) {
+  public FastBigInt subtract(long value) {
+    applyModMulDiv();
     if (subtractionOverflows(modSum, value)) {
       applyModSum();
     }
@@ -109,7 +118,8 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * Add a value.
    * @param value a value to subtract.
    */
-  public FastBigInt sub(BigInteger value) {
+  public FastBigInt subtract(BigInteger value) {
+    applyModMulDiv();
     if (value == BigInteger.ONE) {
       return dec();
     }
@@ -121,9 +131,86 @@ public class FastBigInt implements Comparable<FastBigInt> {
    * Add a value.
    * @param other another instance of this class to subtract.
    */
-  public FastBigInt sub(FastBigInt other) {
-    sub(other.bigValue);
-    sub(other.modSum);
+  public FastBigInt subtract(FastBigInt other) {
+    applyModMulDiv();
+    subtract(other.bigValue);
+    subtract(other.modSum);
+    return this;
+  }
+
+  /**
+   * Multiply for a value.
+   * @param value a value to multiply for.
+   */
+  public FastBigInt multiply(int value) {
+    applyModSum();
+    if (multiplyOverflows(modMul, value)) {
+      applyModMul();
+    }
+    modMul *= value;
+    return this;
+  }
+
+  /**
+   * Multiply for value.
+   * @param value a value to multiply for.
+   */
+  public FastBigInt multiply(BigInteger value) {
+    applyModSum();
+    bigValue = bigValue.multiply(value);
+    return this;
+  }
+
+  /**
+   * Divide for value.
+   * @param other another instance of this class to divide for.
+   */
+  public FastBigInt multiply(FastBigInt other) {
+    applyModSum();
+    multiply(other.modDiv);
+    multiply(other.bigValue);
+    divide(other.modMul);
+    return this;
+  }
+
+  /**
+   * Divide for a value.
+   * @param value to value to divide for.
+   */
+  public FastBigInt divide(int value) {
+    if (value == 0) {
+      throw new ArithmeticException("FastBigInt: division by zero");
+    }
+    applyModSum();
+    if (multiplyOverflows(modDiv, value)) {
+      applyModDiv();
+    }
+    modDiv *= value;
+    return this;
+  }
+
+  /**
+   * Divide for value.
+   * @param value a value to divide for.
+   */
+  public FastBigInt divide(BigInteger value) {
+    if (value == BigInteger.ZERO) {
+      throw new ArithmeticException("FastBigInt: division by zero");
+    }
+    applyModSum();
+    bigValue = bigValue.divide(value);
+    return this;
+  }
+
+  /**
+   * Divide for value.
+   * @param other another instance of this class to divide for.
+   */
+  public FastBigInt divide(FastBigInt other) {
+    applyModSum();
+    multiply(other.modDiv);
+    divide(other.bigValue);
+    divide(other.modMul);
     return this;
   }
 
@@ -133,6 +220,35 @@ public class FastBigInt implements Comparable<FastBigInt> {
     }
     bigValue = bigValue.add(BigInteger.valueOf(modSum));
     modSum = 0L;
+  }
+
+  private void applyModMul() {
+    if (modMul == 1) {
+      return;
+    }
+    bigValue = bigValue.multiply(BigInteger.valueOf(modMul));
+    modMul = 1;
+  }
+
+  private void applyModDiv() {
+    if (modDiv == 1) {
+      return;
+    }
+    bigValue = bigValue.divide(BigInteger.valueOf(modDiv));
+    modDiv = 1;
+  }
+
+  private void applyModMulDiv() {
+    if (modMul == modDiv) {
+      if (modMul == 1) {
+        return;
+      }
+      int comDiv = gcd(modMul, modDiv);
+      modMul /= comDiv;
+      modDiv /= comDiv;
+    }
+    applyModMul();
+    applyModDiv();
   }
 
   private static boolean additionOverflows(final long a, final long b) {
@@ -146,6 +262,23 @@ public class FastBigInt implements Comparable<FastBigInt> {
         || (b < 0L && a < Long.MIN_VALUE - b);
   }
 
+  private static boolean multiplyOverflows(final int a, final int b) {
+    if (b == 0) {
+      return false;
+    }
+    long result = a * b;
+    return a == result / b;
+  }
+
+  private static int gcd(int a, int b) {
+    int r;
+    while (b != 0) {
+      r = a % b;
+      a = b;
+      b = r;
+    }
+    return a;
+  }
 
   @Override
   public String toString() {
