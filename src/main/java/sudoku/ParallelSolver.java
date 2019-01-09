@@ -48,7 +48,6 @@ public class ParallelSolver {
     private Board board;
     private Consumer<Board> onSolution;
     private StackElement move;
-    private BigInteger space;
 
     private class StackElement {
       private final int row;
@@ -87,7 +86,6 @@ public class ParallelSolver {
     public BigCounter compute() {
       if (move != null) {
         board = new Board(board);
-        board.setCachingSearchSpace(true);
         board.setCell(move.row, move.col, move.val);
       }
 
@@ -98,12 +96,11 @@ public class ParallelSolver {
         return new BigCounter(1);
       }
 
-      BigInteger space = board.getSearchSpace();
+      BigInteger space = board.getSearchSpace(true);
       if (space == BigInteger.ZERO) {
         return new BigCounter(0);
       }
       if (space.compareTo(SEARCH_SPACE_CUTOFF) <= 0) {
-        board.setCachingSearchSpace(false);
         return new BigCounter(SequentialSolver.enumerate(board, onSolution));
       }
 
