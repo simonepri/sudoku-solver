@@ -339,11 +339,12 @@ final class Board {
       if (board[i][col] == EMPTY_CELL)
         colSpace *= getCandidatesCount(i, col);
     }
-    int boxIndex = getBoxIndex(row, col);
+    int boxX = row / boxLength;
+    int boxY = col / boxLength;
     for (int i = 0; i < boxLength; i++) {
       for (int j = 0; j < boxLength; j++) {
-        if (board[boxLength * boxIndex + i][boxLength * boxIndex + j] == EMPTY_CELL)
-          boxSpace *= getCandidatesCount(boxLength * boxIndex + i, boxLength * boxIndex + j);
+        if (board[boxLength * boxX + i][boxLength * boxY + j] == EMPTY_CELL)
+          boxSpace *= getCandidatesCount(boxLength * boxX + i, boxLength * boxY + j);
       }
     }
     BigInteger affectedSearchSpace = BigInteger.ONE;
