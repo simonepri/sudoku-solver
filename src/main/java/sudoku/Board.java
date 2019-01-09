@@ -45,9 +45,6 @@ final class Board {
   private int[] colUsed;
   private int[] boxUsed;
 
-  private BigInteger searchSpace;
-  private boolean searchSpaceCaching = false;
-
   /**
    * Default Constructor.
    *
@@ -120,9 +117,6 @@ final class Board {
     for (int row = 0; row < boardLength; row++) {
       board[row] = Arrays.copyOf(other.board[row], boardLength);
     }
-
-    searchSpaceCaching = other.searchSpaceCaching;
-    searchSpace = other.searchSpace;
   }
 
   /**
@@ -173,10 +167,6 @@ final class Board {
       );
     }
 
-    if (searchSpaceCaching) {
-      updateSearchSpaceBeforeSet(row, col);
-    }
-
     if (oldval != EMPTY_CELL) {
       int unsetbit = ~(1 << oldval);
       rowUsed[row] &= unsetbit;
@@ -194,10 +184,6 @@ final class Board {
     }
 
     board[row][col] = val;
-
-    if (searchSpaceCaching) {
-      updateSearchSpaceAfterSet(row, col);
-    }
 
     if (oldval == EMPTY_CELL) {
       updateNextToFillOnSet(row, col, box);
@@ -288,24 +274,26 @@ final class Board {
    * candidates of each empty cell.
    */
   public BigInteger getSearchSpace() {
-    if (searchSpaceCaching) {
-      if (searchSpace == null) {
-        searchSpace = computeSearchSpace();
-      }
-      return searchSpace;
+    if (isFull()) {
+      return null;
     }
-    return computeSearchSpace();
-  }
 
-  /**
-   * Set the search space caching state.
-   * @param status if true subsequent calls to getSearchSpace will be faster.
-   */
-  public void setSearchSpaceCachingStatus(boolean status) {
-    if (!status) {
-      searchSpace = null;
+    BigIntProd space = new BigIntProd(BigInteger.ONE);
+    for (int row = nextFreeRow; row < boardLength; row++) {
+      long rowSpace = 1L;
+      for (int col = nextFreeOnRow[row]; col < boardLength; col++) {
+        if (board[row][col] != EMPTY_CELL) {
+          continue;
+        }
+        rowSpace *= boardLength - getUsedCountRaw(row, col);
+      }
+      if (rowSpace == 0L) {
+        return BigInteger.ZERO;
+      }
+      space.multiply(rowSpace);
     }
-    searchSpaceCaching = status;
+
+    return space.get();
   }
 
   /**
@@ -438,87 +426,6 @@ final class Board {
    */
   private int getBoxIndexRaw(int row, int col) {
     return (((row / boxLength) * boxLength) + (col / boxLength));
-  }
-
-  /**
-   * Get the search space computed as the multiplication of the number of
-   * candidates of each empty cell.
-   */
-  private BigInteger computeSearchSpace() {
-    if (isFull()) {
-      return null;
-    }
-
-    BigIntProd space = new BigIntProd(BigInteger.ONE);
-    for (int row = nextFreeRow; row < boardLength; row++) {
-      long rowSpace = 1L;
-      for (int col = nextFreeOnRow[row]; col < boardLength; col++) {
-        if (board[row][col] != EMPTY_CELL) {
-          continue;
-        }
-        rowSpace *= boardLength - getUsedCountRaw(row, col);
-      }
-      if (rowSpace == 0L) {
-        return BigInteger.ZERO;
-      }
-      space.multiply(rowSpace);
-    }
-
-    return space.get();
-  }
-
-  /**
-   * Get the search space affected by an eventual set operation.
-   *
-   * @param row a row of the board.
-   * @param col a column of the board.
-   */
-  private BigInteger getAffectedSearchSpace(int row, int col) {
-    BigIntProd space = new BigIntProd(BigInteger.ONE);
-
-    long rowSpace = 1L;
-    for (int c = nextFreeOnRow[row]; c < boardLength; c++) {
-      if (board[row][c] != EMPTY_CELL) {
-        continue;
-      }
-      rowSpace *= boardLength - getUsedCountRaw(row, c);
-    }
-    if (rowSpace == 0L) {
-      return BigInteger.ZERO;
-    }
-    space.multiply(rowSpace);
-
-    long colSpace = 1L;
-    for (int r = 0; r < boardLength; r++) {
-      if (board[r][col] != EMPTY_CELL) {
-        continue;
-      }
-      colSpace *= boardLength - getUsedCountRaw(r, col);
-    }
-    if (colSpace == 0L) {
-      return BigInteger.ZERO;
-    }
-    space.multiply(colSpace);
-
-    long boxSpace = 1L;
-    int srow = row / boxLength * boxLength;
-    int erow = srow + boxLength;
-    int scol = col / boxLength * boxLength;
-    int ecol = scol + boxLength;
-    for (int r = Math.max(srow, nextFreeRow); r < erow; r++) {
-      for (int c = Math.max(scol, nextFreeOnRow[r]); c < ecol; c++) {
-        if (board[r][c] != EMPTY_CELL) {
-          continue;
-        }
-        boxSpace *= boardLength - getUsedCountRaw(r, c);
-      }
-    }
-    if (boxSpace == 0L) {
-      return BigInteger.ZERO;
-    }
-    space.multiply(boxSpace);
-
-    return space.get();
   }
 
   /**
@@ -686,43 +593,6 @@ final class Board {
         nextBestFreeRow = row;
       }
     }
-  }
-
-  /**
-   * Helper function to update the search space before a set operation.
-   *
-   * @param row a row of the board.
-   * @param col a column of the board.
-   */
-  private void updateSearchSpaceBeforeSet(int row, int col) {
-    if (searchSpace == null) {
-      return;
-    }
-
-    BigInteger dividend = getAffectedSearchSpace(row, col);
-    if (dividend == BigInteger.ZERO) {
-      return;
-    }
-    searchSpace = searchSpace.divide(dividend);
-  }
-
-  /**
-   * Helper function to update the search space after a set operation.
-   *
-   * @param row a row of the board.
-   * @param col a column of the board.
-   */
-  private void updateSearchSpaceAfterSet(int row, int col) {
-    if (searchSpace == null) {
-      return;
-    }
-
-    BigInteger multiplier = getAffectedSearchSpace(row, col);
-    if (searchSpace.signum() < multiplier.signum()) {
-      searchSpace = null;
-      return;
-    }
-    searchSpace = searchSpace.multiply(multiplier);
   }
 
   /**
