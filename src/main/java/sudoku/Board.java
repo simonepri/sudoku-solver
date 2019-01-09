@@ -287,6 +287,9 @@ final class Board {
         }
         rowSpace *= boardLength - getUsedCountRaw(row, col);
       }
+      if (rowSpace == 1L) {
+        continue;
+      }
       if (rowSpace == 0L) {
         return BigInteger.ZERO;
       }
