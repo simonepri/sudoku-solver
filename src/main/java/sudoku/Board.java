@@ -134,7 +134,9 @@ final class Board {
    */
   public int getCell(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
+      throw new IllegalArgumentException(
+        "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     return board[row][col];
@@ -150,10 +152,14 @@ final class Board {
    */
   public void setCell(int row, int col, int val) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
+      throw new IllegalArgumentException(
+        "The cell specified is out of the board: " + row + ":" + col
+      );
     }
     if (!isValidValue(val)) {
-      throw new IllegalArgumentException("The value specified is invalid: " + val + " at " + row + ":" + col);
+      throw new IllegalArgumentException(
+        "The value specified is invalid: " + val + " at " + row + ":" + col
+      );
     }
 
     int oldval = board[row][col];
@@ -163,7 +169,9 @@ final class Board {
 
     int box = getBoxIndexRaw(row, col);
     if (!isCandidateRaw(row, col, box, val)) {
-      throw new IllegalArgumentException("Value already used: " + val + " at " + row + ":" + col);
+      throw new IllegalArgumentException(
+        "Value already used: " + val + " at " + row + ":" + col
+      );
     }
 
     BigInteger oldAffectedSearchSpace = BigInteger.ONE;
@@ -212,7 +220,9 @@ final class Board {
    */
   public boolean isCandidate(int row, int col, int val) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
+      throw new IllegalArgumentException(
+        "The cell specified is out of the board: " + row + ":" + col
+      );
     }
     if (!isValidValue(val)) {
       return false;
@@ -231,7 +241,9 @@ final class Board {
    */
   public IntStream getCandidates(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
+      throw new IllegalArgumentException(
+        "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     int box = getBoxIndexRaw(row, col);
@@ -247,7 +259,9 @@ final class Board {
    */
   public int getCandidatesCount(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
+      throw new IllegalArgumentException(
+        "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     return boardLength - getUsedCountRaw(row, col);
@@ -257,8 +271,11 @@ final class Board {
    * Get a stream of empty cells of the board. (left to right, top to bottom)
    */
   public Stream<Cell> getFillables() {
-    return IntStream.range(0, boardLength).mapToObj(i -> IntStream.range(0, boardLength).mapToObj(j -> new Cell(i, j)))
-        .flatMap(Function.identity()).filter(cell -> board[cell.row][cell.col] == EMPTY_CELL);
+    return IntStream.range(0, boardLength)
+      .mapToObj(i -> IntStream.range(0, boardLength)
+      .mapToObj(j -> new Cell(i, j)))
+      .flatMap(Function.identity())
+      .filter(cell -> board[cell.row][cell.col] == EMPTY_CELL);
   }
 
   /**
@@ -432,7 +449,9 @@ final class Board {
    */
   public int getBoxIndex(int row, int col) {
     if (!isValidCell(row, col)) {
-      throw new IllegalArgumentException("The cell specified is out of the board: " + row + ":" + col);
+      throw new IllegalArgumentException(
+        "The cell specified is out of the board: " + row + ":" + col
+      );
     }
 
     return getBoxIndexRaw(row, col);
@@ -448,7 +467,9 @@ final class Board {
    */
   private boolean isCandidateRaw(int row, int col, int box, int val) {
     int nthbit = 1 << val;
-    return ((rowUsed[row] & nthbit) == 0) && ((colUsed[col] & nthbit) == 0) && ((boxUsed[box] & nthbit) == 0);
+    return ((rowUsed[row] & nthbit) == 0)
+        && ((colUsed[col] & nthbit) == 0)
+        && ((boxUsed[box] & nthbit) == 0);
   }
 
   /**
