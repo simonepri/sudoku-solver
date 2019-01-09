@@ -705,7 +705,7 @@ final class Board {
     if (dividend.signum() == 0) {
       return;
     }
-    searchSpace = searchSpace.divide(dividend);
+    searchSpace.divide(dividend);
   }
 
   /**
@@ -724,7 +724,7 @@ final class Board {
       searchSpace = null;
       return;
     }
-    searchSpace = searchSpace.multiply(multiplier);
+    searchSpace.multiply(multiplier);
   }
 
   /**
