@@ -173,7 +173,7 @@ run() {
       if [ "$OPTS_SKIP_SEQUENTIAL" = false ]; then
         sequential_out=`run_app "sequential" "$file_path" "$OPTS_ITERATIONS" "$OPTS_TIME" "$OPTS_CUSTOM_CUTOFF"`
         con_printf "."
-        if [[ ! "$sequential_out" =~ $valid_out ]]; then
+        if [ $ABORT -eq 0 ] && [[ ! "$sequential_out" =~ $valid_out ]]; then
           con_printf " ${RED}ERRORED${RST} $sequential_out\n"
           csv_printf "$test_name,,,,,,,,,,,\n"
           continue
@@ -184,7 +184,7 @@ run() {
       if [ "$OPTS_SKIP_PARALLEL" = false ]; then
         parallel_out=`run_app "parallel" "$file_path" "$OPTS_ITERATIONS" "$OPTS_TIME" "$OPTS_CUSTOM_CUTOFF"`
         con_printf "."
-        if [[ ! "$parallel_out" =~ $valid_out ]]; then
+        if [ $ABORT -eq 0 ] && [[ ! "$parallel_out" =~ $valid_out ]]; then
           con_printf " ${RED}ERRORED${RST} $parallel_out\n"
           csv_printf "$test_name,,,,,,,,,,,\n"
           continue
