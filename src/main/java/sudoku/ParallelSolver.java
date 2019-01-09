@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.concurrent.RecursiveTask;
 import java.util.function.Consumer;
 
-import sudoku.util.BigCounter;
+import sudoku.util.FastBigInt;
 
 public class ParallelSolver {
   private static BigInteger SEARCH_SPACE_CUTOFF =
@@ -44,7 +44,7 @@ public class ParallelSolver {
     return new SubtreeTask(board, onSolution).compute().get();
   }
 
-  public static class SubtreeTask extends RecursiveTask<BigCounter> {
+  public static class SubtreeTask extends RecursiveTask<FastBigInt> {
     private Board board;
     private Consumer<Board> onSolution;
     private StackElement move;
@@ -83,7 +83,7 @@ public class ParallelSolver {
     }
 
     @Override
-    public BigCounter compute() {
+    public FastBigInt compute() {
       if (move != null) {
         board = new Board(board);
         board.setCell(move.row, move.col, move.val);
@@ -93,15 +93,15 @@ public class ParallelSolver {
         if (onSolution != null) {
           onSolution.accept(board);
         }
-        return new BigCounter(1);
+        return new FastBigInt(1);
       }
 
       BigInteger space = board.getSearchSpace(true);
       if (space == BigInteger.ZERO) {
-        return new BigCounter(0);
+        return new FastBigInt(0);
       }
       if (space.compareTo(SEARCH_SPACE_CUTOFF) <= 0) {
-        return new BigCounter(SequentialSolver.enumerate(board, onSolution));
+        return new FastBigInt(SequentialSolver.enumerate(board, onSolution));
       }
 
       ArrayList<SubtreeTask> tasks = new ArrayList<>();
@@ -111,7 +111,7 @@ public class ParallelSolver {
         tasks.add(new SubtreeTask(board, onSolution, nmove));
       });
 
-      BigCounter count = new BigCounter(0);
+      FastBigInt count = new FastBigInt(0);
       if (tasks.size() > 0) {
         for (int i = 1; i < tasks.size(); i++) {
           tasks.get(i).fork();

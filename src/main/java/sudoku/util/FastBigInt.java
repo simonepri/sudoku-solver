@@ -2,20 +2,20 @@ package sudoku.util;
 
 import java.math.BigInteger;
 
-public class BigCounter implements Comparable<BigCounter> {
+public class FastBigInt implements Comparable<FastBigInt> {
   private BigInteger bigValue = BigInteger.ZERO;
   private long modSum = 0L;
 
   /**
    * Default Constructor.
    */
-  public BigCounter() {}
+  public FastBigInt() {}
 
   /**
    * Default Constructor.
    * @param initial an initial value.
    */
-  public BigCounter(long initial) {
+  public FastBigInt(long initial) {
     modSum = initial;
   }
 
@@ -23,14 +23,14 @@ public class BigCounter implements Comparable<BigCounter> {
    * Default Constructor.
    * @param initial an initial value.
    */
-  public BigCounter(BigInteger initial) {
+  public FastBigInt(BigInteger initial) {
     bigValue = initial;
   }
 
   /**
    * Increment.
    */
-  public BigCounter inc() {
+  public FastBigInt inc() {
     if (modSum == Long.MAX_VALUE) {
       bigValue = bigValue.add(BigInteger.valueOf(modSum));
       modSum = 0L;
@@ -42,7 +42,7 @@ public class BigCounter implements Comparable<BigCounter> {
   /**
    * Decrement.
    */
-  public BigCounter dec() {
+  public FastBigInt dec() {
     if (modSum == Long.MIN_VALUE) {
       bigValue = bigValue.add(BigInteger.valueOf(modSum));
       modSum = 0L;
@@ -63,7 +63,7 @@ public class BigCounter implements Comparable<BigCounter> {
    * Add a value.
    * @param value a value to add.
    */
-  public BigCounter add(long value) {
+  public FastBigInt add(long value) {
     if (additionOverflows(modSum, value)) {
       applyModSum();
     }
@@ -75,7 +75,7 @@ public class BigCounter implements Comparable<BigCounter> {
    * Add a value.
    * @param value a value to add.
    */
-  public BigCounter add(BigInteger value) {
+  public FastBigInt add(BigInteger value) {
     if (value == BigInteger.ONE) {
       return inc();
     }
@@ -87,7 +87,7 @@ public class BigCounter implements Comparable<BigCounter> {
    * Add a value.
    * @param other another instance of this class to add.
    */
-  public BigCounter add(BigCounter other) {
+  public FastBigInt add(FastBigInt other) {
     add(other.bigValue);
     add(other.modSum);
     return this;
@@ -97,7 +97,7 @@ public class BigCounter implements Comparable<BigCounter> {
    * Subtract a value.
    * @param value a value to subtract.
    */
-  public BigCounter sub(long value) {
+  public FastBigInt sub(long value) {
     if (subtractionOverflows(modSum, value)) {
       applyModSum();
     }
@@ -109,7 +109,7 @@ public class BigCounter implements Comparable<BigCounter> {
    * Add a value.
    * @param value a value to subtract.
    */
-  public BigCounter sub(BigInteger value) {
+  public FastBigInt sub(BigInteger value) {
     if (value == BigInteger.ONE) {
       return dec();
     }
@@ -121,7 +121,7 @@ public class BigCounter implements Comparable<BigCounter> {
    * Add a value.
    * @param other another instance of this class to subtract.
    */
-  public BigCounter sub(BigCounter other) {
+  public FastBigInt sub(FastBigInt other) {
     sub(other.bigValue);
     sub(other.modSum);
     return this;
@@ -153,7 +153,7 @@ public class BigCounter implements Comparable<BigCounter> {
   }
 
   @Override
-  public int compareTo(BigCounter c) {
+  public int compareTo(FastBigInt c) {
     return get().compareTo(c.get());
   }
 
