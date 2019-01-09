@@ -169,14 +169,26 @@ run() {
 
       sequential_out="invalid"
       parallel_out="invalid"
+      valid_out="^[^,]*,[^,]*,[^,]*,[^,]*,[^,]*$"
       if [ "$OPTS_SKIP_SEQUENTIAL" = false ]; then
         sequential_out=`run_app "sequential" "$file_path" "$OPTS_ITERATIONS" "$OPTS_TIME" "$OPTS_CUSTOM_CUTOFF"`
         con_printf "."
+        if [[ ! "$sequential_out" =~ $valid_out ]]; then
+          con_printf " ${RED}ERRORED:${RST} $sequential_out\n"
+          csv_printf "$test_name,,,,,,,,,,,\n"
+          continue
+        fi
       fi
       if [ $ABORT -gt 0 ]; then sequential_out="invalid"; ABORT=0; fi
+
       if [ "$OPTS_SKIP_PARALLEL" = false ]; then
         parallel_out=`run_app "parallel" "$file_path" "$OPTS_ITERATIONS" "$OPTS_TIME" "$OPTS_CUSTOM_CUTOFF"`
         con_printf "."
+        if [[ ! "$parallel_out" =~ $valid_out ]]; then
+          con_printf " ${RED}ERRORED:${RST} $parallel_out\n"
+          csv_printf "$test_name,,,,,,,,,,,\n"
+          continue
+        fi
       fi
       if [ $ABORT -gt 0 ]; then parallel_out="invalid"; ABORT=0; fi
 
