@@ -146,7 +146,7 @@ run() {
   ABORT=0
   trap "ABORT=1" SIGINT
 
-  csv_printf "test name,serial iterations,serial time,serial stdev,serial min,serial max,parallel iterations,parallel time,parallel stdev,parallel min,parallel max,speedup\n"
+  csv_printf "test name,sequential iterations,sequential time,sequential stdev,sequential min,sequential max,parallel iterations,parallel time,parallel stdev,parallel min,parallel max,speedup\n"
   # Iterate on all the folders.
   for dir_path in src/benchmark/boards/*; do
     # Iterate on all .txt file in the folder.
