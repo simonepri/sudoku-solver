@@ -320,7 +320,7 @@ cd sudoku-solver
 > NB: This will also trigger the build process so be sure to have the
 [Java JDK][download:jjdk] installed on your machine prior to launch it.
 
-<img src="media/run-cli.gif" height="420" align="center" alt="Sudoku solution enumerator CLI" />
+<img src="media/run-cli.png" height="420" align="center" alt="Sudoku solution enumerator CLI" />
 
 ## Benchmarking suite
 The project is provided with a [CLI][bin:bench-cli] that allows you
@@ -337,7 +337,7 @@ cd sudoku-solver
 > NB: This will also trigger the build process so be sure to have the
 [`Java JDK`][download:jjdk] installed on your machine prior to launch it.
 
-<img src="media/bench-cli.gif" height="420" align="center" alt="Sudoku solution enumerator benchmarking CLI" />
+<img src="media/bench-cli.png" height="420" align="center" alt="Sudoku solution enumerator benchmarking CLI" />
 
 > TIP: You can stop a test by hitting `CTRL+C` or `Command+C`.
 
