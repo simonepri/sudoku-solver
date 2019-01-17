@@ -173,13 +173,19 @@ TODO
 <!-- Counter modulo Long.MAX_VALUE. -->
 
 #### Parallelize branches using the fork/join framework
-TODO
+
 <!-- Thread "halving". -->
 <!-- Work stealing thread pool. -->
 
 #### Parallelize board copy
 <!-- Pass the "delta" rather than a modified board -->
-TODO
+The Board object has to be modified after filling a cell, so each work item has to have it's local instance of a Board.
+
+Duplicating a Board is an expensive operation so instead of doing it eagerly in the constructor of a RecursiveTask, we make a copy in the compute method.
+
+In the constructor of our RecursiveTask we only pass the change that we want to try.
+
+In this way we offload an expensive computation on the forks, decreasing the Span.
 
 #### Compute the search space
 TODO
