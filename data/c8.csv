@@ -1,6 +1,6 @@
 os,core,cpu
 Linux,8,Intel(R) Xeon(R) CPU @ 2.30GHz
-test name,serial iterations,serial time,serial stdev,serial min,serial max,parallel iterations,parallel time,parallel stdev,parallel min,parallel max,speedup
+test name,sequential iterations,sequential time,sequential stdev,sequential min,sequential max,parallel iterations,parallel time,parallel stdev,parallel min,parallel max,speedup
 1f,3,128963841,8030894,119664527,139260175,3,26177797,484134,25721759,26848084,4.926
 1e,3,28929681,2068917,26446096,31511056,3,5919750,29186,5878741,5944311,4.886
 1d,3,6028958,314699,5611149,6370642,3,1340773,82141,1225043,1407329,4.496

@@ -146,7 +146,7 @@ run() {
   ABORT=0
   trap "ABORT=1" SIGINT
 
-  csv_printf "test name,sequential iterations,sequential time,sequential stdev,sequential min,sequential max,parallel iterations,parallel time,parallel stdev,parallel min,parallel max,speedup\n"
+  csv_printf "test name,sequential iterations,sequential time,sequential stdev,sequential min,sequential max,parallel iterations,parallel time,parallel stdev,parallel min,parallel max,speedup,speedup min,speedup max\n"
   # Iterate on all the folders.
   for dir_path in src/benchmark/boards/*; do
     # Iterate on all .txt file in the folder.
@@ -173,7 +173,7 @@ run() {
         con_printf "."
         if [ $ABORT -eq 0 ] && [[ ! "$sequential_out" =~ $valid_out ]]; then
           con_printf " ${RED}ERRORED${RST} $sequential_out\n"
-          csv_printf "$test_name,,,,,,,,,,,\n"
+          csv_printf "$test_name,,,,,,,,,,,,,\n"
           continue
         fi
       fi
@@ -184,7 +184,7 @@ run() {
         con_printf "."
         if [ $ABORT -eq 0 ] && [[ ! "$parallel_out" =~ $valid_out ]]; then
           con_printf " ${RED}ERRORED${RST} $parallel_out\n"
-          csv_printf "$test_name,,,,,,,,,,,\n"
+          csv_printf "$test_name,,,,,,,,,,,,,\n"
           continue
         fi
       fi
@@ -192,7 +192,7 @@ run() {
 
       if [ "$sequential_out" = "invalid" ] && [ "$parallel_out" = "invalid" ]; then
         con_printf " ${RED}STOPPED${RST}\n"
-        csv_printf "$test_name,,,,,,,,,,,\n"
+        csv_printf "$test_name,,,,,,,,,,,,,\n"
         continue
       fi
 
@@ -210,7 +210,7 @@ run() {
         hum_seq_time_min=`humanize_time "$seq_time_min"`
         hum_seq_time_max=`humanize_time "$seq_time_max"`
 
-        con_printf "○ Sequential x $seq_iterations: ${CYN}$hum_seq_time_avg${RST} ± ${CYN}$hum_seq_time_dev${RST} | ▽ ${CYN}$hum_seq_time_min${RST} △ ${CYN}$hum_seq_time_max${RST}${RST}\n"
+        con_printf "○ Sequential x $seq_iterations: ${CYN}$hum_seq_time_avg${RST} ± ${CYN}$hum_seq_time_dev${RST} | ▽ ${CYN}$hum_seq_time_min${RST} △ ${CYN}$hum_seq_time_max${RST}\n"
         csv_printf ",$seq_iterations,$seq_time_avg,$seq_time_dev,$seq_time_min,$seq_time_max"
       else
         csv_printf ",,,,,"
@@ -226,17 +226,19 @@ run() {
         hum_par_time_min=`humanize_time "$par_time_min"`
         hum_par_time_max=`humanize_time "$par_time_max"`
 
-        con_printf "○ Parallel   x $par_iterations: ${CYN}$hum_par_time_avg${RST} ± ${CYN}$hum_par_time_dev${RST} | ▽ ${CYN}$hum_par_time_min${RST} △ ${CYN}$hum_par_time_max${RST}${RST}\n"
+        con_printf "○ Parallel   x $par_iterations: ${CYN}$hum_par_time_avg${RST} ± ${CYN}$hum_par_time_dev${RST} | ▽ ${CYN}$hum_par_time_min${RST} △ ${CYN}$hum_par_time_max${RST}\n"
         csv_printf ",$par_iterations,$par_time_avg,$par_time_dev,$par_time_min,$par_time_max"
       else
         csv_printf ",,,,,"
       fi
       if [ "$OPTS_SKIP_SEQUENTIAL" = false ] && [ "$sequential_out" != "invalid" ] && [ "$OPTS_SKIP_PARALLEL" = false ] && [ "$parallel_out" != "invalid" ]; then
         speedup=`echo "scale=3; $seq_time_avg/$par_time_avg" | bc | sed "s/^\./0./"`
-        con_printf "○ Speedup: ${CYN}$speedup${RST}\n"
-        csv_printf ",$speedup\n"
+        speedup_min=`echo "scale=3; $seq_time_min/$par_time_max" | bc | sed "s/^\./0./"`
+        speedup_max=`echo "scale=3; $seq_time_max/$par_time_min" | bc | sed "s/^\./0./"`
+        con_printf "○ Speedup: ${CYN}$speedup${RST} | ▽ ${CYN}$speedup_min${RST} △ ${CYN}$speedup_max${RST}\n"
+        csv_printf ",$speedup,$speedup_min,$speedup_max\n"
       else
-        csv_printf ",\n"
+        csv_printf ",,,\n"
       fi
     done
   done

@@ -37,10 +37,11 @@ Term | Description
 -----|------------
 S | A perfect square indicating the number of columns, rows, and boxes of a Sudoku board.
 N | The total number of cells of a board given as N = S * S.
+B | The size of a single box of the matrix as B = √S
 Board | An instance of Sudoku represented with a S x S matrix.
 Row | A row of a board's matrix that can only contain one of each of the numbers in [1, S].
 Column | A column of a board's matrix that can only contain one of each of the numbers in [1, S].
-Box | A particular √S x √S sub-matrix of a board's matrix that can only contain one of each of the numbers in [1, S].
+Box | A particular B x B sub-matrix of a board's matrix that can only contain one of each of the numbers in [1, S].
 Cell | A single entry of a board's matrix either empty or with a legal assignment.
 Empty Cell | A cell whose assignment has still to be found.
 Cell's Candidates | A list of values in [1, S] which can be legally placed in a particular cell.
@@ -106,7 +107,7 @@ def parallel_solutions_counter(board, move):
   if move is not null:
     (row, col, val) = move
     board = board.clone()
-    board.set_cell(row, col, val);
+    board.set_cell(row, col, val)
 
   if board.is_full(): return 1
 
@@ -142,35 +143,129 @@ behind their implementation can be found in the
 ### Implementation details
 
 #### Check if the board is completed in constant time
-TODO
-<!-- Keep the count of empty and total cells. -->
+The naive approach is to loop through the whole board and check whether or
+not there is an empty cell.
+
+A better approach is to keep track of the number of the filled cells of the
+board (also called clues) and compare it against the total number of cells of
+the board.
+
+The number of clues is initially set to `0` and gets increased or decreased
+appropriately after each `set_cell` operation.
+
+So, at the small cost of a constant additional work inside the `set_cell` and an
+overall additional constant memory usage, we reduced the time complexity for the
+`is_full` method from `O(N)` to `O(1)`.
 
 #### Check if a value is legal for a cell in constant time
-TODO
-<!-- Keep an bit-set of size S for each column row and box. -->
-<!-- Update the bit-set after during set operation. -->
-<!-- Use the bit-set to understand if a specific value has already been used. -->
+The naive approach is to iterate on the row, column, and box of the given
+cell searching for the specific value not to be present in any of them.
+
+But if we somehow keep track of the used values on each row, column, and box of
+the board we can avoid looping through all the cells like the naive approach
+does. To do so it's sufficient to keep a bit-set of `S` bits for each
+row, column, and box.
+Then each time a specific cell's value `v` is set, we also set the bit at
+position `v - 1` of the 3 bit-sets for the particular row, column, and box of the
+given cell.
+Finally to check whether a value `v` is valid or not we just check if the bit at
+position `v - 1` is not set in any of the 3 bit-sets for the particular row, column,
+and box of the given cell.
+
+So at the cost of a constant additional work inside the `set_cell` and an
+overall additional memory usage of `O(S)`, we reduced the time complexity for
+the `is_valid_calindate` method from `O(S)` to `O(1)` and thus reduced the
+complexity of the `get_candidates` method from `O(S^2)` to `O(S)`.
 
 #### Count the number of candidates of a cell in constant time
-TODO
-<!-- Count the number of ones of the or of the bit-sets of the used values. -->
-<!-- Precompute the number of ones for all the possible int value of the bit-set. -->
+Given the way we implemented the `is_valid_calindate` method we can easily
+count the valid candidates for a given cell by iterating on all the possible
+values counting the ones valid.
+
+Lets say that for the cell we want to count the candidates, the state of the
+3 bit-sets is the following.
+
+value    | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1
+---------|---|---|---|---|---|---|---|---|---
+row      | 1 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 0
+column   | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+box      | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0
+
+If we compute the bitwise or operation of the 3 bit-sets we obtain a new bit-set
+that has a 1 on every invalid candidate as showed below.
+
+value    | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1
+---------|---|---|---|---|---|---|---|---|---
+invalid  | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 0 | 0
+
+At this point, counting the number of candidates has been reduced to the problem
+of counting the zeros of a bit-set.
+If we use integers to represent our bit-sets then we could use the integer given
+by the binary representation of the bit-set to accesses a pre-computed table in
+constant time that gives us the answer of how many zeros or ones that particular
+number has.
+
+The pre-computed table has to be built only once and can be shared by all the
+boards instantiated.
+
+This tricky optimization allows us to get the number of candidates in `O(1)` but
+requires an additional memory usage of `O(2^S)` shared among all the boards.
 
 #### Get the next empty cell in constant time
-TODO
-<!-- Keep an array of S elements that contains the column index of the next empty cell of each row. -->
-<!-- On set, update the next empty cell for the row where the value has been set. -->
+The naive approach is to iterate over the board looking for the first empty cell.
+
+A better strategy involves the use of an array of `S` elements that contains
+the column index of the next empty cell of each row.
+If we use such additional array and we also keep track of which is the first row
+having an empty cell then we can easily get the empty cell in constant time.
+
+To maintain the array update on each set operation we update the next empty cell
+for the row where the value has been set and if the row has no more empty cells
+we update the variable that tells us which is the first row that contains an
+empty cell.
+
+So at the cost of an additional work of `O(S)` inside the `set_cell` and an
+overall additional memory usage of `O(S)`, we reduced the time complexity for
+the `get_empty_cell` method from `O(N)` to `O(1)`.
 
 #### Get the cell with the lowest number of candidates in constant time
-TODO
-<!-- Keep an array of S elements that contains the column index of the cell with the lowest number of candidates of each row. -->
-<!-- On set, for each row try to update the column index of the cell with the lowest number of candidates with the the column where the value has been set. -->
-<!-- On set, for the row where the value has been set try to update the column index with all the columns of that row. -->
-<!-- On set, for the rows of the box where the value has been set try to update the column index with all the columns of that box. -->
+As we mentioned in the sections above, the strategy used to pick the empty cell
+can impact significantly on the size of the search space.
+Indeed, the more is the number of legal candidates for a cell the lower is the
+probability that our guess for that cell will result correct.
 
-#### Count using BigInteger in constant amortized time
-TODO
-<!-- Counter modulo Long.MAX_VALUE. -->
+Thus is intuitively better to always try to guess values for cells that has
+the lowest number of candidates.
+
+To do this without affecting the current complexity of the `get_empty_cell`
+method we used an array of `S` elements that contains the
+column index of the cell with the lowest number of candidates of each row.
+If we use such additional array and we also keep track of which is the row
+that has the cell with the lower number of candidates then we can easily get
+the empty cell in constant time.
+
+To maintain the array update on each set operation we do three things.
+1) For each row try to update the column index of the cell with the lowest
+number of candidates with the the column where the value has been set and
+eventually update the variable that stores where is the row index of the best empty cel.
+2) For the row where the value has been set try to update the column index with
+all the columns of that row and eventually update the variable that stores where
+is the row index of the best empty cel.
+3) For the rows of the box where the value has been set try to update the column
+index with all the columns of that box and eventually update the variable that
+stores where is the row index of the best empty cel.
+
+So at the cost of an additional work of `O(S)` inside the `set_cell` and an
+overall additional memory usage of `O(S)`, we have potentially reduced the
+search space by many orders of magnitude.
+
+#### Optimized addition and multiplication with BigInteger
+In Java BigInteger objects are immutable and thus every time an operation is
+executed on them a new object is instantiated.
+
+We implemented two modified versions of the BigInteger class, namely
+BigIntSum and BigIntProd, that are mutable BitInteger which allow us to do sums
+and products with less overhead in the average case.
 
 #### Parallelize branches using the fork/join framework
 
@@ -195,10 +290,6 @@ TODO
 #### Choose of the appropriate sequential cut-off
 TODO
 
-#### Addition using BigInteger in constant amortized time
-TODO
-<!-- Adder modulo Long.MAX_VALUE. -->
-
 ## Experiments
 
 ### Testing environment
@@ -221,6 +312,8 @@ TODO
 <!-- Is the speedup always greater than 1? Why? -->
 
 ## Usage
+<img src="media/run-cli.png" width="350" align="right" alt="Sudoku solution enumerator CLI" />
+
 The project is provided with a [CLI][bin:run-cli] that allows you
 to run the solver on your machine with ease.
 
@@ -235,9 +328,9 @@ cd sudoku-solver
 > NB: This will also trigger the build process so be sure to have the
 [Java JDK][download:jjdk] installed on your machine prior to launch it.
 
-<img src="media/run-cli.gif" height="420" align="center" alt="Sudoku solution enumerator CLI" />
-
 ## Benchmarking suite
+<img src="media/bench-cli.png" width="350" align="right" alt="Sudoku solution enumerator benchmarking CLI" />
+
 The project is provided with a [CLI][bin:bench-cli] that allows you
 to reproduce the tests results on your machine.
 
@@ -251,8 +344,6 @@ cd sudoku-solver
 
 > NB: This will also trigger the build process so be sure to have the
 [`Java JDK`][download:jjdk] installed on your machine prior to launch it.
-
-<img src="media/bench-cli.gif" height="420" align="center" alt="Sudoku solution enumerator benchmarking CLI" />
 
 > TIP: You can stop a test by hitting `CTRL+C` or `Command+C`.
 
