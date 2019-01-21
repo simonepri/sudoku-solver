@@ -307,6 +307,7 @@ TODO
 <!-- Is there a correlation between the fill factor, the search space and execution time? -->
 
 ### Speedups obtained
+![Correlation Matrix](data/correlation.svg)
 TODO
 <!-- Table or Graphs showing the speedups of each test. -->
 <!-- Is the speedup always greater than 1? Why? -->
