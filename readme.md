@@ -383,6 +383,10 @@ We can see clearly that the speedup is correlated greatly with the search space 
 
 This trend can also be found looking at the speed up plot.
 
+The speedup also is not very strongly correlated with the number of solutions, while the parallel time is linearly dependent of the number of solutions.
+
+We can conclude that the strength of the parallel algorithm comes from being able to explore the whole search space faster and could be improved a little tweaking the ForkJoin parameters.
+
 <!-- Table or Graphs showing the speedups of each test. -->
 <!-- Is the speedup always greater than 1? Why? -->
 
