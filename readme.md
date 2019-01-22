@@ -269,8 +269,14 @@ and products with less overhead in the average case.
 
 #### Parallelize branches using the fork/join framework
 
-<!-- Thread "halving". -->
-<!-- Work stealing thread pool. -->
+We choose the ForkJoin framework for Java because it is easy to reason with and with nice theoretical guarantees.
+
+A recursive task can model fairly well a backtracking solver. Each backtracking choice can be tested concurrently forking on each choice.
+
+To minimize the overhead of task creation we employ to common strategies in the fork join realm:
+
+- Reusing the same task rather than on a fork to simulate the first choice.
+- Choosing a sequential cutoff
 
 #### Parallelize board copy
 <!-- Pass the "delta" rather than a modified board -->
@@ -283,32 +289,100 @@ In the constructor of our RecursiveTask we only pass the change that we want to 
 In this way we offload an expensive computation on the forks, decreasing the Span.
 
 #### Compute the search space
-TODO
+
+We can estimate the search space multiplying the number of candidates of each empty cell.
+Since it is an expensive task we tried to speed it up.
 <!-- Multiply at groups of log(Long.MAX_VALUE)/log(9). -->
 <!-- Update on set with by dividend. -->
 
 #### Choose of the appropriate sequential cut-off
-TODO
+
+We experimented with different ways to determine the cutoff:
+
+- recursion depth
+- still empty cells
+- estimated search space
+
+We measured limited differences when choosing one of these parameters, provided that we optimize the value of the cutoff accordingly.
+
+This result is readily explained by the correlation graph in section **Speedups obtained**, that is the search space and empty cell have almost perfect linear correlation. Thus one can be used to estimate the other.
+
+Concretely the optimal sequential cutoff can be found looking at processor utilization patterns: it should be full during most of the computation and all the cpu should complete their task at the same time.
+The minimum sequential cutoff also has to consider the task creation overhead.
 
 ## Experiments
 
 ### Testing environment
-TODO
-<!-- CPU model and other hardware info. -->
+
+To get a scalable and homogeneous environment and reproducible results, we leveraged Google cloud infrastructure
+
+| os    | core | cpu                            |
+|-------|------|--------------------------------|
+| Linux | 2    | Intel(R) Xeon(R) CPU @ 2.30GHz |
+| Linux | 4    | Intel(R) Xeon(R) CPU @ 2.30GHz |
+| Linux | 8    | Intel(R) Xeon(R) CPU @ 2.30GHz |
+| Linux | 12   | Intel(R) Xeon(R) CPU @ 2.30GHz |
+| Linux | 16   | Intel(R) Xeon(R) CPU @ 2.30GHz |
+| Linux | 24   | Intel(R) Xeon(R) CPU @ 2.30GHz |
+| Linux | 32   | Intel(R) Xeon(R) CPU @ 2.30GHz |
+| Linux | 40   | Intel(R) Xeon(R) CPU @ 2.30GHz |
+| Linux | 48   | Intel(R) Xeon(R) CPU @ 2.30GHz |
+| Linux | 56   | Intel(R) Xeon(R) CPU @ 2.30GHz |
+| Linux | 64   | Intel(R) Xeon(R) CPU @ 2.30GHz |
+
 
 ### Test cases
-TODO
+
+There are a handful of test cases differing mainly on the number of solutions.
+
+| test name | total cells | empty cells | search space                                     | solutions | Filling factor |
+|-----------|-------------|-------------|--------------------------------------------------|-----------|----------------|
+| 1a        | 81          | 53          | 43129799915034095124480000                       | 1         | 34.57%         |
+| 1b        | 81          | 59          | 1947751863256350720000000000000000000            | 4715      | 27.16%         |
+| 1c        | 81          | 61          | 13980445502865408000000000000000000000000        | 132271    | 24.69%         |
+| 1d        | 81          | 62          | 477847258398720000000000000000000000000000       | 587264    | 23.46%         |
+| 1e        | 81          | 63          | 23409163772243214336000000000000000000000000     | 3151964   | 22.22%         |
+| 1f        | 81          | 64          | 1179821854121058002534400000000000000000000000   | 16269895  | 20.99%         |
+| 2a        | 81          | 58          | 24563768857859261988864000000000                 | 1         | 28.40%         |
+| 2b        | 81          | 60          | 261718015484414301673881600000000000             | 276       | 25.93%         |
+| 2b        | 81          | 62          | 5546527766851092480000000000000000000000         | 32128     | 23.46%         |
+| 2d        | 81          | 64          | 54366191037898352756785152000000000000000000     | 1014785   | 20.99%         |
+| 2e        | 81          | 65          | 4281337544234495279596830720000000000000000000   | 7388360   | 19.75%         |
+| 2f        | 81          | 66          | 509895408914038847535316992000000000000000000000 | 48794239  | 18.52%         |
+
 <!-- Table or Graphs showing the number of empty cells and the search space of each test. -->
 
 ### Execution times
-TODO
+
 <!-- Table or Graphs showing the execution times of each test. -->
 <!-- Which instances does require more time? -->
 <!-- Is there a correlation between the fill factor, the search space and execution time? -->
 
 ### Speedups obtained
-![Correlation Matrix](data/correlation.svg)
-TODO
+Speedup values grouped by test case and core count.
+There seem to be an optimum core count for maximum speedup. It grows almost linearly with relation to core count.
+
+![Speedup for test series 1](data/speedup1.svg)
+
+![Speedup for test series 2](data/speedup2.svg)
+
+Unfortunately due to inefficiencies introduced by the concurrent algorithm, the speedup obtained is sometimes slightly smaller than 1. This happens only on smaller test cases or with a very low core count.
+
+To understand the root cause of the values obtained, we computed a correlation matrix over all the data we gathered.
+
+While the sequential time depends linearly on the number of solution and unrelated to the number of cores, the factors that make up the parallel time and the speed up are more varied.
+
+![Correlation Matrix for all data](data/correlation.svg)
+
+The correlation matrix is muddled by the core count, thus we plotted several correlation matrices grouping the data by core count.
+
+Here is an example of the correlation matrix for the test data obtained on the 64 core machine.
+![Correlation Matrix for 64 cores](data/correlation64.svg)
+
+We can see clearly that the speedup is correlated greatly with the search space and the empty cells, rather than only with the number of solutions. This is expected because search space and empty cells are almost linearly dependent and **search space determines how much branching we can have on our parallel solver**.
+
+This trend can also be found looking at the speed up plot.
+
 <!-- Table or Graphs showing the speedups of each test. -->
 <!-- Is the speedup always greater than 1? Why? -->
 
