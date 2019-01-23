@@ -12,7 +12,7 @@
 </p>
 
 ## Introduction to Sudoku
-<a href="#">
+<a href="#introduction-to-sudoku">
   <img src="data/media/sudoku.gif" width="250" align="right" alt="Example Sudoku Board" />
 </a>
 
@@ -416,9 +416,7 @@ search space faster and could be improved a little tweaking the fork/join
 parameters.
 
 ## Usage
-<a href="#">
-  <img src="data/media/run-cli.png" width="350" align="right" alt="Sudoku solution enumerator CLI" />
-</a>
+<img src="data/media/run-cli.png" width="350" align="right" alt="Sudoku solution enumerator CLI" />
 
 The project is provided with a [CLI][bin:run-cli] that allows you
 to run the solver on your machine with ease.
@@ -435,9 +433,7 @@ cd sudoku-solver
 [Java JDK][download:jjdk] installed on your machine prior to launch it.
 
 ## Benchmarking suite
-<a href="#">
-  <img src="data/media/bench-cli.png" width="350" align="right" alt="Sudoku solution enumerator benchmarking CLI" />
-</a>
+<img src="data/media/bench-cli.png" width="350" align="right" alt="Sudoku solution enumerator benchmarking CLI" />
 
 The project is provided with a [CLI][bin:bench-cli] that allows you
 to reproduce the tests results on your machine.
