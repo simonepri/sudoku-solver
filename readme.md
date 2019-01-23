@@ -374,8 +374,8 @@ The table that follows shows the speed-up values grouped by test case and core
 count.
 
 <p align="center">
-  <img src="data/benchmark/speedup/1*.svg" width="45%" align="center" alt="Speedup for test series 1" />
-  <img src="data/benchmark/speedup/2*.svg" width="45%" align="center" alt="Speedup for test series 2" />
+  <img src="data/benchmark/speedup/1*.svg" width="49%" align="center" alt="Speedup for test series 1" />
+  <img src="data/benchmark/speedup/2*.svg" width="49%" align="center" alt="Speedup for test series 2" />
 </p>
 
 Unfortunately due to the overheads introduced in the parallel algorithm, the
@@ -395,8 +395,8 @@ example of the correlation matrix for the test data obtained on the 64 core
 machine.
 
 <p align="center">
-  <img src="data/benchmark/correlation/all.svg" width="45%" align="center" alt="Correlation matrix for all data" />
-  <img src="data/benchmark/correlation/c64.svg" width="45%" align="center" alt="Correlation matrix for 64 cores" />
+  <img src="data/benchmark/correlation/all.svg" width="49%" align="center" alt="Correlation matrix for all data" />
+  <img src="data/benchmark/correlation/c64.svg" width="49%" align="center" alt="Correlation matrix for 64 cores" />
 </p>
 
 We can clearly see that the speed-up is correlated greatly with the search space
