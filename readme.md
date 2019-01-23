@@ -87,9 +87,9 @@ def sequential_solutions_counter(board):
 > The actual implementation can be found at
 [`src/main/java/sudoku/SequentialSolver.java`][source:sequential].
 
-It's important to notice that the strategy used to pick the empty cell by the
-`get_empty_cell` can lead to [significant reduction][ref:look-ahead] of the
-total search space and thus in the time needed to enumerate all the solutions.
+It's important to notice that the strategy adopted by the `get_empty_cell`
+function to pick the empty cell [can affect the search space][ref:look-ahead]
+and thus the time needed to enumerate all the solutions.
 
 Another notable thing to consider is that the time complexity and space
 complexity of all the operations on the board inside the while loop (`is_full`,
