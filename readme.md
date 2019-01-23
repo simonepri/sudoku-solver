@@ -43,7 +43,7 @@ B                 | The size of a single box of the matrix as B = √S
 Board             | An instance of Sudoku represented with a S x S matrix.
 Row               | A row of a board's matrix that can only contain one of each of the numbers in [1, S].
 Column            | A column of a board's matrix that can only contain one of each of the numbers in [1, S].
-Box               | A particular B x B sub-matrix of a board's matrix that can only contain one of each of the numbers in [1, S].
+Box               | A B x B sub-matrix of a board's matrix that can only contain one of each of the numbers in [1, S].
 Cell              | A single entry of a board's matrix either empty or with a legal assignment.
 Empty Cell        | A cell whose assignment has still to be found.
 Cell's Candidates | A list of values in [1, S] which can be legally placed in a particular cell.
