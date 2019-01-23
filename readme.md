@@ -99,11 +99,11 @@ possible.
 
 More details about the computational complexity of the operations and the idea
 behind their implementation can be found in the
-[implementation details](#implementation-details) section.
+"[implementation details](#implementation-details)" section.
 
 ### Parallel Backtracking
 The parallel algorithm is implemented by parallelizing the recursive guesses of
-each empty cell using the fork/join framework.
+each empty cell using the [fork/join][ref:fork-join] model.
 
 The pseudo-code that follows highlight its core parts.
 
@@ -146,7 +146,7 @@ been introduced.
 
 More details about the computational complexity of the operations and the idea
 behind their implementation can be found in the
-[implementation details](#implementation-details) section.
+"[implementation details](#implementation-details)" section.
 
 ## Implementation details
 In this section, we discuss the purpose of the methods mentioned in the previous
@@ -157,13 +157,13 @@ The operation `is_full` consists in knowing whether the board contains at least
 an empty cell.
 
 Clearly, a simple approach is to loop through the whole board and check whether
-or not there is an empty cell but this would cost us `O(N)` each time. Instead
+or not there is an empty cell, but this would cost us `O(N)` each time. Instead
 of doing so, we keep the count the number of filled cells of the board (also
 called clues) and then compare it against the total number of cells of the
 board.
 
 At the cost of a constant additional work inside the `set_cell` to keep the
-count updated allow us to lower the time complexity of the operation to `O(1)`.
+count updated allows us to lower the time complexity of the operation to `O(1)`.
 
 ### Check if a value is legal for a cell
 The `get_candidates` operation has the job of returning the, possibly empty,
@@ -171,12 +171,12 @@ list of valid values which can be legally placed in a particular empty cell.
 
 To accomplish this, one could simply iterate on the row, column, and box of the
 cell given searching for unused values. Doing this would cost us `O(3*S) + O(S)
-= O(S)` and it's almost the best we can aim for this particular operation.
-Almost, because we can remove the `O(3*S)` addend by keeping track of the
+= O(S)`, and it's almost the best we can aim for this particular operation.
+"Almost", because we can remove the `O(3*S)` addend by keeping track of the
 used values on each row, column, and box of the board.
 
 To do so, we keep a bit-set of `S` bits for each row, column, and box and each
-time a specific cell's value `v` is set, we also set the bit at position `v - 1`
+time a specific cell's value `v` is set we also set the bit at position `v - 1`
 of the 3 bit-sets for the particular row, column, and box of the given cell. To
 check whether a value `v` is valid or not we just check if the bit at position
 `v - 1` is not set in any of the 3 bit-sets for the particular row, column, and
@@ -184,19 +184,19 @@ box of the given cell. Since each check is constant and we have `S` values to
 check, the overall time complexity is `O(S)`.
 
 This optimization cost us a constant additional work inside the `set_cell`
-method to keep the bit-sets updated and a per-instance additional memory usage
+method to keep the bit-sets updated and an additional per-instance memory usage
 of `O(3*S) = O(S)`.
 
 ### Count the number of candidates of a cell
 The `get_search_space_size` computes the search space as defined in the
-[definitions](#definitions) section.
+"[definitions](#definitions)" section.
 
 Intuitively, we can do something like the `get_candidates` to count the number
-of candidates instead of creating a list and this would cost us `O(N) * O(S) =
+of candidates instead of creating a list, and this would cost us `O(N) * O(S) =
 O(N * S)` but there's a tricky and memory hungry approach allows us to reduce
 the cost of the operation to just `O(N) * O(1) = O(N)`.
 
-Lets say that for a particular cell we want to count the candidates, then the
+Let's say that for a particular cell we want to count the candidates, then the
 state of the 3 bit-sets would be the following one.
 
 | value    | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
@@ -215,26 +215,26 @@ that has a 1 on every invalid candidate as showed below.
 Thus, counting the number of candidates has been reduced to the problem of
 counting the zeros of a bit-set.
 
-If we use fixed sized integers (e.g. `32 bit int`) to represent our bit-sets
+If we use fixed sized integers (e.g., `32-bit int`) to represent our bit-sets,
 then we could use the integer given by the binary representation of the bit-set
-to accesses a pre-computed table that gives us the answer of how many zeros or
-ones that particular number has in constant time. The pre-computed table has to
-be built only once and can be shared by all the boards instantiated and requires
-an implies an additional memory usage of `2^O(S)`.
+to accesses a pre-computed table that provides us with the answer of how many
+zeros or ones that particular number has in constant time. The pre-computed
+table has to be built only once and can be shared by all the boards instantiated
+and requires an implies an additional memory usage of `2^O(S)`.
 
 ### Find an empty cell
 One possible strategy we can use for the `get_empty_cell` is simply to pick the
-first empty cell we find in the board.
+first empty cell we find on the board.
 
 We could do this in `O(N)` by just iterating on the board and returning the
 empty cell if present. Instead, we managed to do it in `O(1)` by keeping track
-of the following two information using `O(S)` addition memory per-instance:
+of the following two information using `O(S)` additional per-instance memory:
 - The row index of the first row having an empty cell.
 - The column index of the first empty cell on of each row.
 
-To obtain these info, on each `set_cell` operation we update the column index
-for the particular row in `O(S)` and if the row has no more empty cells we
-update the row index accordingly.
+To obtain the info, on each `set_cell` operation we update the column index
+for the particular row in `O(S)` and then, if the row has no more empty cells,
+we update the row index accordingly.
 
 ### Find the empty cell with the lowest number of candidates
 As we mentioned in the sections above, the strategy used to pick the empty cell
@@ -242,89 +242,99 @@ can impact significantly on the size of the search space. Indeed, the more is
 the number of legal candidates for a cell the lower is the probability that our
 guess for that cell will result in a sudoku solution.
 
-Thus, is intuitively better to always try to guess values for cells that has the
-lowest number of candidates.
+Thus, is intuitively better to always try to guess values for cells that have
+the lowest number of candidates.
 
 To do this without affecting the current complexity of the `get_empty_cell`,
 similarly as we did for the strategy above, we keep track of the following two
-information using `O(S)` addition memory per-instance:
-- The row index the row that has the cell with the lowest number of candidates.
+information using `O(S)` additional per-instance memory:
+- The row index of the row that has the cell with the lowest number of candidates.
 - The column index of the cell with the lowest number of candidates of each row.
 
-To obtain these info, on each set operation we do three things:
-- For the current row we search the column with the lowest number of candidates
+To obtain the info, on each set operation we do three things:
+- For the current row, we search the column with the lowest number of candidates
 in `O(S) * O(1) = O(S)`.
-- For each row of the current box we compare the number of candidate at the
+- For each row of the current box, we compare the number of candidates at the
 saved column index with the new number of candidates of all the columns of that
-box and we update the saved column index for that row if needed in `O(B) * O(B)
+box, and we update the saved column index for that row if needed in `O(B) * O(B)
 * O(1) = O(S) * O(1) = O(S)`.
-- For each row we compare the number of candidates at the saved column index
-with the new number of candidates of the current column and we update the saved
+- For each row, we compare the number of candidates at the saved column index
+with the new number of candidates of the current column, and we update the saved
 column index for that row and the saved row index if needed in `O(S) * O(1) =
 O(S)`.
 
 ### Optimized addition and multiplication with BigInteger
-In Java BigInteger objects are immutable and thus every time an operation is
+In Java, BigInteger objects are immutable and thus every time an operation is
 executed on them a new object is instantiated.
 
 We implemented two modified versions of the BigInteger class, namely `BigIntSum`
 and `BigIntProd`, that are mutable BitInteger and allow us to do sums and
 products in constant amortized time.
 
-> In general the libs we wrote doesn't execute the operation in constant
-amortized time but they do in our particular use case in which we mostly sum and
+> In general, the libs we wrote doesn't guarantee constant amortized time
+operations, but they do in our particular use case in which we mostly sum and
 multiply together small numbers.
 
 ### Parallelize branches using the fork/join framework
-The Java's Fork/Join framework it's easy to reason with and has convenient
-theoretical guarantees.
+The Java's [fork/join][ref:fork-join] framework it's easy to reason with, and
+its [work-stealing][ref:work-stealing] scheduler provides convenient theoretical
+guarantees.
 
-A so called `RecursiveTask` can model fairly well a backtracking solver. Each
-backtracking choice can be tested concurrently forking on each choice.
+A so-called `RecursiveTask` class (`recursive_task` in the pseudo-code above)
+can model fairly well a backtracking solver. Each backtracking choice can be
+tested concurrently forking on each possible candidate.
 
 To minimize the overhead of task creation we employ two common strategies in the
 fork/join realm:
 - Reusing the same task rather than creating a new fork to simulate the first
-choice.
-- Choosing a sequential cut-off in a way that the workload of task evenly
-distributed.
+candidate.
+- Choosing a sequential cut-off in a way that the workload is distributed evenly
+among the tasks.
 
 ### Parallelize board copy
-The `board` object has to be modified to fill a cell, so each parallel task has
-to have its local instance of the board.
+Since the `board` object has to be modified to fill a cell, each parallel task
+has to have its local instance of the board.
 
 Duplicating a board is an expensive operation, so instead of doing it eagerly in
-the constructor of the `RecursiveTask`, we only store the change that we want to
-try, and we make the copy of the board in its `compute` method that will be
-executed in a separate thread.
+the callee task, we supply the `RecursiveTask` constructor with the change that
+we want to try, and we make the copy of the board in its `compute` method that
+will be executed in a separate thread.
 
-In this way we offload an expensive computation on the forks, decreasing the
-span.
+In this way we offload an expensive computation in the callee task, decreasing
+the span.
 
 ### Choose of the appropriate sequential cut-off
-We experimented with different ways to determine the cutoff:
-- recursion depth
-- still empty cells
-- estimated search space
+Due to the overhead involved with the creation of parallel tasks, it's faster to
+switch to the sequential algorithm when the size of the problem becomes small
+enough. We will call that threshold problem size `sequential cut-off` or just
+`cut-off`.
+
+The way we can chose this value mostly depends on what we define as the `size of
+the problem`.
+
+We experimented with the two following approaches:
+- The size of the problem is the number of empty cells to fill.
+- The size of the problem is the search space.
 
 We measured limited differences when choosing one of these parameters, provided
-that we optimize the value of the cutoff accordingly.
+that we optimize the value of the cutoff accordingly, but we used the second
+definition.
 
-The correlation graph in section [speedups obtained](#speedups-obtained) readily
-explains this result, that is the search space and empty cell have an almost
-perfect linear correlation. Thus one can be used to estimate the other.
+The correlation graph in the "[benchmark results](#benchmark-results)" section
+readily explains this result, that is, the search space and empty cell have an
+almost perfect linear correlation. Thus one can be used to estimate the other.
 
-Concretely the optimal sequential cutoff can be found looking at processor
-utilization patterns: it should be full during most of the computation and all
+Concretely, the optimal sequential cutoff can be found looking at processor
+utilization patterns: it should be full during most of the computation, and all
 the CPU should complete their task at the same time. The minimum sequential
 cutoff also has to consider the task creation overhead.
 
-## Experiments
+## Performance comparison
 <!-- Short intro of this section. -->
 
 ### Benchmark environment
-To get a scalable and homogeneous environment and reproducible results, we
-leveraged the [Google Cloud Infrastructure][ref:gcp].
+To get a scalable and homogeneous environment, we leveraged the
+[Google Cloud Infrastructure][ref:goole-cloud].
 
 The table that follows shows the specs of the machine we used.
 
@@ -499,4 +509,6 @@ This project is licensed under the MIT License - see the [license][license] file
 [ref:backtracking]: https://en.wikipedia.org/wiki/backtracking
 [ref:dfs]: https://en.wikipedia.org/wiki/depth-first_search
 [ref:look-ahead]: https://en.wikipedia.org/wiki/look-ahead_(backtracking)
-[ref:gcp]: https://cloud.google.com/compute/docs/machine-types#highcpu
+[ref:fork-join]: https://en.wikipedia.org/wiki/fork-join_model
+[ref:work-stealing]: https://en.wikipedia.org/wiki/work_stealing
+[ref:goole-cloud]: https://cloud.google.com/compute/docs/machine-types#highcpu
