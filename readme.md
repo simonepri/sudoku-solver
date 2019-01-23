@@ -31,8 +31,9 @@ thousands of years.
 
 ### Definitions
 In the following sections, we will use some letters or words to refer to
-specific aspects of the Sudoku problem. The following table summarizes the most
-important.
+specific aspects of the Sudoku problem.
+
+The table that follows summarizes the most important.
 
 Term              | Description
 ------------------|-------------
@@ -44,9 +45,9 @@ Row               | A row of a board's matrix that can only contain one of each 
 Column            | A column of a board's matrix that can only contain one of each of the numbers in [1, S].
 Box               | A particular B x B sub-matrix of a board's matrix that can only contain one of each of the numbers in [1, S].
 Cell              | A single entry of a board's matrix either empty or with a legal assignment.
-Empty Cell        | A cell whose assignment has still to be found.
-Cell's Candidates | A list of values in [1, S] which can be legally placed in a particular cell.
-Search Space      | The product of the candidates of all the empty cells.
+Empty Cell        | A cell whose assignment has still to be found.
+Cell's Candidates | A list of values in [1, S] which can be legally placed in a particular cell.
+Search Space      | The product of the candidates of all the empty cells.
 Solution          | An assignment of values for all the empty cells of a board that satisfies the constraints.
 
 ## Solving Algorithm
