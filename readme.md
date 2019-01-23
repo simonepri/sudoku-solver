@@ -415,6 +415,10 @@ We can conclude that the speed-up comes from being able to explore the whole
 search space faster and could be improved a little tweaking the fork/join
 parameters.
 
+> The raw data collected during the benchmarks can be found in
+[`data/benchmark/raw`][source:data-bench-raw].
+Note that the times are in μs.
+
 ## Usage
 <img src="data/media/run-cli.png" width="350" align="right" alt="Sudoku solution enumerator CLI"/>
 
@@ -500,6 +504,7 @@ This project is licensed under the MIT License - see the [license][license] file
 [source:sequential]: https://github.com/simonepri/sudoku-solver/tree/master/src/main/java/sudoku/SequentialSolver.java
 [source:parallel]: https://github.com/simonepri/sudoku-solver/tree/master/src/main/java/sudoku/ParallelSolver.java
 [source:bench-boards]: https://github.com/simonepri/sudoku-solver/tree/master/src/benchmark/boards
+[source:data-bench-raw]: https://github.com/simonepri/sudoku-solver/tree/master/data/benchmark/raw
 
 [github:simonepri]: https://github.com/simonepri
 [twitter:simoneprimarosa]: http://twitter.com/intent/user?screen_name=simoneprimarosa
