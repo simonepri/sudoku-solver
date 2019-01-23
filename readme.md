@@ -288,10 +288,8 @@ tested concurrently forking on each possible candidate.
 
 To minimize the overhead of task creation we employ two common strategies in the
 fork/join realm:
-- Reusing the same task rather than creating a new fork to simulate the first
-candidate.
-- Choosing a sequential cut-off in a way that the workload is distributed evenly
-among the tasks.
+- Reusing the same task rather than creating a new fork to evaluate the first choice.
+- Choosing a sequential cut-off in a way that the workload is distributed evenly among the tasks.
 
 ### Parallelize board copy
 Since the `board` object has to be modified to fill a cell, each parallel task
@@ -302,7 +300,7 @@ the callee task, we supply the `RecursiveTask` constructor with the change that
 we want to try, and we make the copy of the board in its `compute` method that
 will be executed in a separate thread.
 
-In this way we offload an expensive computation in the callee task, decreasing
+In this way we offload an expensive computation in the forked task, decreasing
 the span.
 
 ### Choose of the appropriate sequential cut-off
@@ -347,18 +345,18 @@ The table that follows summarizes the main characteristics of the tests.
 
 | test name | total cells | empty cells | filling factor | solutions         | search space                         |
 |-----------|-------------|-------------|----------------|-------------------|--------------------------------------|
-| 1a        | 81          | 53          | 34.57%         | 10^0 * 1.         | 10^25 * 4.312979991503409512448      |
-| 1b        | 81          | 59          | 27.16%         | 10^3 * 4.715      | 10^36 * 1.94775186325635072          |
-| 1c        | 81          | 61          | 24.69%         | 10^5 * 1.32271    | 10^40 * 1.3980445502865408           |
-| 1d        | 81          | 62          | 23.46%         | 10^5 * 5.87264    | 10^41 * 4.7784725839872              |
-| 1e        | 81          | 63          | 22.22%         | 10^6 * 3.151964   | 10^43 * 2.3409163772243214336        |
-| 1f        | 81          | 64          | 20.99%         | 10^7 * 1.6269895  | 10^45 * 1.1798218541210580025344     |
-| 2a        | 81          | 58          | 28.40%         | 10^0 * 1.         | 10^31 * 2.4563768857859261988864     |
-| 2b        | 81          | 60          | 25.93%         | 10^2 * 2.76       | 10^35 * 2.617180154844143016738816   |
-| 2b        | 81          | 62          | 23.46%         | 10^4 * 3.2128     | 10^39 * 5.54652776685109248          |
-| 2d        | 81          | 64          | 20.99%         | 10^6 * 1.014785   | 10^43 * 5.4366191037898352756785152  |
-| 2e        | 81          | 65          | 19.75%         | 10^6 * 7.38836    | 10^45 * 4.28133754423449527959683072 |
-| 2f        | 81          | 66          | 18.52%         | 10^7 * 4.8794239  | 10^47 * 5.09895408914038847535316992 |
+| 1a        | 81          | 53          | 34.57%         | 1         | 10^25      |
+| 1b        | 81          | 59          | 27.16%         | 4,715      | 10^36          |
+| 1c        | 81          | 61          | 24.69%         | 132,271    | 10^40           |
+| 1d        | 81          | 62          | 23.46%         |  587,264    | 10^41              |
+| 1e        | 81          | 63          | 22.22%         | 3,151,964   | 10^43        |
+| 1f        | 81          | 64          | 20.99%         | 16,269,895  | 10^45     |
+| 2a        | 81          | 58          | 28.40%         | 1         | 10^31     |
+| 2b        | 81          | 60          | 25.93%         | 276       | 10^35   |
+| 2b        | 81          | 62          | 23.46%         | 32,128     | 10^39          |
+| 2d        | 81          | 64          | 20.99%         | 1,014,785   | 10^43  |
+| 2e        | 81          | 65          | 19.75%         | 738,836    | 10^45 |
+| 2f        | 81          | 66          | 18.52%         | 48,794,239  | 10^47 |
 
 > The test files can be found in
 [`src/benchmark/boards`][source:bench-boards].
@@ -385,14 +383,14 @@ count.
 </p>
 
 Unfortunately due to the overheads introduced in the parallel algorithm, the
-speed-up obtained is sometimes slightly smaller than 1 but this happens only on
+speed-up obtained is sometimes slightly smaller than 1, but this happens only on
 smaller test cases or with a very low number of cores.
 
 To understand the root cause of the values obtained, we computed a correlation
 matrix over all the data we gathered.
 
 While the sequential time depends linearly on the number of solution and it's
-unrelated to the number of cores, the factors that make up the parallel time and
+uncorrelated with the number of cores, the factors that make up the parallel time and
 speed-up are more varied.
 
 The correlation matrix is muddled by the core count, thus we plotted several
@@ -413,7 +411,7 @@ The same trend can also be found looking at the speed-up plot.
 
 The correlation matrices also show us that even though both the the parallel and
 sequential times are linearly dependent on the number of solutions, the speed-up
-is not very strongly correlated to it as well.
+is not very strongly correlated with it as well.
 
 We can conclude that the speed-up comes from being able to explore the whole
 search space faster and could be improved a little tweaking the fork/join
