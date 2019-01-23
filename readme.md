@@ -13,7 +13,7 @@
 
 ## Introduction to Sudoku
 <a href="#introduction-to-sudoku">
-  <img src="data/media/sudoku.gif" width="250" align="right" alt="Example Sudoku Board" />
+  <img src="data/media/sudoku.gif" width="250" align="right" alt="Example Sudoku Board"/>
 </a>
 
 Sudoku is a popular puzzle game usually played on a 9x9 board of numbers between
@@ -376,8 +376,8 @@ The table that follows shows the speed-up values grouped by test case and core
 count.
 
 <p align="center">
-  <img src="data/benchmark/speedup/1*.svg" width="49%" align="center" alt="Speedup for test series 1" />
-  <img src="data/benchmark/speedup/2*.svg" width="49%" align="center" alt="Speedup for test series 2" />
+  <img src="data/benchmark/speedup/1*.svg" width="49%" align="center" alt="Speedup for test series 1"/>
+  <img src="data/benchmark/speedup/2*.svg" width="49%" align="center" alt="Speedup for test series 2"/>
 </p>
 
 Unfortunately due to the overheads introduced in the parallel algorithm, the
@@ -397,8 +397,8 @@ example of the correlation matrix for the test data obtained on the 64 core
 machine.
 
 <p align="center">
-  <img src="data/benchmark/correlation/all.svg" width="49%" align="center" alt="Correlation matrix for all data" />
-  <img src="data/benchmark/correlation/c64.svg" width="49%" align="center" alt="Correlation matrix for 64 cores" />
+  <img src="data/benchmark/correlation/all.svg" width="49%" align="center" alt="Correlation matrix for all data"/>
+  <img src="data/benchmark/correlation/c64.svg" width="49%" align="center" alt="Correlation matrix for 64 cores"/>
 </p>
 
 We can clearly see that the speed-up is correlated greatly with the search space
@@ -416,7 +416,7 @@ search space faster and could be improved a little tweaking the fork/join
 parameters.
 
 ## Usage
-<img src="data/media/run-cli.png" width="350" align="right" alt="Sudoku solution enumerator CLI" />
+<img src="data/media/run-cli.png" width="350" align="right" alt="Sudoku solution enumerator CLI"/>
 
 The project is provided with a [CLI][bin:run-cli] that allows you
 to run the solver on your machine with ease.
@@ -433,7 +433,7 @@ cd sudoku-solver
 [Java JDK][download:jjdk] installed on your machine prior to launch it.
 
 ## Benchmarking suite
-<img src="data/media/bench-cli.png" width="350" align="right" alt="Sudoku solution enumerator benchmarking CLI" />
+<img src="data/media/bench-cli.png" width="350" align="right" alt="Sudoku solution enumerator benchmarking CLI"/>
 
 The project is provided with a [CLI][bin:bench-cli] that allows you
 to reproduce the tests results on your machine.
