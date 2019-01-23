@@ -12,7 +12,9 @@
 </p>
 
 ## Introduction to Sudoku
-<img src="data/media/sudoku.gif" width="250" align="right" alt="Example Sudoku Board" />
+<a href="#">
+  <img src="data/media/sudoku.gif" width="250" align="right" alt="Example Sudoku Board" />
+</a>
 
 Sudoku is a popular puzzle game usually played on a 9x9 board of numbers between
 1 and 9.
@@ -414,7 +416,9 @@ search space faster and could be improved a little tweaking the fork/join
 parameters.
 
 ## Usage
-<img src="data/media/run-cli.png" width="350" align="right" alt="Sudoku solution enumerator CLI" />
+<a href="#">
+  <img src="data/media/run-cli.png" width="350" align="right" alt="Sudoku solution enumerator CLI" />
+</a>
 
 The project is provided with a [CLI][bin:run-cli] that allows you
 to run the solver on your machine with ease.
@@ -431,7 +435,9 @@ cd sudoku-solver
 [Java JDK][download:jjdk] installed on your machine prior to launch it.
 
 ## Benchmarking suite
-<img src="data/media/bench-cli.png" width="350" align="right" alt="Sudoku solution enumerator benchmarking CLI" />
+<a href="#">
+  <img src="data/media/bench-cli.png" width="350" align="right" alt="Sudoku solution enumerator benchmarking CLI" />
+</a>
 
 The project is provided with a [CLI][bin:bench-cli] that allows you
 to reproduce the tests results on your machine.
