@@ -63,7 +63,7 @@ tree of all the legal candidates' assignment of each empty cells.
 The pseudo-code that follows highlights its core parts.
 
 ```python
-def sequential_solutions_counter(board):
+def seq_sol_counter(board):
   stack = []
 
   if board.is_full(): return 1
@@ -84,7 +84,7 @@ def sequential_solutions_counter(board):
 
   return count
 ```
-> The actual implementation can be found at
+> The actual implementation can be found in
 [`src/main/java/sudoku/SequentialSolver.java`][source:sequential].
 
 It's important to notice that the strategy adopted by the `get_empty_cell`
@@ -103,12 +103,12 @@ behind their implementation can be found in the
 
 ### Parallel Backtracking
 The parallel algorithm is implemented by parallelizing the recursive guesses of
-each empty cell.
+each empty cell using the fork/join framework.
 
 The pseudo-code that follows highlight its core parts.
 
 ```python
-def parallel_solutions_counter(board, move):
+def par_sol_counter(board, move):
   if move is not null:
     (row, col, val) = move
     board = board.clone()
@@ -119,36 +119,38 @@ def parallel_solutions_counter(board, move):
   space = board.get_search_space_size()
   if space == 0: return 0
   if space <= SEQUENTIAL_CUTOFF:
-    return sequential_solutions_counter(board)
+    return seq_sol_counter(board)
 
   count = 0
+  tasks = []
   (row, col) = board.get_empty_cell()
-  parallel for val in board.get_candidates(row, col):
-    count += parallel_solutions_counter(board, (row, col, val))
+  for val in board.get_candidates(row, col):
+    task = new recursive_task(par_sol_counter, board, (row, col, val))
+    tasks.push(task)
+  for i in range(1, len(tasks)):
+    tasks[i].fork()
+  count += tasks[0].compute()
+  for i in range(1, len(tasks)):
+    count += tasks[i].join()
 
   return count
 ```
-> The actual implementation can be found at
+> The actual implementation can be found in
 [`src/main/java/sudoku/ParallelSolver.java`][source:parallel].
 
 The considerations that have been given about the
 [sequential backtracking](#sequential-backtracking) also hold for the parallel
-version. In addition to those, it's worth mentioning that two new methods have
-been introduced (`get_search_space_size` and `clone`).
-
-The presence of those new methods and the creation of a thread for each branch
-of the backtracking can further impact performance. The sequential algorithm is
-indeed used as sub-routine to speed-up the computation when the remaining search
-space is below a certain threshold empirically found.
+version. In addition to those, it's worth mentioning that two new methods
+(`get_search_space_size` and `clone`) and a new class (`recursive_task`) have
+been introduced.
 
 More details about the computational complexity of the operations and the idea
 behind their implementation can be found in the
 [implementation details](#implementation-details) section.
 
 ## Implementation details
-In this section, we discuss the key ideas behind the implementation of the
-methods mentioned in the previous sections giving some insights on how we made
-them efficient.
+In this section, we discuss the purpose of the methods mentioned in the previous
+sections providing when appropriate some insights on how we made them efficient.
 
 ### Check if the board is completed
 The operation `is_full` consists in knowing whether the board contains at least
