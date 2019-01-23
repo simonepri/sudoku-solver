@@ -30,7 +30,7 @@ empty Sudoku table, we would have to enumerate
 thousands of years.
 
 ### Definitions
-In the following sections, we will use some letters or words to refer to
+In the following sections, we will use some symbols or words to refer to
 specific aspects of the Sudoku problem.
 
 The table below summarizes the most important.
@@ -157,33 +157,35 @@ The operation `is_full` consists in knowing whether the board contains at least
 an empty cell.
 
 Clearly, a simple approach is to loop through the whole board and check whether
-or not there is an empty cell but this would cost `O(N)` each time. Instead of
-doing so, we count the number of filled cells of the board (also called clues)
-and then compare it against the total number of cells of the board.
+or not there is an empty cell but this would cost us `O(N)` each time. Instead
+of doing so, we keep the count the number of filled cells of the board (also
+called clues) and then compare it against the total number of cells of the
+board.
 
-At the cost of a constant additional work inside the `set_cell` using this
-approach lowers the time complexity of the operation to `O(1)`.
+At the cost of a constant additional work inside the `set_cell` to keep the
+count updated allow us to lower the time complexity of the operation to `O(1)`.
 
 ### Check if a value is legal for a cell
 The `get_candidates` operation has the job of returning the, possibly empty,
 list of valid values which can be legally placed in a particular empty cell.
 
-One approach to accomplish this, is to iterate on the row, column, and box of
-the cell given searching for unused values and this would cost us `O(3*S) =
-O(S)`. This is almost the best we can aim for this particular operation. Almost,
-because we can remove the constant factor `3` by keeping track of the used
-values on each row, column, and box of the board.
+To accomplish this, one could simply iterate on the row, column, and box of the
+cell given searching for unused values. Doing this would cost us `O(3*S) + O(S)
+= O(S)` and it's almost the best we can aim for this particular operation.
+Almost, because we can remove the `O(3*S)` addend by keeping track of the
+used values on each row, column, and box of the board.
 
 To do so, we keep a bit-set of `S` bits for each row, column, and box and each
 time a specific cell's value `v` is set, we also set the bit at position `v - 1`
 of the 3 bit-sets for the particular row, column, and box of the given cell. To
 check whether a value `v` is valid or not we just check if the bit at position
 `v - 1` is not set in any of the 3 bit-sets for the particular row, column, and
-box of the given cell. Since each check is constant and we have `S` to check the
-overall time complexity is `O(S)`.
+box of the given cell. Since each check is constant and we have `S` values to
+check, the overall time complexity is `O(S)`.
 
-Removing this constant factor leads to some additional constant work inside the
-`set_cell` method and an overall additional memory usage of `O(3*S) = O(S)`.
+This optimization cost us a constant additional work inside the `set_cell`
+method to keep the bit-sets updated and a per-instance additional memory usage
+of `O(3*S) = O(S)`.
 
 ### Count the number of candidates of a cell
 The `get_search_space_size` computes the search space as defined in the
@@ -191,11 +193,11 @@ The `get_search_space_size` computes the search space as defined in the
 
 Intuitively, we can do something like the `get_candidates` to count the number
 of candidates instead of creating a list and this would cost us `O(N) * O(S) =
-O(N * S)`. But a tricky and memory costly approach allows us to reduce the cost
-of the operation to just `O(N) * O(1) = O(N)`.
+O(N * S)` but there's a tricky and memory hungry approach allows us to reduce
+the cost of the operation to just `O(N) * O(1) = O(N)`.
 
-Lets say that for a particular cell we want to count the candidates, the state
-of the 3 bit-sets would be the following one.
+Lets say that for a particular cell we want to count the candidates, then the
+state of the 3 bit-sets would be the following one.
 
 | value    | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
 |----------|---|---|---|---|---|---|---|---|---|
@@ -210,65 +212,56 @@ that has a 1 on every invalid candidate as showed below.
 |----------|---|---|---|---|---|---|---|---|---|
 | invalid  | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 0 | 0 |
 
-Thus, counting the number of candidates has been reduced to the problem
-of counting the zeros of a bit-set.
+Thus, counting the number of candidates has been reduced to the problem of
+counting the zeros of a bit-set.
 
-If we use integers to represent our bit-sets then we could use the integer given
-by the binary representation of the bit-set to accesses a pre-computed table
-that gives us the answer of how many zeros or ones that particular number has in
-constant time. The pre-computed table has to be built only once and can be
-shared by all the boards instantiated and requires an implies an additional
-memory usage of `2^O(S)`.
+If we use fixed sized integers (e.g. `32 bit int`) to represent our bit-sets
+then we could use the integer given by the binary representation of the bit-set
+to accesses a pre-computed table that gives us the answer of how many zeros or
+ones that particular number has in constant time. The pre-computed table has to
+be built only once and can be shared by all the boards instantiated and requires
+an implies an additional memory usage of `2^O(S)`.
 
 ### Find an empty cell
 One possible strategy we can use for the `get_empty_cell` is simply to pick the
-first empty cell we find in the board for example from top to bottom, left to
-right.
+first empty cell we find in the board.
 
-To do so we could just iterate on the board and return that empty cell if
-present and this would clearly cost us `O(N)`. Instead of this, we can store the
-column of the first empty cell of each row. If we use such data structure and we
-also keep track of which is the first row having an empty cell then we can
-easily get the empty cell in `O(1)`.
+We could do this in `O(N)` by just iterating on the board and returning the
+empty cell if present. Instead, we managed to do it in `O(1)` by keeping track
+of the following two information using `O(S)` addition memory per-instance:
+- The row index of the first row having an empty cell.
+- The column index of the first empty cell on of each row.
 
-On each set operation we update the next empty cell for the row where the value
-has been set and if the row has no more empty cells we update the variable that
-tells us which is the first row that contains an empty cell.
+To obtain these info, on each `set_cell` operation we update the column index
+for the particular row in `O(S)` and if the row has no more empty cells we
+update the row index accordingly.
 
-So at the cost of an additional work of `O(S)` inside the `set_cell` and an
-overall additional memory usage of `O(S)`, we reduced the time complexity for
-the `get_empty_cell` method from `O(N)` to `O(1)`.
-
-### Find the empty cell with the lowest number of candidates [TO REWRITE]
+### Find the empty cell with the lowest number of candidates
 As we mentioned in the sections above, the strategy used to pick the empty cell
 can impact significantly on the size of the search space. Indeed, the more is
 the number of legal candidates for a cell the lower is the probability that our
-guess for that cell will result correct.
+guess for that cell will result in a sudoku solution.
 
-Thus is intuitively better to always try to guess values for cells that has the
+Thus, is intuitively better to always try to guess values for cells that has the
 lowest number of candidates.
 
-To do this without affecting the current complexity of the `get_empty_cell`
-method we used an array of `S` elements that contains the column index of the
-cell with the lowest number of candidates of each row. If we use such additional
-array and we also keep track of which is the row that has the cell with the
-lower number of candidates then we can easily get the empty cell in constant
-time.
+To do this without affecting the current complexity of the `get_empty_cell`,
+similarly as we did for the strategy above, we keep track of the following two
+information using `O(S)` addition memory per-instance:
+- The row index the row that has the cell with the lowest number of candidates.
+- The column index of the cell with the lowest number of candidates of each row.
 
-To maintain the array update on each set operation we do three things. 1) For
-each row try to update the column index of the cell with the lowest number of
-candidates with the the column where the value has been set and eventually
-update the variable that stores where is the row index of the best empty cel. 2)
-For the row where the value has been set try to update the column index with all
-the columns of that row and eventually update the variable that stores where is
-the row index of the best empty cel. 3) For the rows of the box where the value
-has been set try to update the column index with all the columns of that box and
-eventually update the variable that stores where is the row index of the best
-empty cel.
-
-So at the cost of an additional work of `O(S)` inside the `set_cell` and an
-overall additional memory usage of `O(S)`, we have potentially reduced the
-search space by many orders of magnitude.
+To obtain these info, on each set operation we do three things:
+- For the current row we search the column with the lowest number of candidates
+in `O(S) * O(1) = O(S)`.
+- For each row of the current box we compare the number of candidate at the
+saved column index with the new number of candidates of all the columns of that
+box and we update the saved column index for that row if needed in `O(B) * O(B)
+* O(1) = O(S) * O(1) = O(S)`.
+- For each row we compare the number of candidates at the saved column index
+with the new number of candidates of the current column and we update the saved
+column index for that row and the saved row index if needed in `O(S) * O(1) =
+O(S)`.
 
 ### Optimized addition and multiplication with BigInteger
 In Java BigInteger objects are immutable and thus every time an operation is
