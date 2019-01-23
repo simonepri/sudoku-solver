@@ -367,10 +367,10 @@ The table that follows shows the specs of the machine we used.
 | Linux | 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64 | Intel(R) Xeon(R) CPU @ 2.30GHz |
 
 ### Benchmark results
-The benchmark reveled a speedup that grows almost linearly in relation to the
+The benchmark reveled a speed-up that grows almost linearly in relation to the
 number of cores.
 
-The table that follows shows the speedup values grouped by test case and core
+The table that follows shows the speed-up values grouped by test case and core
 count.
 
 <p align="center">
@@ -378,42 +378,40 @@ count.
   <img src="data/speedup2.svg" width="45%" align="center" alt="Speedup for test series 2" />
 </p>
 
-Unfortunately due to the overheads introduced in the concurrent algorithm, the
-speedup obtained is sometimes slightly smaller than 1. This happens only on
+Unfortunately due to the overheads introduced in the parallel algorithm, the
+speed-up obtained is sometimes slightly smaller than 1 but this happens only on
 smaller test cases or with a very low number of cores.
 
 To understand the root cause of the values obtained, we computed a correlation
 matrix over all the data we gathered.
 
-While the sequential time depends linearly on the number of solution and
+While the sequential time depends linearly on the number of solution and it's
 unrelated to the number of cores, the factors that make up the parallel time and
-the speed up are more varied.
-
-<!-- Table or Graphs showing the execution times of each test. -->
-<!-- Which instances does require more time? -->
-<!-- Is there a correlation between the fill factor, the search space and execution time? -->
+speed-up are more varied.
 
 The correlation matrix is muddled by the core count, thus we plotted several
 correlation matrices grouping the data by core count. On the right there is an
 example of the correlation matrix for the test data obtained on the 64 core
 machine.
+
 <p align="center">
   <img src="data/correlation.svg" width="45%" align="center" alt="Correlation Matrix for all data" />
   <img src="data/correlation64.svg" width="45%" align="center" alt="Correlation Matrix for 64 cores" />
 </p>
 
-We can see clearly that the speedup is correlated greatly with the search space
+We can clearly see that the speed-up is correlated greatly with the search space
 and the empty cells, rather than only with the number of solutions. This is
 expected because search space and empty cells are almost linearly dependent and
 search space determines how much branching we can have on our parallel solver.
+The same trend can also be found looking at the speed-up plot.
 
-This trend can also be found looking at the speed-up plot.
+The correlation matrices also show us that even though both the the parallel and
+sequential times are linearly dependent on the number of solutions, the speed-up
+is not very strongly correlated to it as well.
 
-The speedup also is not very strongly correlated with the number of solutions,
-while the parallel time is linearly dependent of the number of solutions.
-
-We can conclude speedup comes from being able to explore the whole search space
-faster and could be improved a little tweaking the ForkJoin parameters.
+We can conclude that the speed-up comes from being able to explore the whole
+search space faster and could be improved a little tweaking the fork/join
+parameters.
 
 ## Usage
 <img src="media/run-cli.png" width="350" align="right" alt="Sudoku solution enumerator CLI" />
