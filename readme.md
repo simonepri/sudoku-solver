@@ -344,7 +344,7 @@ for the number of legal solutions.
 The table that follows summarizes the main characteristics of the tests.
 
 | test name | total cells | empty cells | filling factor | solutions         | search space                         |
-|-----------|-------------|-------------|----------------|-------------------|--------------------------------------|
+|-----------|-------------|-------------|----------------|-------------------:|--------------------------------------|
 | 1a        | 81          | 53          | 34.57%         | 1         | 10^25      |
 | 1b        | 81          | 59          | 27.16%         | 4,715      | 10^36          |
 | 1c        | 81          | 61          | 24.69%         | 132,271    | 10^40           |
