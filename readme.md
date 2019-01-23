@@ -105,7 +105,7 @@ behind their implementation can be found in the
 The parallel algorithm is implemented by parallelizing the recursive guesses of
 each empty cell using the [fork/join][ref:fork-join] model.
 
-The pseudo-code that follows highlight its core parts.
+The pseudo-code that follows highlights its core parts.
 
 ```python
 def par_sol_counter(board, move):
@@ -330,21 +330,12 @@ the CPU should complete their task at the same time. The minimum sequential
 cutoff also has to consider the task creation overhead.
 
 ## Performance comparison
-<!-- Short intro of this section. -->
+We have built a benchmarking tool with which we have evaluated different KPI of
+the two implementation we implemented.
 
-### Benchmark environment
-To get a scalable and homogeneous environment, we leveraged the
-[Google Cloud Infrastructure][ref:goole-cloud].
-
-The table that follows shows the specs of the machine we used.
-
-| os    | core                                    | cpu                            |
-|-------|-----------------------------------------|--------------------------------|
-| Linux | 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64 | Intel(R) Xeon(R) CPU @ 2.30GHz |
-
+### Benchmarking environment
 To benchmark our implementation we used a handful of test cases differing mainly
-for the number of legal solutions. They can be found in
-[`src/benchmark/boards`][source:bench-boards].
+for the number of legal solutions.
 
 The table that follows summarizes the main characteristics of the tests.
 
@@ -363,12 +354,25 @@ The table that follows summarizes the main characteristics of the tests.
 | 2e        | 81          | 65          | 19.75%         | 10^6 * 7.38836    | 10^45 * 4.28133754423449527959683072 |
 | 2f        | 81          | 66          | 18.52%         | 10^7 * 4.8794239  | 10^47 * 5.09895408914038847535316992 |
 
+> The test files can be found in
+[`src/benchmark/boards`][source:bench-boards].
+
+To get a scalable and homogeneous environment, we leveraged the
+[Google Cloud Infrastructure][ref:goole-cloud].
+
+The table that follows shows the specs of the machine we used.
+
+| os    | core                                    | cpu                            |
+|-------|-----------------------------------------|--------------------------------|
+| Linux | 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64 | Intel(R) Xeon(R) CPU @ 2.30GHz |
+
 ### Benchmark results
 The benchmark reveled a speedup that grows almost linearly in relation to the
 number of cores.
 
 The table that follows shows the speedup values grouped by test case and core
 count.
+
 <p align="center">
   <img src="data/speedup1.svg" width="45%" align="center" alt="Speedup for test series 1" />
   <img src="data/speedup2.svg" width="45%" align="center" alt="Speedup for test series 2" />
