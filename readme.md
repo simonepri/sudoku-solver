@@ -185,7 +185,7 @@ check whether a value `v` is valid or not we just check if the bit at position
 box of the given cell. Since each check is constant and we have `S` values to
 check, the overall time complexity is `O(S)`.
 
-This optimization cost us a constant additional work inside the `set_cell`
+This optimization costs us a constant additional work inside the `set_cell`
 method to keep the bit-sets updated and an additional per-instance memory usage
 of `O(3*S) = O(S)`.
 
@@ -222,7 +222,7 @@ then we could use the integer given by the binary representation of the bit-set
 to accesses a pre-computed table that provides us with the answer of how many
 zeros or ones that particular number has in constant time. The pre-computed
 table has to be built only once and can be shared by all the boards instantiated
-and requires an implies an additional memory usage of `2^O(S)`.
+and implies an additional memory usage of `2^O(S)`.
 
 ### Find an empty cell
 One possible strategy we can use for the `get_empty_cell` is simply to pick the
@@ -409,13 +409,13 @@ expected because search space and empty cells are almost linearly dependent and
 search space determines how much branching we can have on our parallel solver.
 The same trend can also be found looking at the speed-up plot.
 
-The correlation matrices also show us that even though both the the parallel and
+The correlation matrices also show us that even though both the parallel and
 sequential times are linearly dependent on the number of solutions, the speed-up
 is not very strongly correlated with it as well.
 
 We can conclude that the speed-up comes from being able to explore the whole
-search space faster and could be improved a little tweaking the fork/join
-parameters.
+search space faster and that it could be improved a little by tweaking the
+fork/join parameters.
 
 ## Usage
 <img src="data/media/run-cli.png" width="350" align="right" alt="Sudoku solution enumerator CLI"/>
