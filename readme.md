@@ -210,10 +210,10 @@ by the binary representation of the bit-set to accesses a pre-computed table
 that gives us the answer of how many zeros or ones that particular number has in
 constant time. The pre-computed table has to be built only once and can be
 shared by all the boards instantiated and requires an implies an additional
-memory usage of `O(2^S)`.
+memory usage of `2^O(S)`.
 
-### Find an empty cell [TO REWRITE]
-One possible strategy we can use for the `get_empty_cell` is simply pick the
+### Find an empty cell
+One possible strategy we can use for the `get_empty_cell` is simply to pick the
 first empty cell we find in the board for example from top to bottom, left to
 right.
 
@@ -321,42 +321,38 @@ cutoff also has to consider the task creation overhead.
 ## Experiments
 <!-- Short intro of this section. -->
 
-### Testing environment
+### Benchmark environment
 To get a scalable and homogeneous environment and reproducible results, we
 leveraged the [Google Cloud Infrastructure][ref:gcp].
+
+The table that follows shows the specs of the machine we used.
 
 | os    | core                                    | cpu                            |
 |-------|-----------------------------------------|--------------------------------|
 | Linux | 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64 | Intel(R) Xeon(R) CPU @ 2.30GHz |
 
-### Test cases
-To benchmark our implementation we uses a handful of test cases differing mainly
-on the number of legal solutions and they can all be found in
+To benchmark our implementation we used a handful of test cases differing mainly
+for the number of legal solutions. They can be found in
 [`src/benchmark/boards`][source:bench-boards].
 
 The table that follows summarizes the main characteristics of the tests.
 
 | test name | total cells | empty cells | filling factor | solutions         | search space                         |
 |-----------|-------------|-------------|----------------|-------------------|--------------------------------------|
-| 1a        | 81          | 53          | 34.57%         | 10^0 * 1.         | 10^25 * 4.312979991503409512448      |
-| 1b        | 81          | 59          | 27.16%         | 10^3 * 4.715      | 10^36 * 1.94775186325635072          |
-| 1c        | 81          | 61          | 24.69%         | 10^5 * 1.32271    | 10^40 * 1.3980445502865408           |
-| 1d        | 81          | 62          | 23.46%         | 10^5 * 5.87264    | 10^41 * 4.7784725839872              |
-| 1e        | 81          | 63          | 22.22%         | 10^6 * 3.151964   | 10^43 * 2.3409163772243214336        |
-| 1f        | 81          | 64          | 20.99%         | 10^7 * 1.6269895  | 10^45 * 1.1798218541210580025344     |
-| 2a        | 81          | 58          | 28.40%         | 10^0 * 1.         | 10^31 * 2.4563768857859261988864     |
-| 2b        | 81          | 60          | 25.93%         | 10^2 * 2.76       | 10^35 * 2.617180154844143016738816   |
-| 2b        | 81          | 62          | 23.46%         | 10^4 * 3.2128     | 10^39 * 5.54652776685109248          |
-| 2d        | 81          | 64          | 20.99%         | 10^6 * 1.014785   | 10^43 * 5.4366191037898352756785152  |
-| 2e        | 81          | 65          | 19.75%         | 10^6 * 7.38836    | 10^45 * 4.28133754423449527959683072 |
-| 2f        | 81          | 66          | 18.52%         | 10^7 * 4.8794239  | 10^47 * 5.09895408914038847535316992 |
+| 1a        | 81          | 53          | 34.57%         | 10^0 * 1.         | 10^25 * 4.312979991503409512448      |
+| 1b        | 81          | 59          | 27.16%         | 10^3 * 4.715      | 10^36 * 1.94775186325635072          |
+| 1c        | 81          | 61          | 24.69%         | 10^5 * 1.32271    | 10^40 * 1.3980445502865408           |
+| 1d        | 81          | 62          | 23.46%         | 10^5 * 5.87264    | 10^41 * 4.7784725839872              |
+| 1e        | 81          | 63          | 22.22%         | 10^6 * 3.151964   | 10^43 * 2.3409163772243214336        |
+| 1f        | 81          | 64          | 20.99%         | 10^7 * 1.6269895  | 10^45 * 1.1798218541210580025344     |
+| 2a        | 81          | 58          | 28.40%         | 10^0 * 1.         | 10^31 * 2.4563768857859261988864     |
+| 2b        | 81          | 60          | 25.93%         | 10^2 * 2.76       | 10^35 * 2.617180154844143016738816   |
+| 2b        | 81          | 62          | 23.46%         | 10^4 * 3.2128     | 10^39 * 5.54652776685109248          |
+| 2d        | 81          | 64          | 20.99%         | 10^6 * 1.014785   | 10^43 * 5.4366191037898352756785152  |
+| 2e        | 81          | 65          | 19.75%         | 10^6 * 7.38836    | 10^45 * 4.28133754423449527959683072 |
+| 2f        | 81          | 66          | 18.52%         | 10^7 * 4.8794239  | 10^47 * 5.09895408914038847535316992 |
 
-### Execution times
-<!-- Table or Graphs showing the execution times of each test. -->
-<!-- Which instances does require more time? -->
-<!-- Is there a correlation between the fill factor, the search space and execution time? -->
-
-### Speedups obtained
+### Benchmark results
 The benchmark reveled a speedup that grows almost linearly in relation to the
 number of cores.
 
@@ -377,6 +373,10 @@ matrix over all the data we gathered.
 While the sequential time depends linearly on the number of solution and
 unrelated to the number of cores, the factors that make up the parallel time and
 the speed up are more varied.
+
+<!-- Table or Graphs showing the execution times of each test. -->
+<!-- Which instances does require more time? -->
+<!-- Is there a correlation between the fill factor, the search space and execution time? -->
 
 The correlation matrix is muddled by the core count, thus we plotted several
 correlation matrices grouping the data by core count. On the right there is an
