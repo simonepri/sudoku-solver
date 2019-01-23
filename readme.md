@@ -17,23 +17,23 @@
 Sudoku is a popular puzzle game usually played on a 9x9 board of numbers between
 1 and 9.
 
-The goal of the game is to fill the board with numbers. However, each row can
+The goal of the game is to fill the board. However, each row can
 only contain one of each of the numbers between 1 and 9. Similarly, each column
-and 3x3 sub-board can only contain one of each of the numbers between 1 and 9.
+and 3x3 box can only contain one of each of the numbers between 1 and 9.
 This makes for an engaging and challenging puzzle game.
 
 A well-formed Sudoku puzzle is one that has a unique solution. A Sudoku puzzle,
 more in general, can have more than one solution and our goal is to enumerate
 them all, but this task is not always feasible. Indeed, if we were given an
 empty Sudoku table, we would have to enumerate
-[6670903752021072936960 solutions][ref:sudoku-board-num], and this would take
+[6670903752021072936960 solutions][ref:sudoku-board-num] and it would take us
 thousands of years.
 
 ### Definitions
 In the following sections, we will use some letters or words to refer to
 specific aspects of the Sudoku problem.
 
-The table that follows summarizes the most important.
+The table below summarizes the most important.
 
 Term              | Description
 ------------------|-------------
@@ -57,9 +57,10 @@ A typical algorithm to solve Sudoku boards is called
 cells of the Sudoku board.
 
 ### Sequential Backtracking
-The sequential algorithm, that can be found in
-[`src/main/java/sudoku/SequentialSolver.java`][source:sequential], is
-implemented iteratively and can be summarized by the following pseudo-code.
+The sequential algorithm is implemented iteratively, and it simply explores the
+tree of all the legal candidates' assignment of each empty cells.
+
+The pseudo-code that follows highlights its core parts.
 
 ```python
 def sequential_solutions_counter(board):
@@ -83,6 +84,8 @@ def sequential_solutions_counter(board):
 
   return count
 ```
+> The actual implementation can be found at
+[`src/main/java/sudoku/SequentialSolver.java`][source:sequential].
 
 It's important to notice that the strategy used to pick the empty cell by the
 `get_empty_cell` can lead to [significant reduction][ref:look-ahead] of the
@@ -99,10 +102,10 @@ behind their implementation can be found in the
 [implementation details](#implementation-details) section.
 
 ### Parallel Backtracking
-The parallel algorithm, that can be found in
-[`src/main/java/sudoku/ParallelSolver.java`][source:parallel], is
-implemented by parallelizing the recursive guesses of each empty cell and can be
-summarized by the following pseudo-code.
+The parallel algorithm is implemented by parallelizing the recursive guesses of
+each empty cell.
+
+The pseudo-code that follows highlight its core parts.
 
 ```python
 def parallel_solutions_counter(board, move):
@@ -125,6 +128,8 @@ def parallel_solutions_counter(board, move):
 
   return count
 ```
+> The actual implementation can be found at
+[`src/main/java/sudoku/ParallelSolver.java`][source:parallel].
 
 The considerations that have been given about the
 [sequential backtracking](#sequential-backtracking) also hold for the parallel
