@@ -172,10 +172,10 @@ The `get_candidates` operation has the job of returning the, possibly empty,
 list of valid values which can be legally placed in a particular empty cell.
 
 To accomplish this, one could simply iterate on the row, column, and box of the
-cell given searching for unused values. Doing this would cost us `O(3*S) + O(S)
-= O(S)`, and it's almost the best we can aim for this particular operation.
-"Almost", because we can remove the `O(3*S)` addend by keeping track of the
-used values on each row, column, and box of the board.
+cell given searching for unused values. Doing this would cost us
+`O(3*S) + O(S) = O(S)`, and it's almost the best we can aim for this particular
+operation. "Almost", because we can remove the `O(3*S)` addend by keeping track
+of the used values on each row, column, and box of the board.
 
 To do so, we keep a bit-set of `S` bits for each row, column, and box and each
 time a specific cell's value `v` is set we also set the bit at position `v - 1`
@@ -194,9 +194,9 @@ The `get_search_space_size` computes the search space as defined in the
 "[definitions](#definitions)" section.
 
 Intuitively, we can do something like the `get_candidates` to count the number
-of candidates instead of creating a list, and this would cost us `O(N) * O(S) =
-O(N * S)` but there's a tricky and memory hungry approach allows us to reduce
-the cost of the operation to just `O(N) * O(1) = O(N)`.
+of candidates instead of creating a list, and this would cost us
+`O(N) * O(S) = O(N * S)` but there's a tricky and memory hungry approach allows
+us to reduce the cost of the operation to just `O(N) * O(1) = O(N)`.
 
 Let's say that for a particular cell we want to count the candidates, then the
 state of the 3 bit-sets would be the following one.
@@ -258,8 +258,8 @@ To obtain the info, on each set operation we do three things:
 in `O(S) * O(1) = O(S)`.
 - For each row of the current box, we compare the number of candidates at the
 saved column index with the new number of candidates of all the columns of that
-box, and we update the saved column index for that row if needed in `O(B) * O(B)
-* O(1) = O(S) * O(1) = O(S)`.
+box, and we update the saved column index for that row if needed in
+`O(B) * O(B) * O(1) = O(S) * O(1) = O(S)`.
 - For each row, we compare the number of candidates at the saved column index
 with the new number of candidates of the current column, and we update the saved
 column index for that row and the saved row index if needed in `O(S) * O(1) =
@@ -311,8 +311,8 @@ switch to the sequential algorithm when the size of the problem becomes small
 enough. We will call that threshold problem size `sequential cut-off` or just
 `cut-off`.
 
-The way we can chose this value mostly depends on what we define as the `size of
-the problem`.
+The way we can chose this value mostly depends on what we define as the
+`size of the problem`.
 
 We experimented with the two following approaches:
 - The size of the problem is the number of empty cells to fill.
